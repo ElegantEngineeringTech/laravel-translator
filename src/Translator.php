@@ -92,7 +92,7 @@ class Translator
 
                 return $translations;
             }
-        );
+        )->only(array_keys($values));
     }
 
     public function setTranslation(
@@ -139,7 +139,7 @@ class Translator
 
                 return $translations;
             }
-        );
+        )->only($keys);
     }
 
     public function translateTranslation(

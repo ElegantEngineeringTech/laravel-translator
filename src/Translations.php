@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 /**
  * @extends Collection<string|int, array|string|int|float|null>
  */
-class Translations extends Collection
+final class Translations extends Collection
 {
     //
 
@@ -90,5 +90,19 @@ class Translations extends Collection
             ->diffKeys($translationsDotted)
             ->keys()
             ->toArray();
+    }
+
+    public function only($keys): static
+    {
+        return new static(
+            $this->toBase()->dot()->only($keys)->undot()
+        );
+    }
+
+    public function except($keys): static
+    {
+        return new static(
+            $this->toBase()->dot()->except($keys)->undot()
+        );
     }
 }

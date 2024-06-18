@@ -71,3 +71,29 @@ it('finds missing (nested) translations in another collections', function () {
         'f.a',
     ]);
 });
+
+it('filters (nested) translations using only', function () {
+    $translations = new Translations([
+        'a' => 'text',
+        'b' => 'text',
+        'c' => [
+            'a' => 'text',
+            'b' => 'text',
+        ],
+        'd' => 'text',
+        'e' => 'text',
+        'f' => [
+            'a' => 'text',
+        ],
+    ]);
+
+    expect(
+        $translations->only(['a', 'c.a', 'd'])->toArray()
+    )->toBe([
+        'a' => 'text',
+        'c' => [
+            'a' => 'text',
+        ],
+        'd' => 'text',
+    ]);
+});
