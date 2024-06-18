@@ -1,5 +1,34 @@
 <?php
 
-use VendorName\Skeleton\Tests\TestCase;
+use Elegantly\Translator\Tests\TestCase;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 uses(TestCase::class)->in(__DIR__);
+
+uses()->beforeEach(function () {
+    /** @var Filesystem $storage */
+    $storage = $this->getStorage();
+
+    foreach ($storage->allDirectories() as $locale) {
+        foreach ($storage->allFiles($locale) as $file) {
+            $storage->copy(
+                from: $file,
+                to: str_replace('.php', '.php.stub', $file),
+            );
+        }
+    }
+})->in('Feature');
+
+uses()->afterEach(function () {
+    /** @var Filesystem $storage */
+    $storage = $this->getStorage();
+
+    foreach ($storage->allDirectories() as $locale) {
+        foreach ($storage->allFiles($locale) as $file) {
+            $storage->move(
+                from: $file,
+                to: str_replace('.php.stub', '.php', $file),
+            );
+        }
+    }
+})->in('Feature');
