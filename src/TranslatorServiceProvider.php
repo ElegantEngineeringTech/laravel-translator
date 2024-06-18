@@ -47,10 +47,10 @@ class TranslatorServiceProvider extends PackageServiceProvider
         $service = config('translator.service');
 
         return match ($service) {
-            DeepLService::class => new DeepLService(
+            DeepLService::class, 'deepl' => new DeepLService(
                 key: config('translator.services.deepl.key')
             ),
-            OpenAiService::class => new OpenAiService(
+            OpenAiService::class, 'openai' => new OpenAiService(
                 model: config('translator.services.openai.model'),
                 prompt: config('translator.services.openai.prompt'),
             ),

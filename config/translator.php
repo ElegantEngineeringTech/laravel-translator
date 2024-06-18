@@ -3,7 +3,6 @@
 // config for Elegantly/Translator
 
 use Elegantly\Translator\Services\DeepLService;
-use Elegantly\Translator\Services\OpenAiService;
 
 return [
 
@@ -12,10 +11,10 @@ return [
     'service' => DeepLService::class,
 
     'services' => [
-        DeepLService::class => [
+        'deepl' => [
             'key' => env('DEEPL_KEY'),
         ],
-        OpenAiService::class => [
+        'openai' => [
             'model' => 'gpt-4o',
             'prompt' => 'Translate the following json to the locale {targetLocale} while preserving the keys.',
         ],
