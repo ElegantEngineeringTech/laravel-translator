@@ -58,9 +58,9 @@ class Translator
             return [
                 $target => collect($namespaces)->mapWithKeys(fn (string $namespace) => [
                     $namespace => $this->getMissingTranslations($referenceLocale, $target, $namespace),
-                ])->toArray(),
+                ])->filter(),
             ];
-        })->toArray();
+        })->filter()->toArray();
     }
 
     public function getMissingTranslations(
