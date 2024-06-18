@@ -34,7 +34,8 @@ class OpenAiService implements TranslatorServiceInterface
                     ],
                 ]);
 
-                $translations = json_decode($response->choices[0]->message->content);
+                $content = $response->choices[0]->message->content;
+                $translations = json_decode($content, true);
 
                 return $translations;
             })
