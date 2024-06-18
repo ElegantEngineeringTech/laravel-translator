@@ -46,7 +46,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
     public static function getTranslatorServiceFromConfig(?string $serviceName = null): TranslatorServiceInterface
     {
-        $service = config('translator.service');
+        $service = $serviceName ?? config('translator.service');
 
         return match ($service) {
             DeepLService::class, 'deepl' => new DeepLService(
