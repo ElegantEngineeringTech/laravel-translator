@@ -1,11 +1,11 @@
-# This is my package laravel-translator
+# Laravel Translator - All in one translations file manager
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 
-Manage all your laravel translations easily: Sort, find missing strings, translate automatically using DeepL, OpenAI, ...
+Manage all your laravel translations easily: Sort, find missing strings, translate automatically using DeepL, OpenAI or any custom service ...
 
 ## Installation
 
@@ -24,15 +24,35 @@ php artisan vendor:publish --tag="laravel-translator-config"
 This is the contents of the published config file:
 
 ```php
+use Elegantly\Translator\Services\DeepLService;
+use Elegantly\Translator\Services\OpenAiService;
+
 return [
+
+    'lang_path' => lang_path(),
+
+    'service' => DeepLService::class,
+
+    'services' => [
+        DeepLService::class => [
+            'key' => env('DEEPL_KEY'),
+        ],
+        OpenAiService::class => [
+            'model' => 'gpt-4o',
+            'prompt' => 'Translate the following json to the locale {targetLocale} while preserving the keys.',
+        ],
+    ],
 ];
 ```
 
 ## Usage
 
-```php
-$translator = new Elegantly\Translator();
-echo $translator->echoPhrase('Hello, Elegantly!');
+```bash
+php artisan translator:sort
+```
+
+```bash
+php artisan translator:missing fr
 ```
 
 ## Testing

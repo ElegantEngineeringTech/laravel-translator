@@ -9,7 +9,7 @@ class SortAllTranslationsCommand extends Command
 {
     public $signature = 'translator:sort';
 
-    public $description = 'My command';
+    public $description = 'Sort all translations using natural order';
 
     public function handle(): int
     {
