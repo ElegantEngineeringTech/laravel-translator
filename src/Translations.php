@@ -41,6 +41,7 @@ final class Translations extends Collection
      */
     public function toFile(
         ?array $items = null,
+        string $prefix = '',
     ): string {
         $items = $items ?? $this->items;
 
@@ -48,13 +49,21 @@ final class Translations extends Collection
 
         foreach ($items as $key => $value) {
             if (is_array($value)) {
-                $value = $this->toFile($value);
+                $value = $this->toFile($value, $prefix.'    ');
 
-                $output .= "\n    '{$key}' => [{$value}\n    ],";
+                if (is_string($key)) {
+                    $output .= "\n{$prefix}    '{$key}' => [{$value}\n    {$prefix}],";
+                } else {
+                    $output .= "\n{$prefix}    [{$value}\n    {$prefix}],";
+                }
             } else {
                 $value = str_replace('\"', '"', addslashes($value));
 
-                $output .= "\n    '{$key}' => '{$value}',";
+                if (is_string($key)) {
+                    $output .= "\n{$prefix}    '{$key}' => '{$value}',";
+                } else {
+                    $output .= "\n{$prefix}    '{$value}',";
+                }
             }
         }
 
