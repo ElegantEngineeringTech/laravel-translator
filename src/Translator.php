@@ -127,7 +127,7 @@ class Translator
     ): Translations {
         $service = $service ?? $this->translateService;
 
-        if (!$service) {
+        if (! $service) {
             throw TranslatorServiceException::missingTranslateService();
         }
 
@@ -144,7 +144,7 @@ class Translator
 
                 $referenceValues = collect($keys)
                     ->mapWithKeys(fn (string $key) => [$key => $referenceTranslations->get($key)])
-                    ->filter(fn ($value) => !blank($value))
+                    ->filter(fn ($value) => ! blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(
