@@ -4,6 +4,7 @@ namespace Elegantly\Translator;
 
 use Elegantly\Translator\Commands\ShowMissingTranslationsCommand;
 use Elegantly\Translator\Commands\SortAllTranslationsCommand;
+use Elegantly\Translator\Commands\TranslateTranslationsCommand;
 use Elegantly\Translator\Services\DeepLService;
 use Elegantly\Translator\Services\OpenAiService;
 use Elegantly\Translator\Services\TranslatorServiceInterface;
@@ -26,6 +27,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 ShowMissingTranslationsCommand::class,
                 SortAllTranslationsCommand::class,
+                TranslateTranslationsCommand::class,
             ]);
     }
 
