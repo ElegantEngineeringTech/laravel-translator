@@ -3,19 +3,25 @@
 namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
+use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Console\Command;
 
 class TranslateTranslationsCommand extends Command
 {
-    public $signature = 'translator:translate {--from=} {--to=} {--all}';
+    public $signature = 'translator:translate {--from=} {--to=} {--all} {--service}';
 
     public $description = 'Translate translations from the given locale to the target one.';
 
     public function handle(): int
     {
-        $from = (string) $this->argument('from');
-        $to = $this->argument('to');
-        $all = (bool) $this->argument('all');
+        $from = (string) $this->option('from');
+        $to = $this->option('to');
+        $all = (bool) $this->option('all');
+        $serviceName = $this->option('service');
+
+        $service = $serviceName
+            ? TranslatorServiceProvider::getTranslatorServiceFromConfig((string) $serviceName)
+            : null;
 
         $namespaces = Translator::getNamespaces($from);
 
@@ -41,7 +47,8 @@ class TranslateTranslationsCommand extends Command
                     $from,
                     $target,
                     $namespace,
-                    $keys
+                    $keys,
+                    $service
                 );
 
                 $this->table(

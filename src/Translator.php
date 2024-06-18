@@ -111,15 +111,18 @@ class Translator
         string $targetLocale,
         string $namespace,
         array $keys,
+        ?TranslatorServiceInterface $service = null,
     ): Translations {
-        if (! $this->service) {
+        $service = $service ?? $this->service;
+
+        if (! $service) {
             throw TranslatorServiceException::missing();
         }
 
         return $this->transformTranslations(
             $targetLocale,
             $namespace,
-            function (Translations $translations) use ($referenceLocale, $targetLocale, $namespace, $keys) {
+            function (Translations $translations) use ($referenceLocale, $targetLocale, $namespace, $keys, $service) {
 
                 $referenceTranslations = $this->getTranslations($referenceLocale, $namespace);
 
@@ -128,7 +131,7 @@ class Translator
                     ->filter(fn ($value) => ! blank($value))
                     ->toArray();
 
-                $translatedValues = $this->service->translateAll(
+                $translatedValues = $service->translateAll(
                     $referenceValues,
                     $targetLocale
                 );

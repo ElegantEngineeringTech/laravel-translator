@@ -39,12 +39,12 @@ class TranslatorServiceProvider extends PackageServiceProvider
                     'driver' => 'local',
                     'root' => config('translator.lang_path'),
                 ]),
-                service: $this->getTranslatorService()
+                service: static::getTranslatorServiceFromConfig()
             );
         });
     }
 
-    public function getTranslatorService(): TranslatorServiceInterface
+    public static function getTranslatorServiceFromConfig(?string $serviceName = null): TranslatorServiceInterface
     {
         $service = config('translator.service');
 
