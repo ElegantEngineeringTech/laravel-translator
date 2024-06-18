@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class TranslateTranslationsCommand extends Command
 {
-    public $signature = 'translator:translate {--from=} {--to=} {--all} {--service}';
+    public $signature = 'translator:translate {--from=} {--to=} {--service=} {--all} ';
 
     public $description = 'Translate translations from the given locale to the target one.';
 
@@ -29,7 +29,7 @@ class TranslateTranslationsCommand extends Command
 
         foreach ($targets as $target) {
 
-            $this->info("Translating from {$from} to {$target}:");
+            $this->info("Translating from '{$from}' to '{$target}':");
 
             foreach ($namespaces as $namespace) {
 
@@ -39,7 +39,7 @@ class TranslateTranslationsCommand extends Command
                     $keys = Translator::getMissingTranslations($from, $target, $namespace);
                 }
 
-                if (! $this->confirm(count($keys)." found for {$target}.{$namespace}, would you like to continue?")) {
+                if (! $this->confirm(count($keys)." keys to translate found in {$target}.{$namespace}.php, would you like to continue?", true)) {
                     continue;
                 }
 

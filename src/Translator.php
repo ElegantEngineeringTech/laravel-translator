@@ -82,6 +82,11 @@ class Translator
         string $namespace,
         array $values
     ): Translations {
+
+        if (count($values) === 0) {
+            return new Translations();
+        }
+
         return $this->transformTranslations(
             $locale,
             $namespace,
@@ -117,6 +122,10 @@ class Translator
 
         if (! $service) {
             throw TranslatorServiceException::missing();
+        }
+
+        if (count($keys) === 0) {
+            return new Translations();
         }
 
         return $this->transformTranslations(
