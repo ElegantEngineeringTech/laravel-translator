@@ -1,7 +1,10 @@
 {
-    "name": "elegantengineeringtech/laravel-translator",
-    "description": "This is my package laravel-translator",
+    "name": "elegantly/laravel-translator",
+    "description": "All on one translations management for Laravel",
     "keywords": [
+        "laravel-translations",
+        "laravel",
+        "elegantly",
         "ElegantEngineering",
         "laravel",
         "laravel-translator"
