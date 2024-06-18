@@ -1,12 +1,12 @@
 <?php
 
-namespace Elegantly\Translator\Services;
+namespace Elegantly\Translator\Services\Translate;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use OpenAI\Laravel\Facades\OpenAI;
 
-class OpenAiService implements TranslatorServiceInterface
+class OpenAiService implements TranslateServiceInterface
 {
     public function __construct(
         public string $model,

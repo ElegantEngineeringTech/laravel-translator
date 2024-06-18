@@ -1,8 +1,8 @@
 <?php
 
-namespace Elegantly\Translator\Services;
+namespace Elegantly\Translator\Services\Translate;
 
-interface TranslatorServiceInterface
+interface TranslateServiceInterface
 {
     public function translateAll(array $texts, string $targetLocale): array;
 

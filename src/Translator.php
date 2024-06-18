@@ -4,7 +4,8 @@ namespace Elegantly\Translator;
 
 use Elegantly\Translator\Exceptions\TranslatorException;
 use Elegantly\Translator\Exceptions\TranslatorServiceException;
-use Elegantly\Translator\Services\TranslatorServiceInterface;
+use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
+use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 
@@ -12,7 +13,8 @@ class Translator
 {
     public function __construct(
         public Filesystem $storage,
-        public ?TranslatorServiceInterface $service = null,
+        public ?TranslateServiceInterface $translateService = null,
+        public ?GrammarServiceInterface $grammarService = null,
     ) {
         //
     }
@@ -121,12 +123,12 @@ class Translator
         string $targetLocale,
         string $namespace,
         array $keys,
-        ?TranslatorServiceInterface $service = null,
+        ?TranslateServiceInterface $service = null,
     ): Translations {
-        $service = $service ?? $this->service;
+        $service = $service ?? $this->translateService;
 
-        if (! $service) {
-            throw TranslatorServiceException::missing();
+        if (!$service) {
+            throw TranslatorServiceException::missingTranslateService();
         }
 
         if (count($keys) === 0) {
@@ -142,7 +144,7 @@ class Translator
 
                 $referenceValues = collect($keys)
                     ->mapWithKeys(fn (string $key) => [$key => $referenceTranslations->get($key)])
-                    ->filter(fn ($value) => ! blank($value))
+                    ->filter(fn ($value) => !blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(

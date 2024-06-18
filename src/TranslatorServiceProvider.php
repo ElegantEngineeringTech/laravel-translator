@@ -5,9 +5,11 @@ namespace Elegantly\Translator;
 use Elegantly\Translator\Commands\ShowMissingTranslationsCommand;
 use Elegantly\Translator\Commands\SortAllTranslationsCommand;
 use Elegantly\Translator\Commands\TranslateTranslationsCommand;
-use Elegantly\Translator\Services\DeepLService;
-use Elegantly\Translator\Services\OpenAiService;
-use Elegantly\Translator\Services\TranslatorServiceInterface;
+use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
+use Elegantly\Translator\Services\Grammar\OpenAiService as GrammarOpenAiService;
+use Elegantly\Translator\Services\Translate\DeepLService;
+use Elegantly\Translator\Services\Translate\OpenAiService;
+use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -39,24 +41,39 @@ class TranslatorServiceProvider extends PackageServiceProvider
                     'driver' => 'local',
                     'root' => config('translator.lang_path'),
                 ]),
-                service: static::getTranslatorServiceFromConfig()
+                translateService: static::getTranslateServiceFromConfig(),
+                grammarService: static::getGrammarServiceFromConfig(),
             );
         });
     }
 
-    public static function getTranslatorServiceFromConfig(?string $serviceName = null): TranslatorServiceInterface
+    public static function getTranslateServiceFromConfig(?string $serviceName = null): TranslateServiceInterface
     {
-        $service = $serviceName ?? config('translator.service');
+        $service = $serviceName ?? config('translator.translate.service');
 
         return match ($service) {
-            DeepLService::class, 'deepl' => new DeepLService(
-                key: config('translator.services.deepl.key')
+            'deepl', DeepLService::class => new DeepLService(
+                key: config('translator.translate.services.deepl.key')
             ),
-            OpenAiService::class, 'openai' => new OpenAiService(
-                model: config('translator.services.openai.model'),
-                prompt: config('translator.services.openai.prompt'),
+            'openai', OpenAiService::class => new OpenAiService(
+                model: config('translator.translate.services.openai.model'),
+                prompt: config('translator.translate.services.openai.prompt'),
             ),
-            null, '' => null,
+            '', null => null,
+            default => new $service(),
+        };
+    }
+
+    public static function getGrammarServiceFromConfig(?string $serviceName = null): GrammarServiceInterface
+    {
+        $service = $serviceName ?? config('translator.grammar.service');
+
+        return match ($service) {
+            'openai', GrammarOpenAiService::class => new GrammarOpenAiService(
+                model: config('translator.grammar.services.openai.model'),
+                prompt: config('translator.grammar.services.openai.prompt'),
+            ),
+            '', null => null,
             default => new $service(),
         };
     }

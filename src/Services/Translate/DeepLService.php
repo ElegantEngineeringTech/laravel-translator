@@ -1,12 +1,12 @@
 <?php
 
-namespace Elegantly\Translator\Services;
+namespace Elegantly\Translator\Services\Translate;
 
 use DeepL\TextResult;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-class DeepLService implements TranslatorServiceInterface
+class DeepLService implements TranslateServiceInterface
 {
     public function __construct(
         public string $key

@@ -5,7 +5,13 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 
-Manage all your laravel translations easily: Sort, find missing strings, translate automatically using DeepL, OpenAI or any custom service ...
+Manage all your laravel translations easily:
+
+-   Sort tranlations array in natural order
+-   Find missing translations strings
+-   Translate automatically string to other languages (DeepL, OpenAI or any custom service)
+-   Fix Grammar and syntax in your translations (OpenAI, or any custome service)
+-   Format your translations files
 
 ## Installation
 
@@ -24,8 +30,6 @@ php artisan vendor:publish --tag="translator-config"
 This is the contents of the published config file:
 
 ```php
-use Elegantly\Translator\Services\DeepLService;
-use Elegantly\Translator\Services\OpenAiService;
 
 return [
 
@@ -47,9 +51,19 @@ return [
 
 ## Usage
 
+You can use the package like a CLI tool with the following command:
+
+### Sort all translations in natural order
+
+You can format and sort all your php translations files using:
+
 ```bash
 php artisan translator:sort
 ```
+
+### Finnd the missing translations
+
+You can display all the missing translations present in a given locale but not in the other ones using:
 
 ```bash
 php artisan translator:missing fr

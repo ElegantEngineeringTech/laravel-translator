@@ -20,7 +20,7 @@ class TranslateTranslationsCommand extends Command
         $serviceName = $this->option('service');
 
         $service = $serviceName
-            ? TranslatorServiceProvider::getTranslatorServiceFromConfig((string) $serviceName)
+            ? TranslatorServiceProvider::getTranslateServiceFromConfig((string) $serviceName)
             : null;
 
         $namespaces = Translator::getNamespaces($from);

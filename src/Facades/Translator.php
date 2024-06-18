@@ -2,7 +2,7 @@
 
 namespace Elegantly\Translator\Facades;
 
-use Elegantly\Translator\Services\TranslatorServiceInterface;
+use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Elegantly\Translator\Translations;
 use Illuminate\Support\Facades\Facade;
 
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array<int, string> getNamespaces(string $locale)
  * @method static Translations getTranslations(string $locale, string $namespace)
  * @method static Translations sortTranslations(string $locale, string $namespace)
- * @method static Translations translateTranslations(string $referenceLocale, string $targetLocale, string $namespace, array $keys, ?TranslatorServiceInterface $service)
+ * @method static Translations translateTranslations(string $referenceLocale, string $targetLocale, string $namespace, array $keys, ?TranslateServiceInterface $service)
  * @method static array<int, string> getMissingTranslations(string $referenceLocale, string $targetLocale, string $namespace)
  * @method static array getAllMissingTranslations(string $referenceLocale)
  * @method static void sortAllTranslations()
