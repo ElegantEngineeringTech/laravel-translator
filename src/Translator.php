@@ -19,7 +19,10 @@ class Translator
 
     public function getLanguages(): array
     {
-        return $this->storage->allDirectories();
+        return collect($this->storage->allDirectories())
+            ->sort(SORT_NATURAL)
+            ->values()
+            ->toArray();
     }
 
     public function getNamespaces(string $locale): array
@@ -27,6 +30,8 @@ class Translator
         return collect($this->storage->allFiles($locale))
             ->filter(fn (string $file) => File::extension($file) === 'php')
             ->map(fn (string $file) => File::name($file))
+            ->sort(SORT_NATURAL)
+            ->values()
             ->toArray();
     }
 
@@ -120,7 +125,7 @@ class Translator
     ): Translations {
         $service = $service ?? $this->service;
 
-        if (! $service) {
+        if (!$service) {
             throw TranslatorServiceException::missing();
         }
 
@@ -137,7 +142,7 @@ class Translator
 
                 $referenceValues = collect($keys)
                     ->mapWithKeys(fn (string $key) => [$key => $referenceTranslations->get($key)])
-                    ->filter(fn ($value) => ! blank($value))
+                    ->filter(fn ($value) => !blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(

@@ -16,6 +16,7 @@ class SortAllTranslationsCommand extends Command
         $locales = Translator::getLanguages();
 
         foreach ($locales as $locale) {
+            $this->newLine();
             $this->info("Sorting {$locale}");
 
             $this->withProgressBar(

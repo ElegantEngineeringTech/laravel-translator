@@ -7,7 +7,7 @@ it('gets languages', function () {
         storage: $this->getStorage(),
     );
 
-    expect($translator->getLanguages())->toBe(['fr', 'en']);
+    expect($translator->getLanguages())->toBe(['en', 'fr']);
 });
 
 it('gets namespaces', function () {
