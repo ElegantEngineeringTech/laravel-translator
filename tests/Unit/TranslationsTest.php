@@ -35,3 +35,39 @@ it('sorts translations and nested translations', function () {
         'd' => null,
     ]);
 });
+
+it('finds missing (nested) translations in another collections', function () {
+    $translations = new Translations([
+        'a' => 'text',
+        'b' => 'text',
+        'c' => [
+            'a' => 'text',
+            'b' => 'text',
+        ],
+        'd' => 'text',
+        'e' => 'text',
+        'f' => [
+            'a' => 'text',
+        ],
+    ]);
+
+    $missingTranslations = $translations->getMissingTranslationsIn(
+        new Translations([
+            'a' => 'text',
+            'c' => [
+                'b' => 'text',
+            ],
+            'd' => '',
+            'e' => null,
+            'f' => [],
+        ])
+    );
+
+    expect($missingTranslations)->toBe([
+        'b',
+        'c.a',
+        'd',
+        'e',
+        'f.a',
+    ]);
+});

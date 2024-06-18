@@ -3,6 +3,7 @@
 namespace Elegantly\Translator\Services;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use OpenAI\Laravel\Facades\OpenAI;
 
 class OpenAiService implements TranslatorServiceInterface
@@ -16,25 +17,28 @@ class OpenAiService implements TranslatorServiceInterface
 
     public function translateAll(array $texts, string $targetLocale): array
     {
-        $response = OpenAI::chat()->create([
-            'model' => $this->model,
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => str_replace('{targetLocale}', $targetLocale, $this->prompt),
-                ],
-                [
-                    'role' => 'user',
-                    'content' => json_encode($texts),
-                ],
-            ],
-        ]);
+        return collect($texts)
+            ->chunk(50)
+            ->flatMap(function (Collection $chunk) use ($targetLocale) {
+                $response = OpenAI::chat()->create([
+                    'model' => $this->model,
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => str_replace('{targetLocale}', $targetLocale, $this->prompt),
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => json_encode($chunk),
+                        ],
+                    ],
+                ]);
 
-        $translations = $response->choices[0]->message->content;
+                $translations = json_decode($response->choices[0]->message->content);
 
-        return array_map(function (?string $textResult) {
-            return $textResult;
-        }, Arr::wrap($translations));
+                return $translations;
+            })
+            ->toArray();
     }
 
     public function translate(string $text, string $targetLocale): ?string

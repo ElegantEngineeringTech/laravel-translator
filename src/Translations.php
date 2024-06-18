@@ -80,4 +80,15 @@ class Translations extends Collection
 
         return $items;
     }
+
+    public function getMissingTranslationsIn(Translations $translations): array
+    {
+        $dotted = $this->dot()->toBase();
+        $translationsDotted = $translations->dot()->filter(fn ($item) => ! blank($item))->toBase();
+
+        return $dotted
+            ->diffKeys($translationsDotted)
+            ->keys()
+            ->toArray();
+    }
 }

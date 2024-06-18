@@ -71,42 +71,7 @@ class Translator
         $referenceTranslations = $this->getTranslations($referenceLocale, $namespace);
         $targetTranslations = $this->getTranslations($targetLocale, $namespace);
 
-        return $this->recursivelyGetMissingTranslation($referenceTranslations, $targetTranslations);
-    }
-
-    protected function recursivelyGetMissingTranslation(
-        Translations $referenceTranslations,
-        Translations $targetTranslations,
-        ?string $path = null
-    ): array {
-        $missingTranslations = [];
-
-        foreach ($referenceTranslations as $key => $referenceValue) {
-            $newPath = (string) ($path ? "{$path}.{$key}" : $key);
-
-            $targetValue = $targetTranslations->get($key);
-
-            if (
-                gettype($referenceValue) !== gettype($targetValue) ||
-                $targetValue === null ||
-                $targetValue === ''
-            ) {
-                $missingTranslations[] = $newPath;
-            }
-
-            if (is_array($referenceValue)) {
-                $missingTranslations = [
-                    ...$missingTranslations,
-                    ...$this->recursivelyGetMissingTranslation(
-                        new Translations($referenceValue),
-                        new Translations(is_array($targetValue) ? $targetValue : []),
-                        $newPath
-                    ),
-                ];
-            }
-        }
-
-        return $missingTranslations;
+        return $referenceTranslations->getMissingTranslationsIn($targetTranslations);
     }
 
     /**
