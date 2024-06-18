@@ -18,7 +18,7 @@ composer require-dev elegantly/laravel-translator
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-translator-config"
+php artisan vendor:publish --tag="translator-config"
 ```
 
 This is the contents of the published config file:
