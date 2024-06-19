@@ -14,18 +14,18 @@ class SortAllTranslationsCommand extends Command
 
     public function handle(): int
     {
-        $namespacesArg = explode(',', (string) $this->option('namespaces'));
-        $localesArg = explode(',', (string) $this->option('locales'));
+        $namespacesArg = $this->option('namespaces');
+        $localesArg = $this->option('locales');
 
         $locales = collect(Translator::getLanguages())
-            ->when($localesArg, fn (Collection $items) => $items->intersect($localesArg));
+            ->when($localesArg, fn (Collection $items) => $items->intersect(explode(',', $localesArg)));
 
         foreach ($locales as $locale) {
             $this->newLine();
             $this->info("Sorting {$locale}");
 
             $namespaces = collect(Translator::getNamespaces($locale))
-                ->when($namespacesArg, fn (Collection $items) => $items->intersect($namespacesArg));
+                ->when($namespacesArg, fn (Collection $items) => $items->intersect(explode(',', $namespacesArg)));
 
             $this->withProgressBar(
                 $namespaces,

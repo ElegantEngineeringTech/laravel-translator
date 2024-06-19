@@ -276,11 +276,11 @@ class Translator
         string $namespace,
         Translations $translations,
     ): bool {
-        $content = "<?php \n\nreturn [";
+        $content = "<?php\n\nreturn [";
 
         $content .= $translations->toFile();
 
-        $content .= "\n];";
+        $content .= "\n];\n";
 
         return $this->storage->put(
             "{$locale}/{$namespace}.php",
