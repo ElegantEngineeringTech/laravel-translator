@@ -16,17 +16,17 @@ class FixGrammarTranslationsCommand extends Command
     public function handle(): int
     {
         $serviceArg = $this->option('service');
-        $localesArg = explode(',', (string) $this->option('locales'));
+        $localesArg = $this->option('locales');
 
         $service = TranslatorServiceProvider::getGrammarServiceFromConfig($serviceArg);
 
         $locales = collect(Translator::getLanguages())
-            ->when($localesArg, fn (Collection $items) => $items->intersect($localesArg));
+            ->when($localesArg, fn (Collection $items) => $items->intersect(explode(',', $localesArg)));
 
         foreach ($locales as $locale) {
 
             $this->info("Fixing grammar in '{$locale}' locale:");
-            $this->line('Using service '.get_class($service));
+            $this->line('Using service :'.get_class($service));
 
             $namespaces = Translator::getNamespaces($locale);
 

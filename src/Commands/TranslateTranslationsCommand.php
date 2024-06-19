@@ -19,9 +19,7 @@ class TranslateTranslationsCommand extends Command
         $all = (bool) $this->option('all');
         $serviceName = $this->option('service');
 
-        $service = $serviceName
-            ? TranslatorServiceProvider::getTranslateServiceFromConfig((string) $serviceName)
-            : null;
+        $service = TranslatorServiceProvider::getTranslateServiceFromConfig($serviceName);
 
         $namespaces = Translator::getNamespaces($from);
 
@@ -30,9 +28,7 @@ class TranslateTranslationsCommand extends Command
         foreach ($targets as $target) {
 
             $this->info("Translating from '{$from}' to '{$target}':");
-            if ($service) {
-                $this->line('Using custom service '.get_class($service));
-            }
+            $this->line('Using service: '.get_class($service));
 
             foreach ($namespaces as $namespace) {
 
