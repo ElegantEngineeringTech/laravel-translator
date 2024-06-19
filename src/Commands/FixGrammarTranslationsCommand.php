@@ -16,18 +16,17 @@ class FixGrammarTranslationsCommand extends Command
     public function handle(): int
     {
         $serviceArg = $this->option('service');
-        $localesArg = explode(",", (string) $this->option('locales'));
+        $localesArg = explode(',', (string) $this->option('locales'));
 
         $service = TranslatorServiceProvider::getGrammarServiceFromConfig($serviceArg);
 
         $locales = collect(Translator::getLanguages())
             ->when($localesArg, fn (Collection $items) => $items->intersect($localesArg));
 
-
         foreach ($locales as $locale) {
 
             $this->info("Fixing grammar in '{$locale}' locale:");
-            $this->line('Using service ' . get_class($service));
+            $this->line('Using service '.get_class($service));
 
             $namespaces = Translator::getNamespaces($locale);
 
@@ -38,8 +37,8 @@ class FixGrammarTranslationsCommand extends Command
                     ->keys()
                     ->toArray();
 
-                $this->line(count($keys) . " keys to fix found in {$locale}/{$namespace}.php");
-                if (!$this->confirm("Would you like to continue?", true)) {
+                $this->line(count($keys)." keys to fix found in {$locale}/{$namespace}.php");
+                if (! $this->confirm('Would you like to continue?', true)) {
                     continue;
                 }
 
