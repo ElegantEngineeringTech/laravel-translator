@@ -51,7 +51,10 @@ return [
 
 ## Usage
 
-You can use the package like a CLI tool with the following command:
+This package can be used:
+
+-   Like a CLI tool, using commands.
+-   In a programmatic way using `\Elegantly\Translator\Facades\Translator::class` facade class.
 
 ### Sort all translations in natural order
 
@@ -61,12 +64,78 @@ You can format and sort all your php translations files using:
 php artisan translator:sort
 ```
 
-### Finnd the missing translations
+```php
+use Elegantly\Translator\Facades\Translator;
+
+Translator::sortAllTranslations();
+```
+
+### Find the missing translations
 
 You can display all the missing translations present in a given locale but not in the other ones using:
 
 ```bash
 php artisan translator:missing fr
+```
+
+```php
+use Elegantly\Translator\Facades\Translator;
+
+Translator::getAllMissingTranslations('fr');
+```
+
+### Auto translate strings
+
+This package can automatically translate your files for you.
+It includes 2 services right now:
+
+-   DeepL
+-   OpenAI
+
+You can also define your own service.
+
+### Auto-translate using DeepL
+
+First, you need to edit the config file to add your DeepL api key and select deepl as your service:
+
+```php
+return [
+    'translate' => [
+        'service' => 'deepl', // select the default service here
+
+        'services' => [
+            'deepl' => [
+                'key' => env('DEEPL_KEY'), // add you api key here
+            ],
+
+        ],
+    ],
+]
+```
+
+To translate all the missing translations use:
+
+```bash
+php artisan translator:translate --from=fr --to=en
+```
+
+To translate all translations use:
+
+```bash
+php artisan translator:translate --from=fr --to=en --all
+```
+
+Ommitting the `--to` option will translate to every available languages in your project.
+
+```php
+use Elegantly\Translator\Facades\Translator;
+
+Translator::translateTranslations(
+    referenceLocale: 'fr',
+    targetLocale: 'en',
+    namespace: 'namespace-file',
+    keys: ['title', ...]
+);
 ```
 
 ## Testing

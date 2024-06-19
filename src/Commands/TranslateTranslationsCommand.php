@@ -31,7 +31,7 @@ class TranslateTranslationsCommand extends Command
 
             $this->info("Translating from '{$from}' to '{$target}':");
             if ($service) {
-                $this->line('Using custom service '.get_class($service));
+                $this->line('Using custom service ' . get_class($service));
             }
 
             foreach ($namespaces as $namespace) {
@@ -42,7 +42,7 @@ class TranslateTranslationsCommand extends Command
                     $keys = Translator::getMissingTranslations($from, $target, $namespace);
                 }
 
-                if (! $this->confirm(count($keys)." keys to translate found in {$target}.{$namespace}.php, would you like to continue?", true)) {
+                if (!$this->confirm(count($keys) . " keys to translate found in {$target}/{$namespace}.php, would you like to continue?", true)) {
                     continue;
                 }
 

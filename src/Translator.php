@@ -142,8 +142,9 @@ class Translator
 
                 $referenceTranslations = $this->getTranslations($referenceLocale, $namespace);
 
-                $referenceValues = collect($keys)
-                    ->mapWithKeys(fn (string $key) => [$key => $referenceTranslations->get($key)])
+                $referenceValues = $referenceTranslations
+                    ->dot()
+                    ->only($keys)
                     ->filter(fn ($value) => ! blank($value))
                     ->toArray();
 
@@ -159,6 +160,35 @@ class Translator
                 return $translations;
             }
         )->only($keys);
+    }
+
+    public function fixGrammarTranslations(
+        string $locale,
+        string $namespace,
+        array $keys,
+        ?GrammarServiceInterface $service = null,
+    ): Translations {
+        $service = $service ?? $this->grammarService;
+
+        if (! $service) {
+            throw TranslatorServiceException::missingGrammarService();
+        }
+
+        return $this->transformTranslations($locale, $namespace, function (Translations $translations) use ($service, $keys) {
+
+            $fixedTranslations = $service->fixAll(
+                texts: $translations->dot()
+                    ->only($keys)
+                    ->filter(fn ($value) => ! blank($value))
+                    ->toArray()
+            );
+
+            foreach ($fixedTranslations as $key => $value) {
+                $translations->set($key, $value);
+            }
+
+            return $translations;
+        });
     }
 
     public function translateTranslation(
