@@ -7,7 +7,7 @@ return [
     'lang_path' => lang_path(),
 
     'translate' => [
-        'service' => 'deepl',
+        'service' => 'openai',
         'services' => [
             'deepl' => [
                 'key' => env('DEEPL_KEY'),
@@ -25,8 +25,11 @@ return [
             'openai' => [
                 'model' => 'gpt-4o',
                 'prompt' => '
-                            Fix the grammar and the syntax the following json string while preserving the keys.
-                            Do not change the meaning or the tone of the sentences and never change the keys.
+                            Fix the grammar and the syntax the following json string while respecting the following rules:
+                                - Never change the keys.
+                                - Do not escape nor change HTML tags.
+                                - Do not escape nor change special characters or emojis.
+                                - Do not change the meaning or the tone of the sentences.
                             ',
             ],
         ],
