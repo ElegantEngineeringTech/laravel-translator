@@ -23,6 +23,7 @@ class TranslateTranslationsCommand extends Command
         $service = $this->getTranslateService($this->option('service'));
         $targets = $this->getLocales(
             option: $this->option('to'),
+            options: array_diff(Translator::getLanguages(), [$from]),
             label: 'In what locales would you like to translate?'
         );
 

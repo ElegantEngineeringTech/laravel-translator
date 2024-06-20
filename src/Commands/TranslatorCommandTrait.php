@@ -14,9 +14,10 @@ trait TranslatorCommandTrait
 {
     public function getLocales(
         mixed $option,
+        ?array $options = null,
         ?string $label = null
     ): array {
-        $availableLocales = Translator::getLanguages();
+        $availableLocales = $options ?? Translator::getLanguages();
 
         if ($option) {
             if (is_array($option)) {
