@@ -5,6 +5,8 @@ namespace Elegantly\Translator\Commands;
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
 
+use function Laravel\Prompts\spin;
+
 class TranslateTranslationsCommand extends Command
 {
     use TranslatorCommandTrait;
@@ -49,12 +51,15 @@ class TranslateTranslationsCommand extends Command
                     continue;
                 }
 
-                $translations = Translator::translateTranslations(
-                    $from,
-                    $target,
-                    $namespace,
-                    $keys,
-                    $service
+                $translations = spin(
+                    fn () => Translator::translateTranslations(
+                        $from,
+                        $target,
+                        $namespace,
+                        $keys,
+                        $service
+                    ),
+                    'Fetching response...'
                 );
 
                 $this->table(

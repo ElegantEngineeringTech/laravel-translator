@@ -5,6 +5,8 @@ namespace Elegantly\Translator\Commands;
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
 
+use function Laravel\Prompts\spin;
+
 class FixGrammarTranslationsCommand extends Command
 {
     use TranslatorCommandTrait;
@@ -45,11 +47,14 @@ class FixGrammarTranslationsCommand extends Command
                     continue;
                 }
 
-                $translations = Translator::fixGrammarTranslations(
-                    $locale,
-                    $namespace,
-                    $keys,
-                    $service
+                $translations = spin(
+                    fn () => Translator::fixGrammarTranslations(
+                        $locale,
+                        $namespace,
+                        $keys,
+                        $service
+                    ),
+                    'Fetching response...'
                 );
 
                 $this->table(
