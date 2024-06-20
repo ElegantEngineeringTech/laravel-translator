@@ -26,8 +26,7 @@ return [
                 'model' => 'gpt-4o',
                 'prompt' => '
                             Fix the grammar and the syntax the following json string while preserving the keys.
-                            Do not change the meaning or the tone of the sentences.
-                            Your answer must always be a valid and parsable json string.
+                            Do not change the meaning or the tone of the sentences and never change the keys.
                             ',
             ],
         ],
