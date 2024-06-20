@@ -14,10 +14,7 @@ return [
             ],
             'openai' => [
                 'model' => 'gpt-4o',
-                'prompt' => "
-                            Translate the following json to the locale '{targetLocale}' while preserving the keys.
-                            Your answer must always be a valid and parsable json string.
-                            ",
+                'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
             ],
         ],
     ],

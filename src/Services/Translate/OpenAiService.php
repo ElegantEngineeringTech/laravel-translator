@@ -22,6 +22,7 @@ class OpenAiService implements TranslateServiceInterface
             ->flatMap(function (Collection $chunk) use ($targetLocale) {
                 $response = OpenAI::chat()->create([
                     'model' => $this->model,
+                    'response_format' => ['type' => 'json_object'],
                     'messages' => [
                         [
                             'role' => 'system',

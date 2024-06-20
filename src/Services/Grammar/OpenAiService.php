@@ -22,6 +22,7 @@ class OpenAiService implements GrammarServiceInterface
             ->flatMap(function (Collection $chunk) {
                 $response = OpenAI::chat()->create([
                     'model' => $this->model,
+                    'response_format' => ['type' => 'json_object'],
                     'messages' => [
                         [
                             'role' => 'system',
