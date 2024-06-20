@@ -38,8 +38,11 @@ class FixGrammarTranslationsCommand extends Command
                     ->toArray();
 
                 $this->line(count($keys)." keys to fix found in {$locale}/{$namespace}.php");
-                if (! $this->confirm('Would you like to continue?', true)) {
-                    continue;
+
+                if (count($keys)) {
+                    if (! $this->confirm('Would you like to continue?', true)) {
+                        continue;
+                    }
                 }
 
                 $translations = Translator::fixGrammarTranslations(

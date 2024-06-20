@@ -38,8 +38,12 @@ class TranslateTranslationsCommand extends Command
                     $keys = Translator::getMissingTranslations($from, $target, $namespace);
                 }
 
-                if (! $this->confirm(count($keys)." keys to translate found in {$target}/{$namespace}.php, would you like to continue?", true)) {
-                    continue;
+                $this->line(count($keys)." keys to translate found in {$target}/{$namespace}.php");
+
+                if (count($keys)) {
+                    if (! $this->confirm('Would you like to continue?', true)) {
+                        continue;
+                    }
                 }
 
                 $translations = Translator::translateTranslations(
