@@ -30,22 +30,36 @@ php artisan vendor:publish --tag="translator-config"
 This is the contents of the published config file:
 
 ```php
-
 return [
 
     'lang_path' => lang_path(),
 
-    'service' => DeepLService::class,
-
-    'services' => [
-        DeepLService::class => [
-            'key' => env('DEEPL_KEY'),
-        ],
-        OpenAiService::class => [
-            'model' => 'gpt-4o',
-            'prompt' => 'Translate the following json to the locale {targetLocale} while preserving the keys.',
+    'translate' => [
+        'service' => 'deepl',
+        'services' => [
+            'deepl' => [
+                'key' => env('DEEPL_KEY'),
+            ],
+            'openai' => [
+                'model' => 'gpt-4o',
+                'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
+            ],
         ],
     ],
+
+    'grammar' => [
+        'service' => 'openai',
+        'services' => [
+            'openai' => [
+                'model' => 'gpt-4o',
+                'prompt' => '
+                            Fix the grammar and the syntax the following json string while preserving the keys.
+                            Do not change the meaning or the tone of the sentences and never change the keys.
+                            ',
+            ],
+        ],
+    ],
+
 ];
 ```
 
@@ -100,36 +114,17 @@ First, you need to edit the config file to add your DeepL api key and select dee
 
 ```php
 return [
-
-    'lang_path' => lang_path(),
-
     'translate' => [
-        'service' => 'deepl',
+        'service' => 'deepl', // select the default service here
+
         'services' => [
             'deepl' => [
-                'key' => env('DEEPL_KEY'),
+                'key' => env('DEEPL_KEY'), // add you api key here
             ],
-            'openai' => [
-                'model' => 'gpt-4o',
-                'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
-            ],
+
         ],
     ],
-
-    'grammar' => [
-        'service' => 'openai',
-        'services' => [
-            'openai' => [
-                'model' => 'gpt-4o',
-                'prompt' => '
-                            Fix the grammar and the syntax the following json string while preserving the keys.
-                            Do not change the meaning or the tone of the sentences and never change the keys.
-                            ',
-            ],
-        ],
-    ],
-
-];
+]
 ```
 
 To translate all the missing translations use:
