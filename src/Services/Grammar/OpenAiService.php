@@ -18,7 +18,7 @@ class OpenAiService implements GrammarServiceInterface
     public function fixAll(array $texts): array
     {
         return collect($texts)
-            ->chunk(50)
+            ->chunk(20)
             ->flatMap(function (Collection $chunk) {
                 $response = OpenAI::chat()->create([
                     'model' => $this->model,

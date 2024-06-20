@@ -18,7 +18,7 @@ class OpenAiService implements TranslateServiceInterface
     public function translateAll(array $texts, string $targetLocale): array
     {
         return collect($texts)
-            ->chunk(50)
+            ->chunk(20)
             ->flatMap(function (Collection $chunk) use ($targetLocale) {
                 $response = OpenAI::chat()->create([
                     'model' => $this->model,
