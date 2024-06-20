@@ -2,6 +2,7 @@
 
 namespace Elegantly\Translator;
 
+use Elegantly\Translator\Commands\FixGrammarTranslationsCommand;
 use Elegantly\Translator\Commands\ShowMissingTranslationsCommand;
 use Elegantly\Translator\Commands\SortAllTranslationsCommand;
 use Elegantly\Translator\Commands\TranslateTranslationsCommand;
@@ -30,6 +31,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 ShowMissingTranslationsCommand::class,
                 SortAllTranslationsCommand::class,
                 TranslateTranslationsCommand::class,
+                FixGrammarTranslationsCommand::class,
             ]);
     }
 

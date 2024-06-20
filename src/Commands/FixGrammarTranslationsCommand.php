@@ -3,29 +3,27 @@
 namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
-use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 
 class FixGrammarTranslationsCommand extends Command
 {
+    use TranslatorCommandTrait;
+
     public $signature = 'translator:grammar {--locales=} {--service=} ';
 
     public $description = 'Translate translations from the given locale to the target one.';
 
     public function handle(): int
     {
-        $serviceArg = $this->option('service');
-        $localesArg = $this->option('locales');
-
-        $service = TranslatorServiceProvider::getGrammarServiceFromConfig($serviceArg);
-
-        $locales = collect(Translator::getLanguages())
-            ->when($localesArg, fn (Collection $items) => $items->intersect(explode(',', $localesArg)));
+        $service = $this->getGrammarService($this->option('service'));
+        $locales = $this->getLocales(
+            option: $this->option('locales'),
+            label: 'In what locales would you like to translate?'
+        );
 
         foreach ($locales as $locale) {
 
-            $this->info("Fixing grammar in '{$locale}' locale:");
+            $this->info("Fixing grammar in '/{$locale}':");
             $this->line('Using service :'.get_class($service));
 
             $namespaces = Translator::getNamespaces($locale);

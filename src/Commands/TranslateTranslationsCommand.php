@@ -3,27 +3,28 @@
 namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
-use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Console\Command;
 
 class TranslateTranslationsCommand extends Command
 {
+    use TranslatorCommandTrait;
+
     public $signature = 'translator:translate {--from=} {--to=} {--service=} {--all} ';
 
     public $description = 'Translate translations from the given locale to the target one.';
 
     public function handle(): int
     {
-        $from = (string) $this->option('from');
-        $to = $this->option('to');
         $all = (bool) $this->option('all');
-        $serviceName = $this->option('service');
+        $from = (string) $this->option('from');
 
-        $service = TranslatorServiceProvider::getTranslateServiceFromConfig($serviceName);
+        $service = $this->getTranslateService($this->option('service'));
+        $targets = $this->getLocales(
+            option: $this->option('to'),
+            label: 'In what locales would you like to translate?'
+        );
 
         $namespaces = Translator::getNamespaces($from);
-
-        $targets = collect($to ? [(string) $to] : Translator::getLanguages())->filter(fn ($locale) => $locale !== $from);
 
         foreach ($targets as $target) {
 

@@ -8,17 +8,21 @@ use Illuminate\Support\Collection;
 
 class SortAllTranslationsCommand extends Command
 {
+    use TranslatorCommandTrait;
+
     public $signature = 'translator:sort {--locales=} {--namespaces=}';
 
     public $description = 'Sort all translations using natural order';
 
     public function handle(): int
     {
-        $namespacesArg = $this->option('namespaces');
-        $localesArg = $this->option('locales');
 
-        $locales = collect(Translator::getLanguages())
-            ->when($localesArg, fn (Collection $items) => $items->intersect(explode(',', $localesArg)));
+        $locales = $this->getLocales(
+            option: $this->option('locales'),
+            label: 'What locales would you like to sort?'
+        );
+
+        $namespacesArg = $this->option('namespaces');
 
         foreach ($locales as $locale) {
             $this->newLine();
