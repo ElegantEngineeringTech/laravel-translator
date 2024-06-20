@@ -38,7 +38,7 @@ class OpenAiService implements GrammarServiceInterface
                 $content = $response->choices[0]->message->content;
                 $translations = json_decode($content, true);
 
-                return $translations;
+                return collect($translations)->dot();
             })
             ->toArray();
     }
