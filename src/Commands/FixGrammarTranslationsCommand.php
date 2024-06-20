@@ -18,7 +18,7 @@ class FixGrammarTranslationsCommand extends Command
         $service = $this->getGrammarService($this->option('service'));
         $locales = $this->getLocales(
             option: $this->option('locales'),
-            label: 'In what locales would you like to translate?'
+            label: 'What locales would you like to fix?'
         );
 
         foreach ($locales as $locale) {
