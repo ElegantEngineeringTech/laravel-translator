@@ -127,7 +127,7 @@ class Translator
     ): Translations {
         $service = $service ?? $this->translateService;
 
-        if (!$service) {
+        if (! $service) {
             throw TranslatorServiceException::missingTranslateService();
         }
 
@@ -146,7 +146,7 @@ class Translator
                     ->toBase()
                     ->dot()
                     ->only($keys)
-                    ->filter(fn ($value) => !blank($value))
+                    ->filter(fn ($value) => ! blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(
@@ -171,7 +171,7 @@ class Translator
     ): Translations {
         $service = $service ?? $this->grammarService;
 
-        if (!$service) {
+        if (! $service) {
             throw TranslatorServiceException::missingGrammarService();
         }
 
@@ -182,7 +182,7 @@ class Translator
                     ->toBase()
                     ->dot()
                     ->only($keys)
-                    ->filter(fn ($value) => !blank($value))
+                    ->filter(fn ($value) => ! blank($value))
                     ->toArray()
             );
 
