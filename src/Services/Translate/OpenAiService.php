@@ -38,7 +38,7 @@ class OpenAiService implements TranslateServiceInterface
                 $content = $response->choices[0]->message->content;
                 $translations = json_decode($content, true);
 
-                return collect($translations)->dot();
+                return $translations;
             })
             ->toArray();
     }

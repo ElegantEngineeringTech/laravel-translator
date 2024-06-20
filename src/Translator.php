@@ -127,7 +127,7 @@ class Translator
     ): Translations {
         $service = $service ?? $this->translateService;
 
-        if (! $service) {
+        if (!$service) {
             throw TranslatorServiceException::missingTranslateService();
         }
 
@@ -143,9 +143,10 @@ class Translator
                 $referenceTranslations = $this->getTranslations($referenceLocale, $namespace);
 
                 $referenceValues = $referenceTranslations
+                    ->toBase()
                     ->dot()
                     ->only($keys)
-                    ->filter(fn ($value) => ! blank($value))
+                    ->filter(fn ($value) => !blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(
@@ -170,16 +171,18 @@ class Translator
     ): Translations {
         $service = $service ?? $this->grammarService;
 
-        if (! $service) {
+        if (!$service) {
             throw TranslatorServiceException::missingGrammarService();
         }
 
         return $this->transformTranslations($locale, $namespace, function (Translations $translations) use ($service, $keys) {
 
             $fixedTranslations = $service->fixAll(
-                texts: $translations->dot()
+                texts: $translations
+                    ->toBase()
+                    ->dot()
                     ->only($keys)
-                    ->filter(fn ($value) => ! blank($value))
+                    ->filter(fn ($value) => !blank($value))
                     ->toArray()
             );
 
