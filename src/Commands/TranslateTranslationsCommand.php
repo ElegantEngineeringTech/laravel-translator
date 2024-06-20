@@ -40,10 +40,12 @@ class TranslateTranslationsCommand extends Command
 
                 $this->line(count($keys)." keys to translate found in {$target}/{$namespace}.php");
 
-                if (count($keys)) {
-                    if (! $this->confirm('Would you like to continue?', true)) {
-                        continue;
-                    }
+                if (! count($keys)) {
+                    continue;
+                }
+
+                if (! $this->confirm('Would you like to continue?', true)) {
+                    continue;
                 }
 
                 $translations = Translator::translateTranslations(
