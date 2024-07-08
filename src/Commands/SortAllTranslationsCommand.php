@@ -57,7 +57,7 @@ class SortAllTranslationsCommand extends Command implements PromptsForMissingInp
         ];
     }
 
-    function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    public function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         if ($this->didReceiveOptions($input)) {
             return;
@@ -69,7 +69,6 @@ class SortAllTranslationsCommand extends Command implements PromptsForMissingInp
                 ->flatMap(fn (string $locale) => Translator::getNamespaces($locale))
                 ->unique()
                 ->toArray();
-
 
             $input->setOption('namespaces', multiselect(
                 label: 'What namespaces would you like to sort?',

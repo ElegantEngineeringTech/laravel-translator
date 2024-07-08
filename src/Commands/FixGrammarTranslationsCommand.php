@@ -69,7 +69,7 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
         ];
     }
 
-    function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    public function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         if ($this->didReceiveOptions($input)) {
             return;

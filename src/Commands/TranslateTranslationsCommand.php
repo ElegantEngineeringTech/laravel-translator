@@ -88,7 +88,7 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
         ];
     }
 
-    function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    public function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         if ($this->didReceiveOptions($input)) {
             return;
@@ -115,7 +115,7 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
         }
 
         if ($input->getOption('all') === false) {
-            $input->setOption('all', !confirm(
+            $input->setOption('all', ! confirm(
                 label: 'Only translate missing keys?',
                 no: 'No, translate all keys'
             ));

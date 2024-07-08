@@ -11,7 +11,7 @@ class ShowMissingTranslationsCommand extends Command implements PromptsForMissin
 {
     public $signature = 'translator:missing {locale : The locale of reference}';
 
-    public $description = "Show all missing translations present in the locale of reference but not in the others languages.";
+    public $description = 'Show all missing translations present in the locale of reference but not in the others languages.';
 
     public function handle(): int
     {
