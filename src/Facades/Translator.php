@@ -8,7 +8,7 @@ use Elegantly\Translator\Translations;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static array<int, string> getLanguages()
+ * @method static array<int, string> getLocales()
  * @method static array<int, string> getNamespaces(string $locale)
  * @method static Translations getTranslations(string $locale, string $namespace)
  * @method static Translations sortTranslations(string $locale, string $namespace)

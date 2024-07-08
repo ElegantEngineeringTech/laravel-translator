@@ -17,7 +17,7 @@ trait TranslatorCommandTrait
         ?array $options = null,
         ?string $label = null
     ): array {
-        $availableLocales = $options ?? Translator::getLanguages();
+        $availableLocales = $options ?? Translator::getLocales();
 
         if ($option) {
             if (is_array($option)) {

@@ -2,12 +2,12 @@
 
 use Elegantly\Translator\Translator;
 
-it('gets languages', function () {
+it('gets locales', function () {
     $translator = new Translator(
         storage: $this->getStorage(),
     );
 
-    expect($translator->getLanguages())->toBe(['en', 'fr']);
+    expect($translator->getLocales())->toBe(['en', 'fr']);
 });
 
 it('gets namespaces', function () {

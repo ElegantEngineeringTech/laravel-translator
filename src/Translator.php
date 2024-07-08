@@ -19,7 +19,18 @@ class Translator
         //
     }
 
+    /**
+     * @return string[]
+     */
     public function getLanguages(): array
+    {
+        return $this->getLocales();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLocales(): array
     {
         return collect($this->storage->allDirectories())
             ->sort(SORT_NATURAL)
@@ -56,18 +67,22 @@ class Translator
     public function getAllMissingTranslations(
         string $referenceLocale
     ): array {
-        $targets = collect($this->getLanguages())
-            ->reject(fn ($locale) => $locale === $referenceLocale);
+        $locales = collect($this->getLocales())->diff([$referenceLocale]);
 
-        return $targets->mapWithKeys(function (string $target) use ($referenceLocale) {
-            $namespaces = $this->getNamespaces($target);
+        return $locales
+            ->mapWithKeys(function (string $locale) use ($referenceLocale) {
+                $namespaces = collect($this->getNamespaces($locale));
 
-            return [
-                $target => collect($namespaces)->mapWithKeys(fn (string $namespace) => [
-                    $namespace => $this->getMissingTranslations($referenceLocale, $target, $namespace),
-                ])->filter(),
-            ];
-        })->filter()->toArray();
+                return [
+                    $locale => $namespaces
+                        ->mapWithKeys(fn (string $namespace) => [
+                            $namespace => $this->getMissingTranslations($referenceLocale, $locale, $namespace),
+                        ])
+                        ->filter(),
+                ];
+            })
+            ->filter()
+            ->toArray();
     }
 
     public function getMissingTranslations(
@@ -249,7 +264,7 @@ class Translator
 
     public function sortAllTranslations(): void
     {
-        foreach ($this->getLanguages() as $locale) {
+        foreach ($this->getLocales() as $locale) {
             foreach ($this->getNamespaces($locale) as $namespace) {
                 $this->sortTranslations($locale, $namespace);
             }
