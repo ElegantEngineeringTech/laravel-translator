@@ -17,7 +17,7 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
 {
     public $signature = 'translator:translate 
                             {from : The locale to translate} 
-                            {to: The locale to translate to}
+                            {to : The locale to translate to}
                             {--service= : The translation service to use}
                             {--namespaces= : The namespaces to translate}
                             {--all : Translate not only missing keys but all keys}';
