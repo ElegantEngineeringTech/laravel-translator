@@ -5,6 +5,8 @@ namespace Elegantly\Translator\Commands;
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\progress;
@@ -52,19 +54,29 @@ class SortAllTranslationsCommand extends Command implements PromptsForMissingInp
                     required: true,
                 );
             },
-            'namespaces' => function () {
-                $options = collect($this->argument('locales'))
-                    ->flatMap(fn (string $locale) => Translator::getNamespaces($locale))
-                    ->unique()
-                    ->toArray();
-
-                return multiselect(
-                    label: 'What namespaces would you like to sort?',
-                    options: $options,
-                    default: $options,
-                    required: true,
-                );
-            },
         ];
+    }
+
+    function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        if (empty($input->getOption('namespaces'))) {
+
+            $options = collect($input->getArgument('locales'))
+                ->flatMap(fn (string $locale) => Translator::getNamespaces($locale))
+                ->unique()
+                ->toArray();
+
+
+            $input->setOption('namespaces', multiselect(
+                label: 'What namespaces would you like to sort?',
+                options: $options,
+                default: $options,
+                required: true,
+            ));
+        }
     }
 }

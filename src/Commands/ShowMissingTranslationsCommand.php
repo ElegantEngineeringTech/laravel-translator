@@ -4,17 +4,18 @@ namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Symfony\Component\Console\Helper\TableSeparator;
 
-class ShowMissingTranslationsCommand extends Command
+class ShowMissingTranslationsCommand extends Command implements PromptsForMissingInput
 {
-    public $signature = 'translator:missing {locale}';
+    public $signature = 'translator:missing {locale : The locale of reference}';
 
-    public $description = "Show all missing translations taking present in 'locale' but not in the others languages.";
+    public $description = "Show all missing translations present in the locale of reference but not in the others languages.";
 
     public function handle(): int
     {
-        $reference = (string) $this->argument('locale');
+        $reference = $this->argument('locale');
 
         $rows = collect(Translator::getAllMissingTranslations($reference))
             ->flatMap(
@@ -36,5 +37,20 @@ class ShowMissingTranslationsCommand extends Command
         );
 
         return self::SUCCESS;
+    }
+
+    public function promptForMissingArgumentsUsing()
+    {
+        return [
+            'locale' => function () {
+                return select(
+                    label: 'What is the locale of reference?',
+                    options: Translator::getLocales(),
+                    default: config('app.locale'),
+                    required: true,
+                );
+            },
+
+        ];
     }
 }

@@ -7,6 +7,8 @@ use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Laravel\Prompts\Progress;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\progress;
@@ -63,24 +65,34 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
                     required: true,
                 );
             },
-            'service' => function () {
-                return select(
-                    label: 'What service would you like to use?',
-                    options: array_keys(config('translator.grammar.services')),
-                    default: config('translator.grammar.service'),
-                    required: true,
-                );
-            },
-            'namespaces' => function () {
-                $options = Translator::getNamespaces($this->argument('locale'));
 
-                return multiselect(
-                    label: 'What namespaces would you like to fix?',
-                    options: $options,
-                    default: $options,
-                    required: true,
-                );
-            },
         ];
+    }
+
+    function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        if (empty($input->getOption('namespaces'))) {
+            $options = Translator::getNamespaces($this->argument('locale'));
+
+            $input->setOption('namespaces', multiselect(
+                label: 'What namespaces would you like to fix?',
+                options: $options,
+                default: $options,
+                required: true,
+            ));
+        }
+
+        if ($input->getOption('service') === null) {
+            $input->setOption('service', select(
+                label: 'What service would you like to use?',
+                options: array_keys(config('translator.grammar.services')),
+                default: config('translator.grammar.service'),
+                required: true,
+            ));
+        }
     }
 }

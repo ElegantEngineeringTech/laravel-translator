@@ -6,6 +6,8 @@ use Elegantly\Translator\Facades\Translator;
 use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
@@ -83,30 +85,40 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
                     required: true,
                 );
             },
-            'service' => function () {
-                return select(
-                    label: 'What service would you like to use?',
-                    options: array_keys(config('translator.translate.services')),
-                    default: config('translator.translate.service'),
-                    required: true,
-                );
-            },
-            'all' => function () {
-                return confirm(
-                    label: 'Only translate missing keys?',
-                    no: 'No, translate all keys'
-                );
-            },
-            'namespaces' => function () {
-                $options = Translator::getNamespaces($this->argument('from'));
-
-                return multiselect(
-                    label: 'What namespaces would you like to translate?',
-                    options: $options,
-                    default: $options,
-                    required: true,
-                );
-            },
         ];
+    }
+
+    function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        if (empty($input->getOption('namespaces'))) {
+            $options = Translator::getNamespaces($input->getArgument('from'));
+
+            $input->setOption('namespaces', multiselect(
+                label: 'What namespaces would you like to translate?',
+                options: $options,
+                default: $options,
+                required: true,
+            ));
+        }
+
+        if ($input->getOption('service') === null) {
+            $input->setOption('service', select(
+                label: 'What service would you like to use?',
+                options: array_keys(config('translator.translate.services')),
+                default: config('translator.translate.service'),
+                required: true,
+            ));
+        }
+
+        if ($input->getOption('all') === false) {
+            $input->setOption('all', !confirm(
+                label: 'Only translate missing keys?',
+                no: 'No, translate all keys'
+            ));
+        }
     }
 }
