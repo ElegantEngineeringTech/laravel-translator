@@ -130,13 +130,13 @@ return [
 To translate all the missing translations use:
 
 ```bash
-php artisan translator:translate --from=fr --to=en
+php artisan translator:translate
 ```
 
 To translate all translations use:
 
 ```bash
-php artisan translator:translate --from=fr --to=en --all
+php artisan translator:translate --all
 ```
 
 Ommitting the `--to` option will translate to every available languages in your project.
