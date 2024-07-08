@@ -42,7 +42,7 @@ class SortAllTranslationsCommand extends Command implements PromptsForMissingInp
     public function promptForMissingArgumentsUsing()
     {
         return [
-            'locale' => function () {
+            'locales' => function () {
                 $options = Translator::getLocales();
 
                 return multiselect(
