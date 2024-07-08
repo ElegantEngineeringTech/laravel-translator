@@ -4,39 +4,67 @@ namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 
-class SortAllTranslationsCommand extends Command
+use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\progress;
+
+class SortAllTranslationsCommand extends Command implements PromptsForMissingInput
 {
-    use TranslatorCommandTrait;
-
-    public $signature = 'translator:sort {--locales=} {--namespaces=}';
+    public $signature = 'translator:sort 
+                            {locales* : The locales to sort}
+                            {--namespaces=* : The namespaces to sort}';
 
     public $description = 'Sort all translations using natural order';
 
     public function handle(): int
     {
 
-        $locales = $this->getLocales(
-            option: $this->option('locales'),
-            label: 'What locales would you like to sort?'
+        $locales = $this->argument('locales');
+        $namespaces = $this->option('namespaces');
+
+        progress(
+            label: 'Sorting',
+            steps: $locales,
+            callback: function (string $locale, $progress) use ($namespaces) {
+                $progress
+                    ->label("Sorting {$locale}");
+
+                foreach ($namespaces as $namespace) {
+                    Translator::sortTranslations($locale, $namespace);
+                }
+            }
         );
 
-        $namespacesArg = $this->option('namespaces');
-
-        foreach ($locales as $locale) {
-            $this->newLine();
-            $this->info("Sorting {$locale}");
-
-            $namespaces = collect(Translator::getNamespaces($locale))
-                ->when($namespacesArg, fn (Collection $items) => $items->intersect(explode(',', $namespacesArg)));
-
-            $this->withProgressBar(
-                $namespaces,
-                fn (string $namespace) => Translator::sortTranslations($locale, $namespace)
-            );
-        }
-
         return self::SUCCESS;
+    }
+
+    public function promptForMissingArgumentsUsing()
+    {
+        return [
+            'locale' => function () {
+                $options = Translator::getLocales();
+
+                return multiselect(
+                    label: 'What locales would you like to sort?',
+                    options: $options,
+                    default: $options,
+                    required: true,
+                );
+            },
+            'namespaces' => function () {
+                $options = collect($this->argument('locales'))
+                    ->flatMap(fn (string $locale) => Translator::getNamespaces($locale))
+                    ->unique()
+                    ->toArray();
+
+                return multiselect(
+                    label: 'What namespaces would you like to sort?',
+                    options: $options,
+                    default: $options,
+                    required: true,
+                );
+            },
+        ];
     }
 }

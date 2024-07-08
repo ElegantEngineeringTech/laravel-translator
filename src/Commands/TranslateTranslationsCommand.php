@@ -17,7 +17,7 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
     public $signature = 'translator:translate 
                             {from : The locale to translate} 
                             {to : The locale to translate to}
-                            {--namespaces= : The namespaces to translate}
+                            {--namespaces=* : The namespaces to translate}
                             {--service= : The translation service to use}
                             {--all : Translate not only missing keys but all keys}';
 
@@ -29,13 +29,11 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
 
         $to = $this->argument('to');
 
+        $namespaces = $this->option('namespaces');
+
         $service = $this->option('service');
 
         $all = (bool) $this->option('all');
-
-        $namespacesOption = $this->option('namespaces');
-
-        $namespaces = is_string($namespacesOption) ? explode(',', $namespacesOption) : $namespacesOption;
 
         progress(
             label: 'Translating',
