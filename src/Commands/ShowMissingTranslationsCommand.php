@@ -7,6 +7,8 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Symfony\Component\Console\Helper\TableSeparator;
 
+use function Laravel\Prompts\select;
+
 class ShowMissingTranslationsCommand extends Command implements PromptsForMissingInput
 {
     public $signature = 'translator:missing {locale : The locale of reference}';
