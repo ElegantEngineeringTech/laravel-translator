@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\info;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\progress;
 use function Laravel\Prompts\select;
@@ -18,21 +17,19 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
     public $signature = 'translator:translate 
                             {from : The locale to translate} 
                             {to : The locale to translate to}
-                            {--service= : The translation service to use}
                             {--namespaces= : The namespaces to translate}
+                            {--service= : The translation service to use}
                             {--all : Translate not only missing keys but all keys}';
 
     public $description = 'Translate translations from the given locale to the target one.';
 
     public function handle(): int
     {
-        $service = $this->option('service');
-
         $from = $this->argument('from');
 
         $to = $this->argument('to');
 
-        $targets = is_string($to) ? explode(',', $to) : $to;
+        $service = $this->option('service');
 
         $all = (bool) $this->option('all');
 
@@ -40,34 +37,30 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
 
         $namespaces = is_string($namespacesOption) ? explode(',', $namespacesOption) : $namespacesOption;
 
-        foreach ($targets as $target) {
-            info("Translating from {$from} to {$target}");
+        progress(
+            label: 'Translating',
+            steps: $namespaces,
+            callback: function (string $namespace, $progress) use ($from, $service, $to, $all) {
+                $progress
+                    ->label("Translating {$namespace}")
+                    ->hint('Fetching response...');
 
-            progress(
-                label: 'Translating',
-                steps: $namespaces,
-                callback: function (string $namespace, $progress) use ($from, $service, $target, $all) {
-                    $progress
-                        ->label("Translating {$namespace}")
-                        ->hint('Fetching response...');
+                if ($all) {
+                    $keys = Translator::getTranslations($from, $namespace)->dot()->keys()->toArray();
+                } else {
+                    $keys = Translator::getMissingTranslations($from, $to, $namespace);
+                }
 
-                    if ($all) {
-                        $keys = Translator::getTranslations($from, $namespace)->dot()->keys()->toArray();
-                    } else {
-                        $keys = Translator::getMissingTranslations($from, $target, $namespace);
-                    }
-
-                    return Translator::translateTranslations(
-                        $from,
-                        $target,
-                        $namespace,
-                        $keys,
-                        TranslatorServiceProvider::getTranslateServiceFromConfig($service)
-                    );
-                },
-                hint: 'This may take some time.',
-            );
-        }
+                return Translator::translateTranslations(
+                    referenceLocale: $from,
+                    targetLocale: $to,
+                    namespace: $namespace,
+                    keys: $keys,
+                    service: TranslatorServiceProvider::getTranslateServiceFromConfig($service)
+                );
+            },
+            hint: 'This may take some time.',
+        );
 
         return self::SUCCESS;
     }
@@ -86,10 +79,9 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
             'to' => function () {
                 $options = Translator::getLocales();
 
-                return multiselect(
-                    label: 'In what locales would you like to translate?',
-                    options: $options,
-                    default: array_diff($options, [$this->argument('from')]),
+                return select(
+                    label: 'In what locale would you like to translate?',
+                    options: array_diff($options, [$this->argument('from')]),
                     required: true,
                 );
             },
