@@ -3,67 +3,84 @@
 namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
+use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Laravel\Prompts\Progress;
 
-use function Laravel\Prompts\spin;
+use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\progress;
+use function Laravel\Prompts\select;
 
-class FixGrammarTranslationsCommand extends Command
+class FixGrammarTranslationsCommand extends Command implements PromptsForMissingInput
 {
-    use TranslatorCommandTrait;
+    public $signature = 'translator:grammar
+                            {locale : The locale to fix}
+                            {--namespaces=* : The namespaces to fix}
+                            {--service= : The service to use}';
 
-    public $signature = 'translator:grammar {--locales=} {--service=} ';
-
-    public $description = 'Translate translations from the given locale to the target one.';
+    public $description = 'Fix grammar in the given locale translations.';
 
     public function handle(): int
     {
-        $service = $this->getGrammarService($this->option('service'));
-        $locales = $this->getLocales(
-            option: $this->option('locales'),
-            label: 'What locales would you like to fix?'
-        );
+        $locale = $this->argument('locale');
 
-        foreach ($locales as $locale) {
+        $service = $this->option('service');
 
-            $this->info("Fixing grammar in '/{$locale}':");
-            $this->line('Using service :'.get_class($service));
+        $namespaces = $this->option('namespaces');
 
-            $namespaces = Translator::getNamespaces($locale);
-
-            foreach ($namespaces as $namespace) {
+        progress(
+            label: 'Fixing grammar',
+            steps: $namespaces,
+            callback: function (string $namespace, Progress $progress) use ($locale, $service) {
+                $progress->label("Fixing {$namespace}");
 
                 $keys = Translator::getTranslations($locale, $namespace)
                     ->dot()
                     ->keys()
                     ->toArray();
 
-                $this->line(count($keys)." keys to fix found in {$locale}/{$namespace}.php");
-
-                if (! count($keys)) {
-                    continue;
-                }
-
-                if (! $this->confirm('Would you like to continue?', true)) {
-                    continue;
-                }
-
-                $translations = spin(
-                    fn () => Translator::fixGrammarTranslations(
-                        $locale,
-                        $namespace,
-                        $keys,
-                        $service
-                    ),
-                    'Fetching response...'
+                Translator::fixGrammarTranslations(
+                    locale: $locale,
+                    namespace: $namespace,
+                    keys: $keys,
+                    service: TranslatorServiceProvider::getGrammarServiceFromConfig($service)
                 );
-
-                $this->table(
-                    headers: ['key', 'Translation'],
-                    rows: $translations->dot()->map(fn ($value, $key) => ["{$namespace}.{$key}", $value])
-                );
-            }
-        }
+            },
+        );
 
         return self::SUCCESS;
+    }
+
+    public function promptForMissingArgumentsUsing()
+    {
+        return [
+            'locale' => function () {
+                return select(
+                    label: 'From what locale would you like to translate?',
+                    options: Translator::getLocales(),
+                    default: config('app.locale'),
+                    required: true,
+                );
+            },
+            'service' => function () {
+                return select(
+                    label: 'What service would you like to use?',
+                    options: array_keys(config('translator.grammar.services')),
+                    default: config('translator.grammar.service'),
+                    required: true,
+                );
+            },
+            'namespaces' => function () {
+                $options = Translator::getNamespaces($this->argument('locale'));
+
+                return multiselect(
+                    label: 'What namespaces would you like to fix?',
+                    options: $options,
+                    default: $options,
+                    required: true,
+                );
+            },
+        ];
     }
 }
