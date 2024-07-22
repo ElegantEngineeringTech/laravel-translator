@@ -81,7 +81,9 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
 
                 return select(
                     label: 'In what locale would you like to translate?',
-                    options: array_diff($options, [$this->argument('from')]),
+                    options: array_values(
+                        array_diff($options, [$this->argument('from')]),
+                    ),
                     required: true,
                 );
             },
