@@ -45,8 +45,8 @@ class DeepLService implements TranslateServiceInterface
     public static function getLang(string $locale): string
     {
         return match ($locale) {
-            'en' => 'en-US',
-            default => $locale,
+            'en' => 'EN-US',
+            default => strtoupper($locale),
         };
     }
 }
