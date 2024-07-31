@@ -58,7 +58,7 @@ class Translator
             );
         }
 
-        return new Translations();
+        return new Translations;
     }
 
     /**
@@ -106,7 +106,7 @@ class Translator
     ): Translations {
 
         if (count($values) === 0) {
-            return new Translations();
+            return new Translations;
         }
 
         return $this->transformTranslations(
@@ -147,7 +147,7 @@ class Translator
         }
 
         if (count($keys) === 0) {
-            return new Translations();
+            return new Translations;
         }
 
         return $this->transformTranslations(

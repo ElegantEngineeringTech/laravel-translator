@@ -62,7 +62,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 prompt: config('translator.translate.services.openai.prompt'),
             ),
             '', null => null,
-            default => new $service(),
+            default => new $service,
         };
     }
 
@@ -76,7 +76,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 prompt: config('translator.grammar.services.openai.prompt'),
             ),
             '', null => null,
-            default => new $service(),
+            default => new $service,
         };
     }
 }
