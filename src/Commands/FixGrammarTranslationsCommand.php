@@ -59,7 +59,7 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
         return [
             'locale' => function () {
                 return select(
-                    label: 'From what locale would you like to translate?',
+                    label: 'What locale would you like to fix?',
                     options: Translator::getLocales(),
                     default: config('app.locale'),
                     required: true,
