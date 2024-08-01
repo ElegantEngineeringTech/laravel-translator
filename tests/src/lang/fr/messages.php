@@ -10,4 +10,9 @@ return [
     ],
     'empty' => 'Vide',
     'missing' => 'Absent',
+    'dummy' => [
+        'class' => 'class factice',
+        'component' => 'composant factice',
+        'view' => 'vue factice',
+    ],
 ];

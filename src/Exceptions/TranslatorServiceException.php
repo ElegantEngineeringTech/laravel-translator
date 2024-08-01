@@ -15,4 +15,9 @@ class TranslatorServiceException extends Exception
     {
         return new self('The grammar service is missing. Please define a grammar service in configs.');
     }
+
+    public static function missingSearchcodeService(): self
+    {
+        return new self('The searchcode service is missing. Please define a searchcode service in configs.');
+    }
 }

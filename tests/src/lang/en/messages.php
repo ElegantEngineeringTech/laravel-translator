@@ -8,4 +8,9 @@ return [
         'end' => 'End',
     ],
     'empty' => '',
+    'dummy' => [
+        'class' => 'dummy class',
+        'component' => 'dummy component',
+        'view' => 'dummy view',
+    ],
 ];

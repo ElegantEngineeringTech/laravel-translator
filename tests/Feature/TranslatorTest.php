@@ -1,5 +1,6 @@
 <?php
 
+use Elegantly\Translator\Services\SearchCode\RegexService;
 use Elegantly\Translator\Translator;
 
 it('gets locales', function () {
@@ -29,6 +30,11 @@ it('sorts and saves nested translations', function () {
         $translator->getTranslations('fr', 'messages')->toArray()
     )->toBe([
         'add' => 'Ajouter',
+        'dummy' => [
+            'class' => 'class factice',
+            'component' => 'composant factice',
+            'view' => 'vue factice',
+        ],
         'empty' => 'Vide',
         'hello' => 'Bonjour',
         'home' => [
@@ -37,6 +43,7 @@ it('sorts and saves nested translations', function () {
             'title' => 'Titre',
         ],
         'missing' => 'Absent',
+
     ]);
 });
 
@@ -75,6 +82,31 @@ it('finds all missing translations', function () {
                 'missing',
             ],
         ],
+    ]);
+});
+
+it('finds dead translations', function () {
+    $translator = new Translator(
+        storage: $this->getStorage(),
+        searchcodeService: new RegexService([
+            $this->getAppPath(),
+            $this->getResourcesPath(),
+        ])
+    );
+
+    $dead = $translator->getDeadTranslations(
+        locale: 'fr',
+        namespace: 'messages'
+    );
+
+    expect($dead)->toBe([
+        'hello',
+        'add',
+        'home.title',
+        'home.end',
+        'home.missing',
+        'empty',
+        'missing',
     ]);
 });
 

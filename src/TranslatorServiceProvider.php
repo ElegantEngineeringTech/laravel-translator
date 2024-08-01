@@ -8,6 +8,8 @@ use Elegantly\Translator\Commands\SortAllTranslationsCommand;
 use Elegantly\Translator\Commands\TranslateTranslationsCommand;
 use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
 use Elegantly\Translator\Services\Grammar\OpenAiService as GrammarOpenAiService;
+use Elegantly\Translator\Services\SearchCode\RegexService;
+use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\DeepLService;
 use Elegantly\Translator\Services\Translate\OpenAiService;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
@@ -45,6 +47,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 ]),
                 translateService: static::getTranslateServiceFromConfig(),
                 grammarService: static::getGrammarServiceFromConfig(),
+                searchcodeService: static::getSearchcodeServiceFromConfig(),
             );
         });
     }
@@ -74,6 +77,19 @@ class TranslatorServiceProvider extends PackageServiceProvider
             'openai', GrammarOpenAiService::class => new GrammarOpenAiService(
                 model: config('translator.grammar.services.openai.model'),
                 prompt: config('translator.grammar.services.openai.prompt'),
+            ),
+            '', null => null,
+            default => new $service,
+        };
+    }
+
+    public static function getSearchcodeServiceFromConfig(?string $serviceName = null): SearchCodeServiceInterface
+    {
+        $service = $serviceName ?? config('translator.searchcode.service');
+
+        return match ($service) {
+            'regex', RegexService::class => new RegexService(
+                config('translator.searchcode.services.regex.paths')
             ),
             '', null => null,
             default => new $service,

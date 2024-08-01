@@ -5,6 +5,7 @@ namespace Elegantly\Translator;
 use Elegantly\Translator\Exceptions\TranslatorException;
 use Elegantly\Translator\Exceptions\TranslatorServiceException;
 use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
+use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
@@ -15,16 +16,9 @@ class Translator
         public Filesystem $storage,
         public ?TranslateServiceInterface $translateService = null,
         public ?GrammarServiceInterface $grammarService = null,
+        public ?SearchCodeServiceInterface $searchcodeService = null,
     ) {
         //
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getLanguages(): array
-    {
-        return $this->getLocales();
     }
 
     /**
@@ -36,6 +30,14 @@ class Translator
             ->sort(SORT_NATURAL)
             ->values()
             ->toArray();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLanguages(): array
+    {
+        return $this->getLocales();
     }
 
     public function getNamespaces(string $locale): array
@@ -62,6 +64,8 @@ class Translator
     }
 
     /**
+     * Return all the translations keys present in the reference locale but not in the other ones
+     *
      * @return array<string, array<string, array>>
      */
     public function getAllMissingTranslations(
@@ -97,6 +101,30 @@ class Translator
     }
 
     /**
+     * Retreives the translations keys from locale not used in any file
+     */
+    public function getDeadTranslations(
+        string $locale,
+        string $namespace,
+        ?SearchCodeServiceInterface $service = null,
+    ): array {
+        $service ??= $this->searchcodeService;
+
+        if (! $service) {
+            throw TranslatorServiceException::missingSearchcodeService();
+        }
+
+        $definedTranslationsKeys = $this
+            ->getTranslations($locale, $namespace)
+            ->dot()
+            ->keys();
+
+        $usedTranslationsKeys = array_keys($service->filesByTranslations());
+
+        return $definedTranslationsKeys->filter(fn (string $key) => ! in_array("{$namespace}.{$key}", $usedTranslationsKeys))->toArray();
+    }
+
+    /**
      * @param  array<string|int, string|int|float|array|null>  $values
      */
     public function setTranslations(
@@ -117,20 +145,13 @@ class Translator
                     $translations->set($key, $value);
                 }
 
+                if (config('translator.sort_keys')) {
+                    $translations->sortNatural();
+                }
+
                 return $translations;
             }
         )->only(array_keys($values));
-    }
-
-    public function setTranslation(
-        string $locale,
-        string $namespace,
-        string $key,
-        string|array|int|float|null $value,
-    ): Translations {
-        return $this->setTranslations($locale, $namespace, [
-            $key => $value,
-        ]);
     }
 
     public function translateTranslations(
@@ -173,6 +194,10 @@ class Translator
                     $translations->set($key, $value);
                 }
 
+                if (config('translator.sort_keys')) {
+                    $translations->sortNatural();
+                }
+
                 return $translations;
             }
         )->only($keys);
@@ -205,8 +230,23 @@ class Translator
                 $translations->set($key, $value);
             }
 
+            if (config('translator.sort_keys')) {
+                $translations->sortNatural();
+            }
+
             return $translations;
         });
+    }
+
+    public function setTranslation(
+        string $locale,
+        string $namespace,
+        string $key,
+        string|array|int|float|null $value,
+    ): Translations {
+        return $this->setTranslations($locale, $namespace, [
+            $key => $value,
+        ]);
     }
 
     public function translateTranslation(

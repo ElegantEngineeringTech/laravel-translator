@@ -6,6 +6,11 @@ return [
 
     'lang_path' => lang_path(),
 
+    /**
+     * Auto sort translations keys after each manipulations: translate, grammar, ...
+     */
+    'sort_keys' => false,
+
     'translate' => [
         'service' => 'openai',
         'services' => [
@@ -31,6 +36,19 @@ return [
                                 - Do not escape nor change special characters or emojis.
                                 - Do not change the meaning or the tone of the sentences.
                             ',
+            ],
+        ],
+    ],
+
+    'searchcode' => [
+        'service' => 'regex',
+
+        'services' => [
+            'regex' => [
+                'paths' => [
+                    app_path(),
+                    resource_path(),
+                ],
             ],
         ],
     ],

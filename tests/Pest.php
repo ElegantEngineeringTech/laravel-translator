@@ -11,10 +11,12 @@ uses()->beforeEach(function () {
 
     foreach ($storage->allDirectories() as $locale) {
         foreach ($storage->allFiles($locale) as $file) {
-            $storage->copy(
-                from: $file,
-                to: str_replace('.php', '.php.stub', $file),
-            );
+            if (str($file)->endsWith('.php')) {
+                $storage->copy(
+                    from: $file,
+                    to: str_replace('.php', '.php.stub', $file),
+                );
+            }
         }
     }
 })->in('Feature');
@@ -25,10 +27,12 @@ uses()->afterEach(function () {
 
     foreach ($storage->allDirectories() as $locale) {
         foreach ($storage->allFiles($locale) as $file) {
-            $storage->move(
-                from: $file,
-                to: str_replace('.php.stub', '.php', $file),
-            );
+            if (str($file)->endsWith('.php.stub')) {
+                $storage->move(
+                    from: $file,
+                    to: str_replace('.php.stub', '.php', $file),
+                );
+            }
         }
     }
 })->in('Feature');

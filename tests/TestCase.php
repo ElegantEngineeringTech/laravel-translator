@@ -3,17 +3,28 @@
 namespace Elegantly\Translator\Tests;
 
 use Elegantly\Translator\TranslatorServiceProvider;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-    public function getStorage()
+    public function getAppPath(): string
+    {
+        return __DIR__.'/src/app';
+    }
+
+    public function getResourcesPath(): string
+    {
+        return __DIR__.'/src/resources';
+    }
+
+    public function getStorage(): Filesystem
     {
         return Storage::build([
             'driver' => 'local',
-            'root' => __DIR__.'/lang',
+            'root' => __DIR__.'/src/lang',
         ]);
     }
 
