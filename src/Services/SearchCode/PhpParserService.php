@@ -5,6 +5,7 @@ namespace Elegantly\Translator\Services\SearchCode;
 use Illuminate\Support\Facades\Blade;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
@@ -39,7 +40,7 @@ class PhpParserService implements SearchCodeServiceInterface
     public static function scanCode(string $code): array
     {
 
-        $parser = (new ParserFactory)->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForHostVersion();
 
         $ast = $parser->parse($code);
 
@@ -47,8 +48,11 @@ class PhpParserService implements SearchCodeServiceInterface
 
         /** @var FuncCall[] $results */
         $results = $nodeFinder->find($ast, function (Node $node) {
-            return $node instanceof FuncCall
-                && in_array($node->name->name, ['__', 'trans', 'trans_choice']);
+            if ($node instanceof FuncCall && $node->name instanceof Name) {
+                return in_array($node->name->name, ['__', 'trans', 'trans_choice']);
+            }
+
+            return false;
         });
 
         return collect($results)
