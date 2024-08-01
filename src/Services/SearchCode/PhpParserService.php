@@ -60,6 +60,7 @@ class PhpParserService implements SearchCodeServiceInterface
                 return $value instanceof String_ ? $value->value : null;
             })
             ->values()
+            ->sort(SORT_NATURAL)
             ->toArray();
     }
 
@@ -74,6 +75,7 @@ class PhpParserService implements SearchCodeServiceInterface
                 return static::scanCode($content);
             })
             ->filter()
+            ->sortKeys(SORT_NATURAL)
             ->toArray();
     }
 
@@ -95,6 +97,8 @@ class PhpParserService implements SearchCodeServiceInterface
                 ];
             }
         }
+
+        ksort($results, SORT_NATURAL);
 
         return $results;
     }
