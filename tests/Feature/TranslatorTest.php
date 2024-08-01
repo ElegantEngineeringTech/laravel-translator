@@ -85,7 +85,7 @@ it('finds all missing translations', function () {
     ]);
 });
 
-it('finds dead translations', function () {
+it('finds dead translations in a namespace', function () {
     $translator = new Translator(
         storage: $this->getStorage(),
         searchcodeService: new PhpParserService([
@@ -107,6 +107,41 @@ it('finds dead translations', function () {
         'home.missing',
         'empty',
         'missing',
+    ]);
+});
+
+it('finds all dead translations', function () {
+    $translator = new Translator(
+        storage: $this->getStorage(),
+        searchcodeService: new PhpParserService([
+            $this->getAppPath(),
+            $this->getResourcesPath(),
+        ])
+    );
+
+    $deadTranslations = $translator->getAllDeadTranslations();
+
+    expect($deadTranslations)->toBe([
+        'en' => [
+            'messages' => [
+                'hello',
+                'add',
+                'home.title',
+                'home.end',
+                'empty',
+            ],
+        ],
+        'fr' => [
+            'messages' => [
+                'hello',
+                'add',
+                'home.title',
+                'home.end',
+                'home.missing',
+                'empty',
+                'missing',
+            ],
+        ],
     ]);
 });
 

@@ -125,6 +125,27 @@ class Translator
     }
 
     /**
+     * @return array<string, array<string, string[]>>
+     */
+    public function getAllDeadTranslations(): array
+    {
+        return collect($this->getLocales())
+            ->mapWithKeys(function (string $locale) {
+                $namespaces = collect($this->getNamespaces($locale));
+
+                return [
+                    $locale => $namespaces
+                        ->mapWithKeys(fn (string $namespace) => [
+                            $namespace => $this->getDeadTranslations($locale, $namespace),
+                        ])
+                        ->filter(),
+                ];
+            })
+            ->filter()
+            ->toArray();
+    }
+
+    /**
      * @param  array<string|int, string|int|float|array|null>  $values
      */
     public function setTranslations(
