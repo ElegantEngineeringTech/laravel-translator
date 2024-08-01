@@ -43,14 +43,13 @@ return [
     'searchcode' => [
         'service' => 'php-parser',
 
-        'services' => [
-            'php-parser' => [
-                'paths' => [
-                    app_path(),
-                    resource_path(),
-                ],
-            ],
+        'paths' => [
+            app_path(),
+            resource_path(),
         ],
+
+        'excluded_paths' => [],
+
     ],
 
 ];

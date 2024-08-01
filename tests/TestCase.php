@@ -10,6 +10,14 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    public function getExcludedPaths(): array
+    {
+        return [
+            'ignored',
+            'ignored.blade.php',
+        ];
+    }
+
     public function getAppPath(): string
     {
         return __DIR__.'/src/app';

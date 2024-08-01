@@ -15,7 +15,8 @@ use Symfony\Component\Finder\SplFileInfo;
 class PhpParserService implements SearchCodeServiceInterface
 {
     public function __construct(
-        public array $paths
+        public array $paths,
+        public array $excludedPaths = [],
     ) {
         //
     }
@@ -24,13 +25,16 @@ class PhpParserService implements SearchCodeServiceInterface
     {
         return Finder::create()
             ->in($this->paths)
-            ->followLinks()
-            ->ignoreDotFiles(true)
-            ->ignoreVCS(true)
-            ->ignoreUnreadableDirs(true)
+            // ->exclude($this->excludedPaths)
+            ->notPath($this->excludedPaths)
             ->exclude('vendor')
             ->exclude('node_modules')
+            ->ignoreDotFiles(true)
+            ->ignoreVCS(true)
+            ->ignoreVCSIgnored(true)
+            ->ignoreUnreadableDirs(true)
             ->name('*.php')
+            ->followLinks()
             ->files();
     }
 

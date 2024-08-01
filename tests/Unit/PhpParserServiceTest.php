@@ -26,6 +26,7 @@ it('gets all the translations keys grouped by files', function () {
             $appPath,
             $resourcesPath,
         ],
+        excludedPaths: $this->getExcludedPaths()
     );
 
     expect($service->translationsByFiles())->toBe([
@@ -53,6 +54,7 @@ it('gets all the files grouped by translations', function () {
             $appPath,
             $resourcesPath,
         ],
+        excludedPaths: $this->getExcludedPaths()
     );
 
     expect($service->filesByTranslations())->toBe([

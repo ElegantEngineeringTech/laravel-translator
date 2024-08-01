@@ -91,7 +91,8 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
         return match ($service) {
             'php-parser', PhpParserService::class => new PhpParserService(
-                config('translator.searchcode.services.php-parser.paths')
+                paths: config('translator.searchcode.paths'),
+                excludedPaths: config('translator.searchcode.excluded_paths', [])
             ),
             '', null => null,
             default => new $service,

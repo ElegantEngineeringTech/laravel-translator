@@ -88,10 +88,13 @@ it('finds all missing translations', function () {
 it('finds dead translations in a namespace', function () {
     $translator = new Translator(
         storage: $this->getStorage(),
-        searchcodeService: new PhpParserService([
-            $this->getAppPath(),
-            $this->getResourcesPath(),
-        ])
+        searchcodeService: new PhpParserService(
+            paths: [
+                $this->getAppPath(),
+                $this->getResourcesPath(),
+            ],
+            excludedPaths: $this->getExcludedPaths()
+        )
     );
 
     $dead = $translator->getDeadTranslations(
@@ -113,10 +116,13 @@ it('finds dead translations in a namespace', function () {
 it('finds all dead translations', function () {
     $translator = new Translator(
         storage: $this->getStorage(),
-        searchcodeService: new PhpParserService([
-            $this->getAppPath(),
-            $this->getResourcesPath(),
-        ])
+        searchcodeService: new PhpParserService(
+            paths: [
+                $this->getAppPath(),
+                $this->getResourcesPath(),
+            ],
+            excludedPaths: $this->getExcludedPaths()
+        )
     );
 
     $deadTranslations = $translator->getAllDeadTranslations();
