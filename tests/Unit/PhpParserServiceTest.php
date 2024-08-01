@@ -41,7 +41,7 @@ it('gets all the translations keys grouped by files', function () {
             'messages.dummy.view',
         ],
     ]);
-});
+})->skipOnWindows();
 
 it('gets all the files grouped by translations', function () {
 
@@ -76,4 +76,4 @@ it('gets all the files grouped by translations', function () {
             ],
         ],
     ]);
-});
+})->skipOnWindows();
