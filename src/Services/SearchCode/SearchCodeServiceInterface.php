@@ -4,6 +4,9 @@ namespace Elegantly\Translator\Services\SearchCode;
 
 interface SearchCodeServiceInterface
 {
+    /**
+     * @return array<string, string[]>
+     */
     public function translationsByFiles(): array;
 
     /**

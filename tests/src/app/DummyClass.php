@@ -6,6 +6,6 @@ class DummyClass
 {
     public function getLabel()
     {
-        return __('messages.dummy.class');
+        return __(key: 'messages.dummy.class');
     }
 }

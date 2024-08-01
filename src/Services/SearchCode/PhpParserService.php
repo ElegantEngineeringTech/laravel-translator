@@ -2,17 +2,17 @@
 
 namespace Elegantly\Translator\Services\SearchCode;
 
-use Spatie\Regex\MatchResult;
-use Spatie\Regex\Regex;
+use Illuminate\Support\Facades\Blade;
+use PhpParser\Node;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\NodeFinder;
+use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class RegexService implements SearchCodeServiceInterface
+class PhpParserService implements SearchCodeServiceInterface
 {
-    public static $patterns = [
-        '/__\(["\'](?<key>[a-z0-9.\-_]+)["\']\)/i',
-    ];
-
     public function __construct(
         public array $paths
     ) {
@@ -38,22 +38,41 @@ class RegexService implements SearchCodeServiceInterface
      */
     public static function scanCode(string $code): array
     {
-        $chunks = collect(explode("\n", $code));
 
-        return $chunks
-            ->flatMap(function (string $code) {
-                return collect(static::$patterns)
-                    ->flatMap(fn (string $pattern) => Regex::matchAll($pattern, $code)->results())
-                    ->map(fn (MatchResult $matchResult) => $matchResult->group('key'));
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
+
+        $ast = $parser->parse($code);
+
+        $nodeFinder = new NodeFinder;
+
+        /** @var FuncCall[] $results */
+        $results = $nodeFinder->find($ast, function (Node $node) {
+            return $node instanceof FuncCall
+                && in_array($node->name->name, ['__', 'trans', 'trans_choice']);
+        });
+
+        return collect($results)
+            ->map(function (FuncCall $funcCall) {
+                $args = collect($funcCall->getArgs());
+                $argKey = $args->firstWhere('name.name', 'key') ?? $args->first();
+                $value = $argKey->value;
+
+                return $value instanceof String_ ? $value->value : null;
             })
+            ->values()
             ->toArray();
     }
 
     public function translationsByFiles(): array
     {
         return collect($this->finder())
-            ->keyBy(fn (SplFileInfo $file) => $file->getRealPath())
-            ->map(fn (SplFileInfo $file) => static::scanCode($file->getContents()))
+            ->map(function (SplFileInfo $file) {
+                $content = str($file->getFilename())->endsWith('.blade.php')
+                    ? Blade::compileString($file->getContents())
+                    : $file->getContents();
+
+                return static::scanCode($content);
+            })
             ->filter()
             ->toArray();
     }

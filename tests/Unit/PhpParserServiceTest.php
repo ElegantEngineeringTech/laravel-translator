@@ -1,13 +1,27 @@
 <?php
 
-use Elegantly\Translator\Services\SearchCode\RegexService;
+use Elegantly\Translator\Services\SearchCode\PhpParserService;
+
+it('finds all occurences of __ in code', function (string $code) {
+    $results = PhpParserService::scanCode($code);
+
+    expect($results)->toHaveLength(1);
+})->with([
+    "<?php __('messages.dummy.class');",
+    "<?php trans('messages.dummy.class');",
+    "<?php trans_choice('messages.dummy.class', 1);",
+    "<?php __('messages.dummy.class', []);",
+    "<?php __('messages.dummy.class', [], 'en');",
+    "<?php __(key: 'messages.dummy.class');",
+    "<?php __(key: 'messages.dummy.class', replace: [], locale: 'en');",
+]);
 
 it('gets all the translations keys grouped by files', function () {
 
     $appPath = $this->getAppPath();
     $resourcesPath = $this->getResourcesPath();
 
-    $service = new RegexService(
+    $service = new PhpParserService(
         paths: [
             $appPath,
             $resourcesPath,
@@ -34,7 +48,7 @@ it('gets all the files grouped by translations', function () {
     $appPath = $this->getAppPath();
     $resourcesPath = $this->getResourcesPath();
 
-    $service = new RegexService(
+    $service = new PhpParserService(
         paths: [
             $appPath,
             $resourcesPath,

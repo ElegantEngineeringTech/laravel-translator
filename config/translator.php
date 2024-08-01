@@ -41,10 +41,10 @@ return [
     ],
 
     'searchcode' => [
-        'service' => 'regex',
+        'service' => 'php-parser',
 
         'services' => [
-            'regex' => [
+            'php-parser' => [
                 'paths' => [
                     app_path(),
                     resource_path(),

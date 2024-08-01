@@ -1,6 +1,6 @@
 <?php
 
-use Elegantly\Translator\Services\SearchCode\RegexService;
+use Elegantly\Translator\Services\SearchCode\PhpParserService;
 use Elegantly\Translator\Translator;
 
 it('gets locales', function () {
@@ -88,7 +88,7 @@ it('finds all missing translations', function () {
 it('finds dead translations', function () {
     $translator = new Translator(
         storage: $this->getStorage(),
-        searchcodeService: new RegexService([
+        searchcodeService: new PhpParserService([
             $this->getAppPath(),
             $this->getResourcesPath(),
         ])

@@ -8,7 +8,7 @@ use Elegantly\Translator\Commands\SortAllTranslationsCommand;
 use Elegantly\Translator\Commands\TranslateTranslationsCommand;
 use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
 use Elegantly\Translator\Services\Grammar\OpenAiService as GrammarOpenAiService;
-use Elegantly\Translator\Services\SearchCode\RegexService;
+use Elegantly\Translator\Services\SearchCode\PhpParserService;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\DeepLService;
 use Elegantly\Translator\Services\Translate\OpenAiService;
@@ -88,7 +88,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         $service = $serviceName ?? config('translator.searchcode.service');
 
         return match ($service) {
-            'regex', RegexService::class => new RegexService(
+            'php-parser', PhpParserService::class => new PhpParserService(
                 config('translator.searchcode.services.regex.paths')
             ),
             '', null => null,
