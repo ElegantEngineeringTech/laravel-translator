@@ -39,6 +39,7 @@ it('gets all the translations keys grouped by files', function () {
             'messages.dummy.view',
         ],
         "{$resourcesPath}/views/dummy-view.blade.php" => [
+            'messages.dummy.nested',
             'messages.dummy.view',
             'messages.dummy.view',
         ],
@@ -71,6 +72,12 @@ it('gets all the files grouped by translations', function () {
                 "{$resourcesPath}/components/dummy-component.blade.php",
             ],
         ],
+        'messages.dummy.nested' => [
+            'count' => 1,
+            'files' => [
+                "{$resourcesPath}/views/dummy-view.blade.php",
+            ],
+        ],
         'messages.dummy.view' => [
             'count' => 3,
             'files' => [
@@ -78,6 +85,7 @@ it('gets all the files grouped by translations', function () {
                 "{$resourcesPath}/views/dummy-view.blade.php",
             ],
         ],
+
     ]);
 })->skipOnWindows();
 

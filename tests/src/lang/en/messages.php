@@ -12,5 +12,10 @@ return [
         'class' => 'dummy class',
         'component' => 'dummy component',
         'view' => 'dummy view',
+        'nested' => [
+            'used',
+            'as',
+            'array',
+        ],
     ],
 ];

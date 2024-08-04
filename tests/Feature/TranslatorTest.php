@@ -33,6 +33,11 @@ it('sorts and saves nested translations', function () {
         'dummy' => [
             'class' => 'class factice',
             'component' => 'composant factice',
+            'nested' => [
+                'used',
+                'as',
+                'array',
+            ],
             'view' => 'vue factice',
         ],
         'empty' => 'Vide',

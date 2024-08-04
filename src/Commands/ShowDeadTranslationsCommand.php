@@ -18,10 +18,44 @@ class ShowDeadTranslationsCommand extends Command
             Translator::clearCache();
         }
 
+        $results = [
+            ['.blade.php', 0, 0],
+            ['.php', 0, 0],
+        ];
+
+        $bar = $this->output->createProgressBar();
+
         $translations = Translator::getAllDeadTranslations(
-            progress: function (string $file, array $translations) {
-                $this->line($file);
+            progress: function (string $file, array $translations) use (&$results, $bar) {
+
+                if (str($file)->endsWith('.blade.php')) {
+                    // $this->line($file);
+
+                    $results[0][2] += 1;
+                    if (count($translations)) {
+                        $results[0][1] += 1;
+                    }
+                } elseif (str($file)->endsWith('.php')) {
+                    $results[1][2] += 1;
+                    if (count($translations)) {
+                        $results[1][1] += 1;
+                    }
+                }
+
+                $bar->advance();
+
+                // $this->output->write("<fg=green>✔️</>");
+                // $this->output->write(".");
             }
+        );
+
+        $bar->finish();
+
+        $this->newLine();
+
+        $this->table(
+            headers: ['Type', 'With translations', 'Total'],
+            rows: $results,
         );
 
         $rows = collect($translations)

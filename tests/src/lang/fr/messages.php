@@ -14,5 +14,10 @@ return [
         'class' => 'class factice',
         'component' => 'composant factice',
         'view' => 'vue factice',
+        'nested' => [
+            'used',
+            'as',
+            'array',
+        ],
     ],
 ];

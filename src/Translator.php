@@ -124,7 +124,10 @@ class Translator
 
         $usedTranslationsKeys = array_keys($this->getFilesByUsedTranslations($service, $progress));
 
-        return $definedTranslationsKeys->filter(fn (string $key) => ! in_array("{$namespace}.{$key}", $usedTranslationsKeys))->toArray();
+        return $definedTranslationsKeys
+            ->reject(fn (string $key) => str("{$namespace}.{$key}")->startsWith($usedTranslationsKeys))
+            ->values()
+            ->toArray();
     }
 
     /**
