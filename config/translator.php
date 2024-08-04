@@ -59,7 +59,11 @@ return [
         /**
          * Translations to exclude from deadcode detection
          */
-        'ignored_translations' => [],
+        'ignored_translations' => [
+            // 'validation',
+            // 'passwords',
+            // 'pagination',
+        ],
 
         'services' => [
             'php-parser' => [

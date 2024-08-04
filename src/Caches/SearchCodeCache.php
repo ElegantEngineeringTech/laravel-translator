@@ -5,6 +5,7 @@ namespace Elegantly\Translator\Caches;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
 
@@ -88,7 +89,7 @@ class SearchCodeCache
                     value: new Array_([
                         new ArrayItem(
                             key: new String_('created_at'),
-                            value: new String_($item['created_at'])
+                            value: new Int_($item['created_at'])
                         ),
                         new ArrayItem(
                             key: new String_('translations'),
