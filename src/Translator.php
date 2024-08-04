@@ -2,6 +2,7 @@
 
 namespace Elegantly\Translator;
 
+use Closure;
 use Elegantly\Translator\Exceptions\TranslatorException;
 use Elegantly\Translator\Exceptions\TranslatorServiceException;
 use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
@@ -102,11 +103,14 @@ class Translator
 
     /**
      * Retreives the translations keys from locale not used in any file
+     *
+     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
      */
     public function getDeadTranslations(
         string $locale,
         string $namespace,
         ?SearchCodeServiceInterface $service = null,
+        ?Closure $progress = null,
     ): array {
         $service ??= $this->searchcodeService;
 
@@ -119,24 +123,30 @@ class Translator
             ->dot()
             ->keys();
 
-        $usedTranslationsKeys = array_keys($service->filesByTranslations());
+        $usedTranslationsKeys = array_keys($service->filesByTranslations($progress));
 
         return $definedTranslationsKeys->filter(fn (string $key) => ! in_array("{$namespace}.{$key}", $usedTranslationsKeys))->toArray();
     }
 
     /**
+     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
      * @return array<string, array<string, string[]>>
      */
-    public function getAllDeadTranslations(): array
-    {
+    public function getAllDeadTranslations(
+        ?Closure $progress = null,
+    ): array {
         return collect($this->getLocales())
-            ->mapWithKeys(function (string $locale) {
+            ->mapWithKeys(function (string $locale) use ($progress) {
                 $namespaces = collect($this->getNamespaces($locale));
 
                 return [
                     $locale => $namespaces
                         ->mapWithKeys(fn (string $namespace) => [
-                            $namespace => $this->getDeadTranslations($locale, $namespace),
+                            $namespace => $this->getDeadTranslations(
+                                locale: $locale,
+                                namespace: $namespace,
+                                progress: $progress,
+                            ),
                         ])
                         ->filter(),
                 ];
@@ -365,5 +375,13 @@ class Translator
             "{$locale}/{$namespace}.php",
             $content
         );
+    }
+
+    public function clearCache(): static
+    {
+
+        $this->searchcodeService?->getCache()?->flush();
+
+        return $this;
     }
 }

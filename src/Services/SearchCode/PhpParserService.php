@@ -29,6 +29,11 @@ class PhpParserService implements SearchCodeServiceInterface
         }
     }
 
+    public function getCache(): ?SearchCodeCache
+    {
+        return $this->cache;
+    }
+
     public function finder(): Finder
     {
         return Finder::create()
@@ -79,6 +84,9 @@ class PhpParserService implements SearchCodeServiceInterface
             ->toArray();
     }
 
+    /**
+     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
+     */
     public function translationsByFiles(
         ?Closure $progress = null,
     ): array {
@@ -104,7 +112,7 @@ class PhpParserService implements SearchCodeServiceInterface
                 }
 
                 if ($progress) {
-                    $progress($file);
+                    $progress($file, $translations);
                 }
 
                 return $translations;
@@ -114,6 +122,9 @@ class PhpParserService implements SearchCodeServiceInterface
             ->toArray();
     }
 
+    /**
+     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
+     */
     public function filesByTranslations(
         ?Closure $progress = null,
     ): array {

@@ -8,13 +8,23 @@ use Symfony\Component\Console\Helper\TableSeparator;
 
 class ShowDeadTranslationsCommand extends Command
 {
-    public $signature = 'translator:dead';
+    public $signature = 'translator:dead {--clear-cache}';
 
     public $description = 'Show all dead translations defined in translations files but not used in the codebase.';
 
     public function handle(): int
     {
-        $rows = collect(Translator::getAllDeadTranslations())
+        if ($this->option('clear-cache')) {
+            Translator::clearCache();
+        }
+
+        $translations = Translator::getAllDeadTranslations(
+            progress: function (string $file, array $translations) {
+                $this->line($file);
+            }
+        );
+
+        $rows = collect($translations)
             ->flatMap(
                 fn (array $namespaces, string $locale) => collect($namespaces)
                     ->flatMap(function (array $keys, string $namespace) use ($locale, $namespaces) {
