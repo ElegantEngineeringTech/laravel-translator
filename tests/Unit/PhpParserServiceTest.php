@@ -1,6 +1,7 @@
 <?php
 
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
+use Illuminate\Support\Facades\Storage;
 
 it('finds all occurences of __ in code', function (string $code) {
     $results = PhpParserService::scanCode($code);
@@ -77,5 +78,32 @@ it('gets all the files grouped by translations', function () {
                 "{$resourcesPath}/views/dummy-view.blade.php",
             ],
         ],
+    ]);
+})->skipOnWindows();
+
+it('caches results from files', function () {
+
+    $appPath = $this->getAppPath();
+    $resourcesPath = $this->getResourcesPath();
+
+    $service = new PhpParserService(
+        paths: [
+            $appPath,
+            $resourcesPath,
+        ],
+        excludedPaths: $this->getExcludedPaths(),
+        cacheStorage: Storage::fake('cache')
+    );
+
+    $service->cache->put("{$appPath}/DummyClass.php", [
+        'messages.dummy.class',
+    ]);
+
+    $result = $service->cache->get("{$appPath}/DummyClass.php");
+
+    expect($result['created_at'])->toBeInt();
+
+    expect($result['translations'])->toBe([
+        'messages.dummy.class',
     ]);
 })->skipOnWindows();

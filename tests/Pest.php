@@ -1,5 +1,6 @@
 <?php
 
+use Elegantly\Translator\Caches\SearchCodeCache;
 use Elegantly\Translator\Tests\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;
 
@@ -35,4 +36,10 @@ uses()->afterEach(function () {
             }
         }
     }
+
+    $cache = new SearchCodeCache(
+        storage: Storage::fake('cache')
+    );
+
+    $cache->flush();
 })->in('Feature');

@@ -2,6 +2,9 @@
 
 namespace Elegantly\Translator\Services\SearchCode;
 
+use Closure;
+use Elegantly\Translator\Caches\SearchCodeCache;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
@@ -14,18 +17,22 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class PhpParserService implements SearchCodeServiceInterface
 {
+    public ?SearchCodeCache $cache = null;
+
     public function __construct(
         public array $paths,
         public array $excludedPaths = [],
+        ?Filesystem $cacheStorage = null,
     ) {
-        //
+        if ($cacheStorage) {
+            $this->cache = new SearchCodeCache($cacheStorage);
+        }
     }
 
     public function finder(): Finder
     {
         return Finder::create()
             ->in($this->paths)
-            // ->exclude($this->excludedPaths)
             ->notPath($this->excludedPaths)
             ->exclude('vendor')
             ->exclude('node_modules')
@@ -39,7 +46,7 @@ class PhpParserService implements SearchCodeServiceInterface
     }
 
     /**
-     * @return string[]
+     * @return string[] All translations keys used in the code
      */
     public static function scanCode(string $code): array
     {
@@ -72,24 +79,45 @@ class PhpParserService implements SearchCodeServiceInterface
             ->toArray();
     }
 
-    public function translationsByFiles(): array
-    {
+    public function translationsByFiles(
+        ?Closure $progress = null,
+    ): array {
         return collect($this->finder())
-            ->map(function (SplFileInfo $file) {
-                $content = str($file->getFilename())->endsWith('.blade.php')
-                    ? Blade::compileString($file->getContents())
-                    : $file->getContents();
+            ->map(function (SplFileInfo $file, string $key) use ($progress) {
 
-                return static::scanCode($content);
+                $lastModified = $file->getMTime();
+                $cachedResult = $this->cache?->get($key);
+
+                if (
+                    $lastModified && $cachedResult &&
+                    $lastModified < $cachedResult['created_at']
+                ) {
+                    $translations = $cachedResult['translations'];
+                } else {
+                    $content = str($file->getFilename())->endsWith('.blade.php')
+                        ? Blade::compileString($file->getContents())
+                        : $file->getContents();
+
+                    $translations = static::scanCode($content);
+
+                    $this->cache?->put($key, $translations);
+                }
+
+                if ($progress) {
+                    $progress($file);
+                }
+
+                return $translations;
             })
             ->filter()
             ->sortKeys(SORT_NATURAL)
             ->toArray();
     }
 
-    public function filesByTranslations(): array
-    {
-        $translations = $this->translationsByFiles();
+    public function filesByTranslations(
+        ?Closure $progress = null,
+    ): array {
+        $translations = $this->translationsByFiles($progress);
 
         $results = [];
 

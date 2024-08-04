@@ -92,7 +92,13 @@ class TranslatorServiceProvider extends PackageServiceProvider
         return match ($service) {
             'php-parser', PhpParserService::class => new PhpParserService(
                 paths: config('translator.searchcode.paths'),
-                excludedPaths: config('translator.searchcode.excluded_paths', [])
+                excludedPaths: config('translator.searchcode.excluded_paths', []),
+                cacheStorage: config('translator.searchcode.services.php-parser.cache_path')
+                    ? Storage::build([
+                        'driver' => 'local',
+                        'root' => config('translator.searchcode.services.php-parser.cache_path'),
+                    ])
+                    : null,
             ),
             '', null => null,
             default => new $service,
