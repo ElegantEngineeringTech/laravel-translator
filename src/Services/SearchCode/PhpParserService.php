@@ -79,6 +79,7 @@ class PhpParserService implements SearchCodeServiceInterface
 
                 return $value instanceof String_ ? $value->value : null;
             })
+            ->filter()
             ->values()
             ->sort(SORT_NATURAL)
             ->toArray();
