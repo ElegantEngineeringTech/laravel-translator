@@ -113,6 +113,31 @@ it('finds dead translations in a namespace', function () {
     ]);
 });
 
+it('ignore dead translations', function () {
+    $translator = new Translator(
+        storage: $this->getStorage(),
+        searchcodeService: new PhpParserService(
+            paths: [
+                $this->getAppPath(),
+                $this->getResourcesPath(),
+            ],
+            excludedPaths: $this->getExcludedPaths()
+        )
+    );
+
+    $dead = $translator->getDeadTranslations(
+        locale: 'fr',
+        namespace: 'messages',
+        ignore: ['messages.home', 'messages.empty']
+    );
+
+    expect($dead)->toBe([
+        'hello',
+        'add',
+        'missing',
+    ]);
+});
+
 it('finds all dead translations', function () {
     $translator = new Translator(
         storage: $this->getStorage(),

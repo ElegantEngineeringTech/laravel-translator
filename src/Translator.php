@@ -111,19 +111,18 @@ class Translator
         string $namespace,
         ?SearchCodeServiceInterface $service = null,
         ?Closure $progress = null,
+        ?array $ignore = null,
     ): array {
-        $service ??= $this->searchcodeService;
-
-        if (! $service) {
-            throw TranslatorServiceException::missingSearchcodeService();
-        }
+        $ignoredTranslations = $ignore ?? config('translator.searchcode.ignored_translations', []);
 
         $definedTranslationsKeys = $this
             ->getTranslations($locale, $namespace)
             ->dot()
-            ->keys();
+            ->keys()
+            ->reject(fn (string $key) => str("{$namespace}.{$key}")->startsWith($ignoredTranslations))
+            ->values();
 
-        $usedTranslationsKeys = array_keys($service->filesByTranslations($progress));
+        $usedTranslationsKeys = array_keys($this->getFilesByUsedTranslations($service, $progress));
 
         return $definedTranslationsKeys->filter(fn (string $key) => ! in_array("{$namespace}.{$key}", $usedTranslationsKeys))->toArray();
     }
@@ -134,9 +133,10 @@ class Translator
      */
     public function getAllDeadTranslations(
         ?Closure $progress = null,
+        ?array $ignore = null,
     ): array {
         return collect($this->getLocales())
-            ->mapWithKeys(function (string $locale) use ($progress) {
+            ->mapWithKeys(function (string $locale) use ($progress, $ignore) {
                 $namespaces = collect($this->getNamespaces($locale));
 
                 return [
@@ -146,6 +146,7 @@ class Translator
                                 locale: $locale,
                                 namespace: $namespace,
                                 progress: $progress,
+                                ignore: $ignore
                             ),
                         ])
                         ->filter(),
@@ -153,6 +154,44 @@ class Translator
             })
             ->filter()
             ->toArray();
+    }
+
+    /**
+     * Retreives the translations keys used in the codebase
+     *
+     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
+     * @return array<string, array{ count: int, files: string[] }>
+     */
+    public function getFilesByUsedTranslations(
+        ?SearchCodeServiceInterface $service = null,
+        ?Closure $progress = null,
+    ): array {
+        $service ??= $this->searchcodeService;
+
+        if (! $service) {
+            throw TranslatorServiceException::missingSearchcodeService();
+        }
+
+        return $service->filesByTranslations($progress);
+    }
+
+    /**
+     * Retreives the translations keys used in the codebase
+     *
+     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
+     * @return array<string, string[]>
+     */
+    public function getUsedTranslationsByFiles(
+        ?SearchCodeServiceInterface $service = null,
+        ?Closure $progress = null,
+    ): array {
+        $service ??= $this->searchcodeService;
+
+        if (! $service) {
+            throw TranslatorServiceException::missingSearchcodeService();
+        }
+
+        return $service->translationsByFiles($progress);
     }
 
     /**

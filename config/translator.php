@@ -43,12 +43,23 @@ return [
     'searchcode' => [
         'service' => 'php-parser',
 
+        /**
+         * Files or directories to include
+         */
         'paths' => [
             app_path(),
             resource_path(),
         ],
 
+        /**
+         * Files or directories to exclude
+         */
         'excluded_paths' => [],
+
+        /**
+         * Translations to exclude from deadcode detection
+         */
+        'ignored_translations' => [],
 
         'services' => [
             'php-parser' => [
