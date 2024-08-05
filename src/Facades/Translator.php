@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static Translations fixGrammarTranslations(string $locale, string $namespace, array $keys, ?GrammarServiceInterface $service)
  * @method static array<int, string> getMissingTranslations(string $referenceLocale, string $targetLocale, string $namespace)
  * @method static array getAllMissingTranslations(string $referenceLocale)
- * @method static array getAllDeadTranslations( null|(Closure(string $file, string[] $translations):void) $progress )
+ * @method static array getAllDeadTranslations( null|(Closure(string $file, string[] $translations):void) $progress = null )
+ * @method static array getDeadTranslations(string $locale, string $namespace, ?SearchCodeServiceInterface $service = null, null|(Closure(string $file, string[] $translations):void) $progress = null, ?array $ignore = null )
  * @method static void sortAllTranslations()
  * @method static \Elegantly\Translator\Translator clearCache()
  *

@@ -4,13 +4,75 @@ namespace Elegantly\Translator\Commands;
 
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Laravel\Prompts\Progress;
+use Laravel\Prompts\Table;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 
-class ShowDeadTranslationsCommand extends Command
+use function Laravel\Prompts\alert;
+use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\pause;
+use function Laravel\Prompts\progress;
+
+class ShowDeadTranslationsCommand extends Command implements PromptsForMissingInput
 {
-    public $signature = 'translator:dead {--clear-cache}';
+    public $signature = 'translator:dead {locales* : The locales to scan} {--clear-cache}';
 
     public $description = 'Show all dead translations defined in translations files but not used in the codebase.';
+
+    public function handleLocale(string $locale): array
+    {
+
+        $namespaces = Translator::getNamespaces($locale);
+
+        return progress(
+            "Scanning files: {$locale}",
+            array_combine($namespaces, $namespaces),
+            function (string $namespace, Progress $progress) use ($locale) {
+                $progress->hint($namespace);
+
+                $translations = Translator::getDeadTranslations(
+                    locale: $locale,
+                    namespace: $namespace,
+                );
+
+                return [$namespace, $translations];
+            }
+        );
+    }
+
+    public function displayLocale(string $locale)
+    {
+        $result = collect($this->handleLocale($locale));
+
+        alert($result->flatten()->count().' dead translations found.');
+
+        $table = new Table(['Keys'], []);
+
+        $length = $result->count();
+
+        foreach ($result as $index => [$namespace, $items]) {
+            $count = count($items);
+
+            $table->rows[] = ["<info>{$namespace}</info> : <fg=gray>{$count}</>"];
+            $table->rows[] = new TableSeparator;
+
+            if (! $count) {
+                continue;
+            }
+
+            foreach ($items as $item) {
+                $table->rows[] = [new TableCell("{$namespace}.{$item}")];
+            }
+
+            if ($index < $length - 1) {
+                $table->rows[] = new TableSeparator;
+            }
+        }
+
+        $table->display();
+    }
 
     public function handle(): int
     {
@@ -18,65 +80,32 @@ class ShowDeadTranslationsCommand extends Command
             Translator::clearCache();
         }
 
-        $results = [
-            ['.blade.php', 0, 0],
-            ['.php', 0, 0],
-        ];
+        $locales = $this->argument('locales');
 
-        $bar = $this->output->createProgressBar();
+        foreach ($locales as $index => $locale) {
 
-        $translations = Translator::getAllDeadTranslations(
-            progress: function (string $file, array $translations) use (&$results, $bar) {
+            $this->displayLocale($locale);
 
-                if (str($file)->endsWith('.blade.php')) {
-                    // $this->line($file);
-
-                    $results[0][2] += 1;
-                    if (count($translations)) {
-                        $results[0][1] += 1;
-                    }
-                } elseif (str($file)->endsWith('.php')) {
-                    $results[1][2] += 1;
-                    if (count($translations)) {
-                        $results[1][1] += 1;
-                    }
-                }
-
-                $bar->advance();
-
-                // $this->output->write("<fg=green>✔️</>");
-                // $this->output->write(".");
+            if ($nextLocale = $locales[$index + 1] ?? null) {
+                pause("Press enter to continue with '{$nextLocale}'...");
             }
-        );
-
-        $bar->finish();
-
-        $this->newLine();
-
-        $this->table(
-            headers: ['Type', 'With translations', 'Total'],
-            rows: $results,
-        );
-
-        $rows = collect($translations)
-            ->flatMap(
-                fn (array $namespaces, string $locale) => collect($namespaces)
-                    ->flatMap(function (array $keys, string $namespace) use ($locale, $namespaces) {
-                        $values = array_map(fn (string $key) => [$locale, "{$namespace}.$key"], $keys);
-
-                        if (array_key_last($namespaces) !== $namespace) {
-                            $values[] = [new TableSeparator, new TableSeparator];
-                        }
-
-                        return $values;
-                    })
-            )->toArray();
-
-        $this->table(
-            headers: ['Language', 'Dead key'],
-            rows: $rows
-        );
+        }
 
         return self::SUCCESS;
+    }
+
+    public function promptForMissingArgumentsUsing()
+    {
+        return [
+            'locales' => function () {
+                return multiselect(
+                    label: 'What locales would you like to scan?',
+                    options: Translator::getLocales(),
+                    default: [config('app.locale')],
+                    required: true,
+                );
+            },
+
+        ];
     }
 }
