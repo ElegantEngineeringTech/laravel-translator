@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getDeadTranslations(string $locale, string $namespace, ?SearchCodeServiceInterface $service = null, null|(Closure(string $file, string[] $translations):void) $progress = null, ?array $ignore = null )
  * @method static void sortAllTranslations()
  * @method static \Elegantly\Translator\Translator clearCache()
+ * @method static Translations setTranslations(string $locale, string $namespace, array $values)
+ * @method static Translations deleteTranslations(string $locale, string $namespace, array $keys)
  *
  * @see \Elegantly\Translator\Translator
  */

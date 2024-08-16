@@ -51,17 +51,31 @@ class Translator
             ->toArray();
     }
 
+    /**
+     * This function uses eval and not include
+     * Because using 'include' would cache/compile the code in opcache
+     * Therefore it would not reflect the changes after the file is edited
+     */
     public function getTranslations(string $locale, string $namespace): Translations
     {
-        $path = "{$locale}/{$namespace}.php";
-
-        if ($this->storage->exists($path)) {
+        if ($content = $this->getTranslationsFileContent($locale, $namespace)) {
             return new Translations(
-                items: include $this->storage->path($path),
+                items: eval('?>'.$content),
             );
         }
 
         return new Translations;
+    }
+
+    public function getTranslationsFileContent(string $locale, string $namespace): ?string
+    {
+        $path = "{$locale}/{$namespace}.php";
+
+        if ($this->storage->exists($path)) {
+            return $this->storage->get($path);
+        }
+
+        return null;
     }
 
     /**
