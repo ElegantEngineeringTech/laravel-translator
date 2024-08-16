@@ -9,9 +9,10 @@ Manage all your laravel translations easily:
 
 -   Sort tranlations array in natural order
 -   Find missing translations strings
--   Translate automatically string to other languages (DeepL, OpenAI or any custom service)
+-   Translate strings to other languages (DeepL, OpenAI or any custom service)
 -   Fix Grammar and syntax in your translations (OpenAI, or any custome service)
 -   Format your translations files
+-   Find dead translations keys (keys not used anywhere in your codebase)
 
 ## Installation
 
