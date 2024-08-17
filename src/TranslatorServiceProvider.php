@@ -54,7 +54,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         });
     }
 
-    public static function getTranslateServiceFromConfig(?string $serviceName = null): TranslateServiceInterface
+    public static function getTranslateServiceFromConfig(?string $serviceName = null): ?TranslateServiceInterface
     {
         $service = $serviceName ?? config('translator.translate.service');
 
@@ -74,7 +74,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         };
     }
 
-    public static function getproofreadServiceFromConfig(?string $serviceName = null): ProofreadServiceInterface
+    public static function getproofreadServiceFromConfig(?string $serviceName = null): ?ProofreadServiceInterface
     {
         $service = $serviceName ?? config('translator.proofread.service');
 
@@ -91,7 +91,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         };
     }
 
-    public static function getSearchcodeServiceFromConfig(?string $serviceName = null): SearchCodeServiceInterface
+    public static function getSearchcodeServiceFromConfig(?string $serviceName = null): ?SearchCodeServiceInterface
     {
         $service = $serviceName ?? config('translator.searchcode.service');
 
