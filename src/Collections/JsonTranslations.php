@@ -50,6 +50,6 @@ final class JsonTranslations extends Collection implements TranslationsInterface
 
     public function toFile(): string
     {
-        return $this->toJson();
+        return $this->toJson(JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 }
