@@ -60,9 +60,12 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
         return match ($service) {
             'deepl', DeepLService::class => new DeepLService(
-                key: config('translator.translate.services.deepl.key')
+                key: config('translator.services.deepl.key')
             ),
             'openai', OpenAiService::class => new OpenAiService(
+                apiKey: config('translator.services.openai.key') ?? config('translator.translate.services.openai.key'),
+                organization: config('translator.services.openai.organization') ?? config('translator.translate.services.openai.organization'),
+                timeout: config('translator.services.openai.request_timeout') ?? config('translator.translate.services.openai.request_timeout') ?? 120,
                 model: config('translator.translate.services.openai.model'),
                 prompt: config('translator.translate.services.openai.prompt'),
             ),
@@ -77,6 +80,9 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
         return match ($service) {
             'openai', ProofreadOpenAiService::class => new ProofreadOpenAiService(
+                apiKey: config('translator.services.openai.key') ?? config('translator.translate.services.openai.key'),
+                organization: config('translator.services.openai.organization') ?? config('translator.translate.services.openai.organization'),
+                timeout: config('translator.services.openai.request_timeout') ?? config('translator.translate.services.openai.request_timeout') ?? 120,
                 model: config('translator.proofread.services.openai.model'),
                 prompt: config('translator.proofread.services.openai.prompt'),
             ),

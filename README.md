@@ -7,12 +7,11 @@
 
 Manage all your laravel translations easily:
 
--   Translate strings to other languages (DeepL, OpenAI or any custom service)
--   Proofread your translations strings and automatically fix grammar and syntax (OpenAI, or any custome service)
--   Find missing translations strings in all your locales
--   Find dead translations keys (keys not used anywhere in your codebase)
--   Sort your tranlations in natural order
--   Format your translations files
+-   **Translate** strings to other languages (DeepL, OpenAI or any custom service)
+-   **Proofread** your translations strings and automatically fix grammar and syntax (OpenAI, or any custome service)
+-   **Find missing** translations strings in all your locales
+-   **Find dead** translations keys (keys not used anywhere in your codebase)
+-   **Sort** your tranlations in natural order
 
 ## Installation
 
@@ -22,7 +21,7 @@ You can install the package via composer:
 composer require-dev elegantly/laravel-translator
 ```
 
-You can publish the config file with:
+Then publish the config file with:
 
 ```bash
 php artisan vendor:publish --tag="translator-config"
@@ -40,12 +39,20 @@ return [
      */
     'sort_keys' => false,
 
+    'services' => [
+        'openai' => [
+            'key' => env('OPENAI_API_KEY'),
+            'organization' => env('OPENAI_ORGANIZATION'),
+            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
+        ],
+        'deepl' => [
+            'key' => env('DEEPL_KEY'),
+        ],
+    ],
+
     'translate' => [
         'service' => 'openai',
         'services' => [
-            'deepl' => [
-                'key' => env('DEEPL_KEY'),
-            ],
             'openai' => [
                 'model' => 'gpt-4o',
                 'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
@@ -73,7 +80,7 @@ return [
         'service' => 'php-parser',
 
         /**
-         * Files or directories to include
+         * Files or directories to include in the deadcode scan
          */
         'paths' => [
             app_path(),
@@ -81,12 +88,12 @@ return [
         ],
 
         /**
-         * Files or directories to exclude
+         * Files or directories to exclude from the deadcode scan
          */
         'excluded_paths' => [],
 
         /**
-         * Translations to exclude from deadcode detection
+         * Translations keys to exclude from deadcode detection
          */
         'ignored_translations' => [
             // 'validation',
@@ -105,92 +112,208 @@ return [
 ];
 ```
 
-## Usage
+## Translate your strings automatically
 
-This package can be used:
+Before translating anyhting, you must chose and setup a translation service. This package includes two services by default:
 
--   Like a CLI tool, using commands.
--   In a programmatic way using `\Elegantly\Translator\Facades\Translator::class` facade.
-
-### Sort all translations in natural order
-
-You can format and sort all your php translations files using:
-
-```bash
-php artisan translator:sort
-```
-
-```php
-use Elegantly\Translator\Facades\Translator;
-
-Translator::sortAllTranslations();
-```
-
-### Find the missing translations
-
-You can display all the missing translations keys defined for a given locale but not for the other ones:
-
-```bash
-php artisan translator:missing fr
-```
-
-```php
-use Elegantly\Translator\Facades\Translator;
-
-Translator::getAllMissingTranslations('fr');
-```
-
-### Auto translate strings
-
-This package can automatically translate your translations strings for you.
-Right now, it includes 2 services :
-
--   DeepL
 -   OpenAI
+-   DeepL
 
-You can also define your own service.
+### Setting up OpenAI
 
-### Auto-translate using DeepL
-
-First, you need to edit the config file to add your DeepL api key and select deepl as your service:
+First configure the OpenAI key in the config file or define the env value:
 
 ```php
 return [
-    'translate' => [
-        'service' => 'deepl', // select the default service here
+    // ...
 
-        'services' => [
-            'deepl' => [
-                'key' => env('DEEPL_KEY'), // add you api key here
-            ],
-
+    'services' => [
+        'openai' => [
+            'key' => env('OPENAI_API_KEY'),
+            'organization' => env('OPENAI_ORGANIZATION'),
+            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
         ],
     ],
+
+    // ...
 ]
 ```
 
-To translate all the missing translations use:
+### Setting up DeepL
+
+First configure the DeepL key in the config file or define the env value:
+
+```php
+return [
+    // ...
+
+    'services' => [
+        // ...
+        'deepl' => [
+            'key' => env('DEEPL_KEY'),
+        ],
+    ],
+
+    // ...
+]
+```
+
+### From CLI
 
 ```bash
 php artisan translator:translate
 ```
 
-To translate all translations use:
-
-```bash
-php artisan translator:translate --all
-```
-
-Ommitting the `--to` option will translate to every available languages in your project.
+### From code
 
 ```php
 use Elegantly\Translator\Facades\Translator;
 
+// Translate strings defined in php files
 Translator::translateTranslations(
     source: 'fr',
     target: 'en',
-    namespace: 'namespace-file-or-null',
+    namespace: 'validation',
     keys: ['title', ...]
+);
+
+// Translate strings defined in JSON files
+Translator::translateTranslations(
+    source: 'fr',
+    target: 'en',
+    namespace: null,
+    keys: ['title', ...]
+);
+```
+
+## Proofread your translations
+
+This package allow you to proofread (i.e fix grammar and syntax) your translations strings.
+For now the package includes one service:
+
+-   OpenAI
+
+But you can create you own service if you need.
+
+### Setting up OpenAI
+
+First configure the OpenAI key in the config file or define the env value:
+
+```php
+return [
+    // ...
+
+    'services' => [
+        'openai' => [
+            'key' => env('OPENAI_API_KEY'),
+            'organization' => env('OPENAI_ORGANIZATION'),
+            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
+        ],
+    ],
+
+    // ...
+]
+```
+
+### From CLI
+
+```bash
+php artisan translator:proofread
+```
+
+### From code
+
+```php
+use Elegantly\Translator\Facades\Translator;
+
+// proofread translations strings defined in php files
+Translator::proofreadTranslations(
+    locale: 'fr',
+    namespace: 'auth',
+    keys: ['title', ...]
+);
+
+// proofread translations strings defined in JSON files
+Translator::proofreadTranslations(
+    locale: 'fr',
+    namespace: null,
+    keys: ['title', ...]
+);
+```
+
+## Find missing translations
+
+### From CLI
+
+```bash
+php artisan translator:missing
+```
+
+### From code
+
+```php
+// compare /fr/validation.php and /en/validation.php
+Translator::getMissingTranslations(
+    source: 'fr',
+    target: 'en',
+    namespace: 'validation'
+);
+
+// compare /fr.json and /en.json
+Translator::getMissingTranslations(
+    source: 'fr',
+    target: 'en',
+    namespace: null
+);
+```
+
+## Find dead translations
+
+### From CLI
+
+```bash
+php artisan translator:dead
+```
+
+### From code
+
+```php
+// compare /fr/validation.php and /en/validation.php
+Translator::getDeadTranslations(
+    locale: 'fr',
+    namespace: 'validation'
+);
+
+// compare /fr.json and /en.json
+Translator::getDeadTranslations(
+    locale: 'fr',
+    namespace: null
+);
+```
+
+## Sort & format your translations files
+
+### From CLI
+
+```bash
+php artisan translator:sort
+```
+
+### From code
+
+```php
+use Elegantly\Translator\Facades\Translator;
+
+// sort translations from `/fr/validation.php`
+Translator::sortTranslations(
+    locale: 'fr',
+    namespace: 'validation'
+);
+
+// sort translations from `/fr.json`
+Translator::sortTranslations(
+    locale: 'fr',
+    namespace: null
 );
 ```
 

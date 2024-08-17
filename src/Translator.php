@@ -365,7 +365,7 @@ class Translator
             $namespace,
             function (PhpTranslations|JsonTranslations $translations) use ($service, $keys) {
 
-                $fixedTranslations = $service->fixAll(
+                $fixedTranslations = $service->proofreadAll(
                     texts: $translations
                         ->toDotTranslations()
                         ->only($keys)

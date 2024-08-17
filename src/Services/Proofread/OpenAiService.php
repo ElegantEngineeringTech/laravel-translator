@@ -4,23 +4,43 @@ namespace Elegantly\Translator\Services\Proofread;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use OpenAI\Laravel\Facades\OpenAI;
+use InvalidArgumentException;
+use OpenAI;
 
 class OpenAiService implements ProofreadServiceInterface
 {
     public function __construct(
+        public string $apiKey,
+        public ?string $organization,
+        public int $timeout,
         public string $model,
         public string $prompt,
     ) {
         //
     }
 
-    public function fixAll(array $texts): array
+    public function getOpenAI(): \OpenAI\Client
+    {
+        if (blank($this->apiKey)) {
+            throw throw new InvalidArgumentException(
+                'The OpenAI API Key is missing. Please publish the [translator.php] configuration file and set the [translator.translate.services.openai.key].'
+            );
+        }
+
+        return OpenAI::factory()
+            ->withApiKey($this->apiKey)
+            ->withOrganization($this->organization)
+            ->withHttpHeader('OpenAI-Beta', 'assistants=v2')
+            ->withHttpClient(new \GuzzleHttp\Client(['timeout' => $this->timeout]))
+            ->make();
+    }
+
+    public function proofreadAll(array $texts): array
     {
         return collect($texts)
             ->chunk(20)
             ->flatMap(function (Collection $chunk) {
-                $response = OpenAI::chat()->create([
+                $response = $this->getOpenAI()->chat()->create([
                     'model' => $this->model,
                     'response_format' => ['type' => 'json_object'],
                     'messages' => [
@@ -43,8 +63,8 @@ class OpenAiService implements ProofreadServiceInterface
             ->toArray();
     }
 
-    public function fix(string $text): ?string
+    public function proofread(string $text): ?string
     {
-        return Arr::first($this->fixAll([$text]));
+        return Arr::first($this->proofreadAll([$text]));
     }
 }

@@ -11,12 +11,20 @@ return [
      */
     'sort_keys' => false,
 
+    'services' => [
+        'openai' => [
+            'key' => env('OPENAI_API_KEY'),
+            'organization' => env('OPENAI_ORGANIZATION'),
+            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
+        ],
+        'deepl' => [
+            'key' => env('DEEPL_KEY'),
+        ],
+    ],
+
     'translate' => [
         'service' => 'openai',
         'services' => [
-            'deepl' => [
-                'key' => env('DEEPL_KEY'),
-            ],
             'openai' => [
                 'model' => 'gpt-4o',
                 'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
@@ -44,7 +52,7 @@ return [
         'service' => 'php-parser',
 
         /**
-         * Files or directories to include
+         * Files or directories to include in the deadcode scan
          */
         'paths' => [
             app_path(),
@@ -52,12 +60,12 @@ return [
         ],
 
         /**
-         * Files or directories to exclude
+         * Files or directories to exclude from the deadcode scan
          */
         'excluded_paths' => [],
 
         /**
-         * Translations to exclude from deadcode detection
+         * Translations keys to exclude from deadcode detection
          */
         'ignored_translations' => [
             // 'validation',
