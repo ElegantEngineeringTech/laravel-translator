@@ -35,8 +35,13 @@ return [
 
     'lang_path' => lang_path(),
 
+    /**
+     * Auto sort translations keys after each manipulations: translate, grammar, ...
+     */
+    'sort_keys' => false,
+
     'translate' => [
-        'service' => 'deepl',
+        'service' => 'openai',
         'services' => [
             'deepl' => [
                 'key' => env('DEEPL_KEY'),
@@ -48,17 +53,53 @@ return [
         ],
     ],
 
-    'grammar' => [
+    'proofread' => [
         'service' => 'openai',
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o',
                 'prompt' => '
-                            Fix the grammar and the syntax the following json string while preserving the keys.
-                            Do not change the meaning or the tone of the sentences and never change the keys.
+                            Fix the grammar and the syntax the following json string while respecting the following rules:
+                                - Never change the keys.
+                                - Do not escape nor change HTML tags.
+                                - Do not escape nor change special characters or emojis.
+                                - Do not change the meaning or the tone of the sentences.
                             ',
             ],
         ],
+    ],
+
+    'searchcode' => [
+        'service' => 'php-parser',
+
+        /**
+         * Files or directories to include
+         */
+        'paths' => [
+            app_path(),
+            resource_path(),
+        ],
+
+        /**
+         * Files or directories to exclude
+         */
+        'excluded_paths' => [],
+
+        /**
+         * Translations to exclude from deadcode detection
+         */
+        'ignored_translations' => [
+            // 'validation',
+            // 'passwords',
+            // 'pagination',
+        ],
+
+        'services' => [
+            'php-parser' => [
+                'cache_path' => base_path('.translator.cache'),
+            ],
+        ],
+
     ],
 
 ];
@@ -69,7 +110,7 @@ return [
 This package can be used:
 
 -   Like a CLI tool, using commands.
--   In a programmatic way using `\Elegantly\Translator\Facades\Translator::class` facade class.
+-   In a programmatic way using `\Elegantly\Translator\Facades\Translator::class` facade.
 
 ### Sort all translations in natural order
 
@@ -87,7 +128,7 @@ Translator::sortAllTranslations();
 
 ### Find the missing translations
 
-You can display all the missing translations present in a given locale but not in the other ones using:
+You can display all the missing translations keys defined for a given locale but not for the other ones:
 
 ```bash
 php artisan translator:missing fr
@@ -101,8 +142,8 @@ Translator::getAllMissingTranslations('fr');
 
 ### Auto translate strings
 
-This package can automatically translate your files for you.
-It includes 2 services right now:
+This package can automatically translate your translations strings for you.
+Right now, it includes 2 services :
 
 -   DeepL
 -   OpenAI
@@ -146,9 +187,9 @@ Ommitting the `--to` option will translate to every available languages in your 
 use Elegantly\Translator\Facades\Translator;
 
 Translator::translateTranslations(
-    referenceLocale: 'fr',
-    targetLocale: 'en',
-    namespace: 'namespace-file',
+    source: 'fr',
+    target: 'en',
+    namespace: 'namespace-file-or-null',
     keys: ['title', ...]
 );
 ```
