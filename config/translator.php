@@ -23,7 +23,7 @@ return [
     ],
 
     'translate' => [
-        'service' => 'openai',
+        'service' => null,
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o',
@@ -33,7 +33,7 @@ return [
     ],
 
     'proofread' => [
-        'service' => 'openai',
+        'service' => null,
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o',
