@@ -219,6 +219,26 @@ it('sets translations', function () {
     ]);
 });
 
+it('sets json translations', function () {
+    $translator = new Translator(
+        storage: $this->getStorage(),
+    );
+
+    $translator->setTranslations('fr', Translator::JSON_NAMESPACE, [
+        'Missing' => 'Absent',
+        'Empty' => 'Vide',
+    ]);
+
+    $translations = $translator->getTranslations('fr', Translator::JSON_NAMESPACE);
+
+    expect(
+        $translations->toArray()
+    )->toMatchArray([
+        'Missing' => 'Absent',
+        'Empty' => 'Vide',
+    ]);
+});
+
 it('deletes translations', function () {
     $translator = new Translator(
         storage: $this->getStorage(),
