@@ -297,7 +297,7 @@ class Translator
         }
 
         return $this->transformTranslations(
-            $source,
+            $target,
             $namespace,
             function (PhpTranslations|JsonTranslations $translations) use ($source, $target, $namespace, $keys, $service) {
 
