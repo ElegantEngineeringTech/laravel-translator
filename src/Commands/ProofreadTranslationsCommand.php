@@ -14,14 +14,14 @@ use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\progress;
 use function Laravel\Prompts\select;
 
-class FixGrammarTranslationsCommand extends Command implements PromptsForMissingInput
+class ProofreadTranslationsCommand extends Command implements PromptsForMissingInput
 {
-    public $signature = 'translator:grammar
+    public $signature = 'translator:proofread
                             {locale : The locale to fix}
                             {--namespaces=* : The namespaces to fix}
                             {--service= : The service to use}';
 
-    public $description = 'Fix grammar in the given locale translations.';
+    public $description = 'Proofread the translations in the given locale.';
 
     public function handle(): int
     {
@@ -32,21 +32,21 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
         $namespaces = $this->option('namespaces');
 
         progress(
-            label: 'Fixing grammar',
+            label: 'Proofreading',
             steps: $namespaces,
             callback: function (string $namespace, Progress $progress) use ($locale, $service) {
-                $progress->label("Fixing {$namespace}");
+                $progress->label("Proofreading {$namespace}");
 
                 $keys = Translator::getTranslations($locale, $namespace)
                     ->dot()
                     ->keys()
                     ->toArray();
 
-                Translator::fixGrammarTranslations(
+                Translator::proofreadTranslations(
                     locale: $locale,
                     namespace: $namespace,
                     keys: $keys,
-                    service: TranslatorServiceProvider::getGrammarServiceFromConfig($service)
+                    service: TranslatorServiceProvider::getproofreadServiceFromConfig($service)
                 );
             },
         );
@@ -59,7 +59,7 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
         return [
             'locale' => function () {
                 return select(
-                    label: 'What locale would you like to fix?',
+                    label: 'What locale would you like to proofread?',
                     options: Translator::getLocales(),
                     default: config('app.locale'),
                     required: true,
@@ -79,7 +79,7 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
             $options = Translator::getNamespaces($this->argument('locale'));
 
             $input->setOption('namespaces', multiselect(
-                label: 'What namespaces would you like to fix?',
+                label: 'What namespaces would you like to proofread?',
                 options: $options,
                 default: $options,
                 required: true,
@@ -89,8 +89,8 @@ class FixGrammarTranslationsCommand extends Command implements PromptsForMissing
         if ($input->getOption('service') === null) {
             $input->setOption('service', select(
                 label: 'What service would you like to use?',
-                options: array_keys(config('translator.grammar.services')),
-                default: config('translator.grammar.service'),
+                options: array_keys(config('translator.proofread.services')),
+                default: config('translator.proofread.service'),
                 required: true,
             ));
         }

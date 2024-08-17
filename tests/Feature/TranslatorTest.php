@@ -16,7 +16,22 @@ it('gets namespaces', function () {
         storage: $this->getStorage(),
     );
 
-    expect($translator->getNamespaces('fr'))->toBe(['messages']);
+    expect($translator->getNamespaces('fr'))->toBe([
+        Translator::JSON_NAMESPACE,
+        'messages',
+    ]);
+});
+
+it('gets json translations', function () {
+    $translator = new Translator(
+        storage: $this->getStorage(),
+    );
+
+    $translations = $translator->getTranslations('fr');
+
+    expect($translations)->toHaveLength(2);
+
+    expect($translations->get('All rights reserved.'))->not->toBe(null);
 });
 
 it('sorts and saves nested translations', function () {
@@ -58,12 +73,12 @@ it('finds missing translations', function () {
     );
 
     $missing = $translator->getMissingTranslations(
-        referenceLocale: 'fr',
-        targetLocale: 'en',
+        source: 'fr',
+        target: 'en',
         namespace: 'messages'
     );
 
-    expect($missing)->toBe([
+    expect($missing->toArray())->toBe([
         'home.missing',
         'empty',
         'missing',
@@ -76,10 +91,10 @@ it('finds all missing translations', function () {
     );
 
     $missing = $translator->getAllMissingTranslations(
-        referenceLocale: 'fr',
+        source: 'fr',
     );
 
-    expect($missing)->toBe([
+    expect($missing->toArray())->toBe([
         'en' => [
             'messages' => [
                 'home.missing',
@@ -107,7 +122,7 @@ it('finds dead translations in a namespace', function () {
         namespace: 'messages'
     );
 
-    expect($dead)->toBe([
+    expect($dead->toArray())->toBe([
         'hello',
         'add',
         'home.title',
@@ -136,7 +151,7 @@ it('ignore dead translations', function () {
         ignore: ['messages.home', 'messages.empty']
     );
 
-    expect($dead)->toBe([
+    expect($dead->toArray())->toBe([
         'hello',
         'add',
         'missing',
@@ -157,7 +172,7 @@ it('finds all dead translations', function () {
 
     $deadTranslations = $translator->getAllDeadTranslations();
 
-    expect($deadTranslations)->toBe([
+    expect($deadTranslations->toArray())->toBe([
         'en' => [
             'messages' => [
                 'hello',
@@ -168,6 +183,9 @@ it('finds all dead translations', function () {
             ],
         ],
         'fr' => [
+            '_JSON_' => [
+                'All rights reserved.',
+            ],
             'messages' => [
                 'hello',
                 'add',

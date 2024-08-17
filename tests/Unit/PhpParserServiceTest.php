@@ -39,6 +39,7 @@ it('gets all the translations keys grouped by files', function () {
             'messages.dummy.view',
         ],
         "{$resourcesPath}/views/dummy-view.blade.php" => [
+            'This one is used.',
             'messages.dummy.nested',
             'messages.dummy.view',
             'messages.dummy.view',
@@ -60,6 +61,12 @@ it('gets all the files grouped by translations', function () {
     );
 
     expect($service->filesByTranslations())->toBe([
+        'This one is used.' => [
+            'count' => 1,
+            'files' => [
+                "{$resourcesPath}/views/dummy-view.blade.php",
+            ],
+        ],
         'messages.dummy.class' => [
             'count' => 1,
             'files' => [

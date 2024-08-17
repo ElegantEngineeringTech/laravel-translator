@@ -2,13 +2,13 @@
 
 namespace Elegantly\Translator;
 
-use Elegantly\Translator\Commands\FixGrammarTranslationsCommand;
+use Elegantly\Translator\Commands\ProofreadTranslationsCommand;
 use Elegantly\Translator\Commands\ShowDeadTranslationsCommand;
 use Elegantly\Translator\Commands\ShowMissingTranslationsCommand;
 use Elegantly\Translator\Commands\SortAllTranslationsCommand;
 use Elegantly\Translator\Commands\TranslateTranslationsCommand;
-use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
-use Elegantly\Translator\Services\Grammar\OpenAiService as GrammarOpenAiService;
+use Elegantly\Translator\Services\Proofread\OpenAiService as ProofreadOpenAiService;
+use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\DeepLService;
@@ -34,7 +34,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 ShowMissingTranslationsCommand::class,
                 SortAllTranslationsCommand::class,
                 TranslateTranslationsCommand::class,
-                FixGrammarTranslationsCommand::class,
+                ProofreadTranslationsCommand::class,
                 ShowDeadTranslationsCommand::class,
             ]);
     }
@@ -48,7 +48,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                     'root' => config('translator.lang_path'),
                 ]),
                 translateService: static::getTranslateServiceFromConfig(),
-                grammarService: static::getGrammarServiceFromConfig(),
+                proofreadService: static::getproofreadServiceFromConfig(),
                 searchcodeService: static::getSearchcodeServiceFromConfig(),
             );
         });
@@ -71,14 +71,14 @@ class TranslatorServiceProvider extends PackageServiceProvider
         };
     }
 
-    public static function getGrammarServiceFromConfig(?string $serviceName = null): GrammarServiceInterface
+    public static function getproofreadServiceFromConfig(?string $serviceName = null): ProofreadServiceInterface
     {
-        $service = $serviceName ?? config('translator.grammar.service');
+        $service = $serviceName ?? config('translator.proofread.service');
 
         return match ($service) {
-            'openai', GrammarOpenAiService::class => new GrammarOpenAiService(
-                model: config('translator.grammar.services.openai.model'),
-                prompt: config('translator.grammar.services.openai.prompt'),
+            'openai', ProofreadOpenAiService::class => new ProofreadOpenAiService(
+                model: config('translator.proofread.services.openai.model'),
+                prompt: config('translator.proofread.services.openai.prompt'),
             ),
             '', null => null,
             default => new $service,

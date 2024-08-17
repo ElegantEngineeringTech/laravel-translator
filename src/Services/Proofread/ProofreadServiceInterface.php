@@ -1,8 +1,8 @@
 <?php
 
-namespace Elegantly\Translator\Services\Grammar;
+namespace Elegantly\Translator\Services\Proofread;
 
-interface GrammarServiceInterface
+interface ProofreadServiceInterface
 {
     public function fixAll(array $texts): array;
 

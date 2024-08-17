@@ -10,14 +10,17 @@ uses()->beforeEach(function () {
     /** @var Filesystem $storage */
     $storage = $this->getStorage();
 
-    foreach ($storage->allDirectories() as $locale) {
-        foreach ($storage->allFiles($locale) as $file) {
-            if (str($file)->endsWith('.php')) {
-                $storage->copy(
-                    from: $file,
-                    to: str_replace('.php', '.php.stub', $file),
-                );
-            }
+    foreach ($storage->allFiles() as $file) {
+        if (str($file)->endsWith('.php')) {
+            $storage->copy(
+                from: $file,
+                to: str_replace('.php', '.php.stub', $file),
+            );
+        } elseif (str($file)->endsWith('.json')) {
+            $storage->copy(
+                from: $file,
+                to: str_replace('.json', '.json.stub', $file),
+            );
         }
     }
 })->in('Feature');
@@ -26,14 +29,17 @@ uses()->afterEach(function () {
     /** @var Filesystem $storage */
     $storage = $this->getStorage();
 
-    foreach ($storage->allDirectories() as $locale) {
-        foreach ($storage->allFiles($locale) as $file) {
-            if (str($file)->endsWith('.php.stub')) {
-                $storage->move(
-                    from: $file,
-                    to: str_replace('.php.stub', '.php', $file),
-                );
-            }
+    foreach ($storage->allFiles() as $file) {
+        if (str($file)->endsWith('.php.stub')) {
+            $storage->move(
+                from: $file,
+                to: str_replace('.php.stub', '.php', $file),
+            );
+        } elseif (str($file)->endsWith('.json.stub')) {
+            $storage->move(
+                from: $file,
+                to: str_replace('.json.stub', '.json', $file),
+            );
         }
     }
 

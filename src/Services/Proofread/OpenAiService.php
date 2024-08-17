@@ -1,12 +1,12 @@
 <?php
 
-namespace Elegantly\Translator\Services\Grammar;
+namespace Elegantly\Translator\Services\Proofread;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use OpenAI\Laravel\Facades\OpenAI;
 
-class OpenAiService implements GrammarServiceInterface
+class OpenAiService implements ProofreadServiceInterface
 {
     public function __construct(
         public string $model,

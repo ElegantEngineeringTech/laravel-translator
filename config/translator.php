@@ -24,7 +24,7 @@ return [
         ],
     ],
 
-    'grammar' => [
+    'proofread' => [
         'service' => 'openai',
         'services' => [
             'openai' => [

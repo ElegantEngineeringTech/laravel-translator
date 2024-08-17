@@ -52,8 +52,8 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
                 }
 
                 return Translator::translateTranslations(
-                    referenceLocale: $from,
-                    targetLocale: $to,
+                    source: $from,
+                    target: $to,
                     namespace: $namespace,
                     keys: $keys,
                     service: TranslatorServiceProvider::getTranslateServiceFromConfig($service)

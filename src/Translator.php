@@ -3,20 +3,25 @@
 namespace Elegantly\Translator;
 
 use Closure;
+use Elegantly\Translator\Collections\JsonTranslations;
+use Elegantly\Translator\Collections\PhpTranslations;
 use Elegantly\Translator\Exceptions\TranslatorException;
 use Elegantly\Translator\Exceptions\TranslatorServiceException;
-use Elegantly\Translator\Services\Grammar\GrammarServiceInterface;
+use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 
 class Translator
 {
+    const JSON_NAMESPACE = '_JSON_';
+
     public function __construct(
         public Filesystem $storage,
         public ?TranslateServiceInterface $translateService = null,
-        public ?GrammarServiceInterface $grammarService = null,
+        public ?ProofreadServiceInterface $proofreadService = null,
         public ?SearchCodeServiceInterface $searchcodeService = null,
     ) {
         //
@@ -33,43 +38,49 @@ class Translator
             ->toArray();
     }
 
-    /**
-     * @return string[]
-     */
-    public function getLanguages(): array
-    {
-        return $this->getLocales();
-    }
-
     public function getNamespaces(string $locale): array
     {
         return collect($this->storage->allFiles($locale))
             ->filter(fn (string $file) => File::extension($file) === 'php')
             ->map(fn (string $file) => File::name($file))
+            ->when(
+                $this->storage->exists("{$locale}.json"),
+                fn (Collection $collection) => $collection->push(static::JSON_NAMESPACE)
+            )
             ->sort(SORT_NATURAL)
             ->values()
             ->toArray();
     }
 
-    /**
-     * This function uses eval and not include
-     * Because using 'include' would cache/compile the code in opcache
-     * Therefore it would not reflect the changes after the file is edited
-     */
-    public function getTranslations(string $locale, string $namespace): Translations
-    {
+    public function getTranslations(
+        string $locale,
+        ?string $namespace = null
+    ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
+        /**
+         * This function uses eval and not include
+         * Because using 'include' would cache/compile the code in opcache
+         * Therefore it would not reflect the changes after the file is edited
+         */
         if ($content = $this->getTranslationsFileContent($locale, $namespace)) {
-            return new Translations(
-                items: eval('?>'.$content),
-            );
+
+            return match ($namespace) {
+                static::JSON_NAMESPACE => new JsonTranslations(json_decode($content, true)),
+                default => new PhpTranslations(eval('?>'.$content)),
+            };
         }
 
-        return new Translations;
+        return new PhpTranslations;
     }
 
-    public function getTranslationsFileContent(string $locale, string $namespace): ?string
-    {
-        $path = "{$locale}/{$namespace}.php";
+    protected function getTranslationsFileContent(
+        string $locale,
+        ?string $namespace = null
+    ): ?string {
+        $namespace ??= static::JSON_NAMESPACE;
+
+        $path = $this->getTranslationsPath($locale, $namespace);
 
         if ($this->storage->exists($path)) {
             return $this->storage->get($path);
@@ -79,46 +90,48 @@ class Translator
     }
 
     /**
-     * Return all the translations keys present in the reference locale but not in the other ones
-     *
-     * @return array<string, array<string, array>>
+     * @return Collection<int, string>
      */
-    public function getAllMissingTranslations(
-        string $referenceLocale
-    ): array {
-        $locales = collect($this->getLocales())->diff([$referenceLocale]);
-
-        return $locales
-            ->mapWithKeys(function (string $locale) use ($referenceLocale) {
-                $namespaces = collect($this->getNamespaces($locale));
-
-                return [
-                    $locale => $namespaces
-                        ->mapWithKeys(fn (string $namespace) => [
-                            $namespace => $this->getMissingTranslations($referenceLocale, $locale, $namespace),
-                        ])
-                        ->filter(),
-                ];
-            })
-            ->filter()
-            ->toArray();
+    public function getMissingTranslations(
+        string $source,
+        string $target,
+        string $namespace,
+    ): Collection {
+        return $this
+            ->getTranslations($source, $namespace)
+            ->diffTranslationsKeys(
+                $this->getTranslations($target, $namespace)
+            );
     }
 
-    public function getMissingTranslations(
-        string $referenceLocale,
-        string $targetLocale,
-        string $namespace,
-    ): array {
-        $referenceTranslations = $this->getTranslations($referenceLocale, $namespace);
-        $targetTranslations = $this->getTranslations($targetLocale, $namespace);
+    /**
+     * Return all the translations keys present in the reference locale but not in the other ones
+     *
+     * @return Collection<string, Collection<string, Collection<int, string>>>
+     */
+    public function getAllMissingTranslations(
+        string $source
+    ): Collection {
+        $locales = collect($this->getLocales())->diff([$source]);
 
-        return $referenceTranslations->getMissingTranslationsIn($targetTranslations);
+        return $locales
+            ->mapWithKeys(function (string $locale) use ($source) {
+                $namespaces = collect($this->getNamespaces($locale))
+                    ->mapWithKeys(fn (string $namespace) => [
+                        $namespace => $this->getMissingTranslations($source, $locale, $namespace),
+                    ])
+                    ->filter();
+
+                return [$locale => $namespaces];
+            })
+            ->filter();
     }
 
     /**
      * Retreives the translations keys from locale not used in any file
      *
      * @param  null|(Closure(string $file, string[] $translations):void)  $progress
+     * @return Collection<int, string>
      */
     public function getDeadTranslations(
         string $locale,
@@ -126,51 +139,56 @@ class Translator
         ?SearchCodeServiceInterface $service = null,
         ?Closure $progress = null,
         ?array $ignore = null,
-    ): array {
+    ): Collection {
         $ignoredTranslations = $ignore ?? config('translator.searchcode.ignored_translations', []);
 
-        $definedTranslationsKeys = $this
+        $translationsKeys = $this
             ->getTranslations($locale, $namespace)
-            ->dot()
-            ->keys()
-            ->reject(fn (string $key) => str("{$namespace}.{$key}")->startsWith($ignoredTranslations))
+            ->toTranslationsKeys()
+            ->reject(function (string $key) use ($namespace, $ignoredTranslations) {
+                return match ($namespace) {
+                    static::JSON_NAMESPACE => str($key)->startsWith($ignoredTranslations),
+                    default => str("{$namespace}.{$key}")->startsWith($ignoredTranslations),
+                };
+            })
             ->values();
 
         $usedTranslationsKeys = array_keys($this->getFilesByUsedTranslations($service, $progress));
 
-        return $definedTranslationsKeys
-            ->reject(fn (string $key) => str("{$namespace}.{$key}")->startsWith($usedTranslationsKeys))
-            ->values()
-            ->toArray();
+        return $translationsKeys
+            ->reject(function (string $key) use ($usedTranslationsKeys, $namespace) {
+                return match ($namespace) {
+                    static::JSON_NAMESPACE => str($key)->startsWith($usedTranslationsKeys),
+                    default => str("{$namespace}.{$key}")->startsWith($usedTranslationsKeys),
+                };
+            })
+            ->values();
     }
 
     /**
      * @param  null|(Closure(string $file, string[] $translations):void)  $progress
-     * @return array<string, array<string, string[]>>
+     * @return Collection<string, Collection<string, Collection<int, string>>>
      */
     public function getAllDeadTranslations(
         ?Closure $progress = null,
         ?array $ignore = null,
-    ): array {
+    ): Collection {
         return collect($this->getLocales())
             ->mapWithKeys(function (string $locale) use ($progress, $ignore) {
-                $namespaces = collect($this->getNamespaces($locale));
+                $namespaces = collect($this->getNamespaces($locale))
+                    ->mapWithKeys(fn (string $namespace) => [
+                        $namespace => $this->getDeadTranslations(
+                            locale: $locale,
+                            namespace: $namespace,
+                            progress: $progress,
+                            ignore: $ignore
+                        ),
+                    ])
+                    ->filter();
 
-                return [
-                    $locale => $namespaces
-                        ->mapWithKeys(fn (string $namespace) => [
-                            $namespace => $this->getDeadTranslations(
-                                locale: $locale,
-                                namespace: $namespace,
-                                progress: $progress,
-                                ignore: $ignore
-                            ),
-                        ])
-                        ->filter(),
-                ];
+                return [$locale => $namespaces];
             })
-            ->filter()
-            ->toArray();
+            ->filter();
     }
 
     /**
@@ -211,23 +229,20 @@ class Translator
         return $service->translationsByFiles($progress);
     }
 
-    /**
-     * @param  array<string|int, string|int|float|array|null>  $values
-     */
     public function setTranslations(
         string $locale,
         string $namespace,
         array $values
-    ): Translations {
+    ): PhpTranslations|JsonTranslations {
 
-        if (count($values) === 0) {
-            return new Translations;
+        if (empty($values)) {
+            return $this->getNewTranslationsCollection($namespace);
         }
 
         return $this->transformTranslations(
             $locale,
             $namespace,
-            function (Translations $translations) use ($values) {
+            function (PhpTranslations|JsonTranslations $translations) use ($values) {
                 foreach ($values as $key => $value) {
                     $translations->set($key, $value);
                 }
@@ -241,40 +256,48 @@ class Translator
         )->only(array_keys($values));
     }
 
+    public function setTranslation(
+        string $locale,
+        string $namespace,
+        string $key,
+        mixed $value,
+    ): PhpTranslations|JsonTranslations {
+        return $this->setTranslations($locale, $namespace, [
+            $key => $value,
+        ]);
+    }
+
     public function translateTranslations(
-        string $referenceLocale,
-        string $targetLocale,
+        string $source,
+        string $target,
         string $namespace,
         array $keys,
         ?TranslateServiceInterface $service = null,
-    ): Translations {
+    ): PhpTranslations|JsonTranslations {
         $service = $service ?? $this->translateService;
 
         if (! $service) {
             throw TranslatorServiceException::missingTranslateService();
         }
 
-        if (count($keys) === 0) {
-            return new Translations;
+        if (empty($keys)) {
+            return $this->getNewTranslationsCollection($namespace);
         }
 
         return $this->transformTranslations(
-            $targetLocale,
+            $source,
             $namespace,
-            function (Translations $translations) use ($referenceLocale, $targetLocale, $namespace, $keys, $service) {
+            function (PhpTranslations|JsonTranslations $translations) use ($source, $target, $namespace, $keys, $service) {
 
-                $referenceTranslations = $this->getTranslations($referenceLocale, $namespace);
-
-                $referenceValues = $referenceTranslations
-                    ->toBase()
-                    ->dot()
+                $sourceDotTranslations = $this->getTranslations($source, $namespace)
+                    ->toDotTranslations()
                     ->only($keys)
                     ->filter(fn ($value) => ! blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(
-                    $referenceValues,
-                    $targetLocale
+                    $sourceDotTranslations,
+                    $target
                 );
 
                 foreach ($translatedValues as $key => $value) {
@@ -290,89 +313,57 @@ class Translator
         )->only($keys);
     }
 
-    public function fixGrammarTranslations(
+    public function translateTranslation(
+        string $source,
+        string $target,
+        string $namespace,
+        string $key,
+        ?TranslateServiceInterface $service = null,
+    ): PhpTranslations|JsonTranslations {
+        return $this->translateTranslations(
+            $source,
+            $target,
+            $namespace,
+            [$key],
+            $service
+        );
+    }
+
+    public function proofreadTranslations(
         string $locale,
         string $namespace,
         array $keys,
-        ?GrammarServiceInterface $service = null,
-    ): Translations {
-        $service = $service ?? $this->grammarService;
+        ?ProofreadServiceInterface $service = null,
+    ): PhpTranslations|JsonTranslations {
+        $service = $service ?? $this->proofreadService;
 
         if (! $service) {
-            throw TranslatorServiceException::missingGrammarService();
+            throw TranslatorServiceException::missingProofreadService();
         }
 
-        return $this->transformTranslations($locale, $namespace, function (Translations $translations) use ($service, $keys) {
+        if (empty($keys)) {
+            return $this->getNewTranslationsCollection($namespace);
+        }
 
-            $fixedTranslations = $service->fixAll(
-                texts: $translations
-                    ->toBase()
-                    ->dot()
-                    ->only($keys)
-                    ->filter(fn ($value) => ! blank($value))
-                    ->toArray()
-            );
-
-            foreach ($fixedTranslations as $key => $value) {
-                $translations->set($key, $value);
-            }
-
-            if (config('translator.sort_keys')) {
-                $translations->sortNatural();
-            }
-
-            return $translations;
-        });
-    }
-
-    public function setTranslation(
-        string $locale,
-        string $namespace,
-        string $key,
-        string|array|int|float|null $value,
-    ): Translations {
-        return $this->setTranslations($locale, $namespace, [
-            $key => $value,
-        ]);
-    }
-
-    public function translateTranslation(
-        string $referenceLocale,
-        string $targetLocale,
-        string $namespace,
-        string $key,
-    ): Translations {
-        return $this->translateTranslations(
-            $referenceLocale,
-            $targetLocale,
-            $namespace,
-            [$key]
-        );
-    }
-
-    public function deleteTranslation(
-        string $locale,
-        string $namespace,
-        string $key,
-    ): Translations {
-        return $this->deleteTranslations(
-            $locale,
-            $namespace,
-            [$key]
-        );
-    }
-
-    public function deleteTranslations(
-        string $locale,
-        string $namespace,
-        array $keys,
-    ): Translations {
         return $this->transformTranslations(
             $locale,
             $namespace,
-            function (Translations $translations) use ($keys) {
-                foreach ($keys as $key) {
-                    $translations->forget($key);
+            function (PhpTranslations|JsonTranslations $translations) use ($service, $keys) {
+
+                $fixedTranslations = $service->fixAll(
+                    texts: $translations
+                        ->toDotTranslations()
+                        ->only($keys)
+                        ->filter(fn ($value) => ! blank($value))
+                        ->toArray()
+                );
+
+                foreach ($fixedTranslations as $key => $value) {
+                    $translations->set($key, $value);
+                }
+
+                if (config('translator.sort_keys')) {
+                    $translations->sortNatural();
                 }
 
                 return $translations;
@@ -380,32 +371,81 @@ class Translator
         );
     }
 
-    public function sortTranslations(string $locale, string $namespace): Translations
+    public function proofreadTranslation(
+        string $locale,
+        string $namespace,
+        string $key,
+        ?ProofreadServiceInterface $service = null,
+    ): PhpTranslations|JsonTranslations {
+        return $this->proofreadTranslations(
+            $locale,
+            $namespace,
+            [$key],
+            $service
+        );
+    }
+
+    public function deleteTranslations(
+        string $locale,
+        string $namespace,
+        array $keys,
+    ): PhpTranslations|JsonTranslations {
+        return $this->transformTranslations(
+            $locale,
+            $namespace,
+            function (PhpTranslations|JsonTranslations $translations) use ($keys) {
+                $translations->forget($keys);
+
+                return $translations;
+            }
+        );
+    }
+
+    public function deleteTranslation(
+        string $locale,
+        string $namespace,
+        string $key,
+    ): PhpTranslations|JsonTranslations {
+        return $this->deleteTranslations(
+            $locale,
+            $namespace,
+            [$key]
+        );
+    }
+
+    public function sortTranslations(string $locale, string $namespace): PhpTranslations|JsonTranslations
     {
         return $this->transformTranslations(
             $locale,
             $namespace,
-            fn (Translations $translations) => $translations->sortNatural()
+            fn (PhpTranslations|JsonTranslations $translations) => $translations->sortNatural()
         );
     }
 
-    public function sortAllTranslations(): void
+    /**
+     * @return Collection<string, Collection<string, PhpTranslations|JsonTranslations>>
+     */
+    public function sortAllTranslations(): Collection
     {
-        foreach ($this->getLocales() as $locale) {
-            foreach ($this->getNamespaces($locale) as $namespace) {
-                $this->sortTranslations($locale, $namespace);
-            }
-        }
+        return collect($this->getLocales())
+            ->mapWithKeys(function (string $locale) {
+                $namespaces = collect($this->getNamespaces($locale))
+                    ->mapWithKeys(function (string $namespace) use ($locale) {
+                        return [$namespace => $this->sortTranslations($locale, $namespace)];
+                    });
+
+                return [$locale => $namespaces];
+            });
     }
 
     /**
-     * @param  callable(Translations $translations):Translations  $callback
+     * @param  Closure(PhpTranslations|JsonTranslations $translations):(PhpTranslations|JsonTranslations)  $callback
      */
     public function transformTranslations(
         string $locale,
         string $namespace,
-        callable $callback,
-    ): Translations {
+        Closure $callback,
+    ): PhpTranslations|JsonTranslations {
         $translations = $this->getTranslations($locale, $namespace);
         $translations = $callback($translations);
 
@@ -419,25 +459,37 @@ class Translator
     public function saveTranslations(
         string $locale,
         string $namespace,
-        Translations $translations,
+        PhpTranslations|JsonTranslations $translations,
     ): bool {
-        $content = "<?php\n\nreturn [";
-
-        $content .= $translations->toFile();
-
-        $content .= "\n];\n";
-
         return $this->storage->put(
-            "{$locale}/{$namespace}.php",
-            $content
+            $this->getTranslationsPath($locale, $namespace),
+            $translations->toFile()
         );
     }
 
-    public function clearCache(): static
+    public function getTranslationsPath(
+        string $locale,
+        ?string $namespace = null
+    ): string {
+        $namespace ??= static::JSON_NAMESPACE;
+
+        return match ($namespace) {
+            static::JSON_NAMESPACE => "{$locale}.json",
+            default => "{$locale}/{$namespace}.php",
+        };
+    }
+
+    public function getNewTranslationsCollection(
+        string $namespace
+    ): PhpTranslations|JsonTranslations {
+        return match ($namespace) {
+            static::JSON_NAMESPACE => new JsonTranslations,
+            default => new PhpTranslations,
+        };
+    }
+
+    public function clearCache(): void
     {
-
         $this->searchcodeService?->getCache()?->flush();
-
-        return $this;
     }
 }

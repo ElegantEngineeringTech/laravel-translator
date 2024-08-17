@@ -1,9 +1,9 @@
 <?php
 
-use Elegantly\Translator\Translations;
+use Elegantly\Translator\Collections\PhpTranslations;
 
 it('sorts translations and nested translations', function () {
-    $translations = new Translations(
+    $translations = new PhpTranslations(
         items: [
             'c' => null,
             'b' => null,
@@ -37,7 +37,7 @@ it('sorts translations and nested translations', function () {
 });
 
 it('finds missing (nested) translations in another collections', function () {
-    $translations = new Translations([
+    $translations = new PhpTranslations([
         'a' => 'text',
         'b' => 'text',
         'c' => [
@@ -51,8 +51,8 @@ it('finds missing (nested) translations in another collections', function () {
         ],
     ]);
 
-    $missingTranslations = $translations->getMissingTranslationsIn(
-        new Translations([
+    $missingTranslations = $translations->diffTranslationsKeys(
+        new PhpTranslations([
             'a' => 'text',
             'c' => [
                 'b' => 'text',
@@ -63,7 +63,7 @@ it('finds missing (nested) translations in another collections', function () {
         ])
     );
 
-    expect($missingTranslations)->toBe([
+    expect($missingTranslations->toArray())->toBe([
         'b',
         'c.a',
         'd',
@@ -73,7 +73,7 @@ it('finds missing (nested) translations in another collections', function () {
 });
 
 it('filters (nested) translations using only', function () {
-    $translations = new Translations([
+    $translations = new PhpTranslations([
         'a' => 'text',
         'b' => 'text',
         'c' => [
