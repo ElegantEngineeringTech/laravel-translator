@@ -27,7 +27,7 @@ it('gets json translations', function () {
         storage: $this->getStorage(),
     );
 
-    $translations = $translator->getTranslations('fr');
+    $translations = $translator->getTranslations('fr', null);
 
     expect($translations)->toHaveLength(2);
 

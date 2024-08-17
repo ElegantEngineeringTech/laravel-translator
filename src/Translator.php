@@ -27,6 +27,11 @@ class Translator
         //
     }
 
+    public function getJsonNamespace(): string
+    {
+        return static::JSON_NAMESPACE;
+    }
+
     /**
      * @return string[]
      */
@@ -54,7 +59,7 @@ class Translator
 
     public function getTranslations(
         string $locale,
-        ?string $namespace = null
+        ?string $namespace
     ): PhpTranslations|JsonTranslations {
         $namespace ??= static::JSON_NAMESPACE;
 
@@ -76,7 +81,7 @@ class Translator
 
     protected function getTranslationsFileContent(
         string $locale,
-        ?string $namespace = null
+        ?string $namespace
     ): ?string {
         $namespace ??= static::JSON_NAMESPACE;
 
@@ -95,8 +100,10 @@ class Translator
     public function getMissingTranslations(
         string $source,
         string $target,
-        string $namespace,
+        ?string $namespace,
     ): Collection {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this
             ->getTranslations($source, $namespace)
             ->diffTranslationsKeys(
@@ -135,11 +142,12 @@ class Translator
      */
     public function getDeadTranslations(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         ?SearchCodeServiceInterface $service = null,
         ?Closure $progress = null,
         ?array $ignore = null,
     ): Collection {
+        $namespace ??= static::JSON_NAMESPACE;
         $ignoredTranslations = $ignore ?? config('translator.searchcode.ignored_translations', []);
 
         $translationsKeys = $this
@@ -231,9 +239,10 @@ class Translator
 
     public function setTranslations(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         array $values
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
 
         if (empty($values)) {
             return $this->getNewTranslationsCollection($namespace);
@@ -258,10 +267,12 @@ class Translator
 
     public function setTranslation(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         string $key,
         mixed $value,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->setTranslations($locale, $namespace, [
             $key => $value,
         ]);
@@ -270,10 +281,11 @@ class Translator
     public function translateTranslations(
         string $source,
         string $target,
-        string $namespace,
+        ?string $namespace,
         array $keys,
         ?TranslateServiceInterface $service = null,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
         $service = $service ?? $this->translateService;
 
         if (! $service) {
@@ -316,10 +328,12 @@ class Translator
     public function translateTranslation(
         string $source,
         string $target,
-        string $namespace,
+        ?string $namespace,
         string $key,
         ?TranslateServiceInterface $service = null,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->translateTranslations(
             $source,
             $target,
@@ -331,10 +345,11 @@ class Translator
 
     public function proofreadTranslations(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         array $keys,
         ?ProofreadServiceInterface $service = null,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
         $service = $service ?? $this->proofreadService;
 
         if (! $service) {
@@ -373,10 +388,12 @@ class Translator
 
     public function proofreadTranslation(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         string $key,
         ?ProofreadServiceInterface $service = null,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->proofreadTranslations(
             $locale,
             $namespace,
@@ -387,9 +404,11 @@ class Translator
 
     public function deleteTranslations(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         array $keys,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->transformTranslations(
             $locale,
             $namespace,
@@ -403,9 +422,11 @@ class Translator
 
     public function deleteTranslation(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         string $key,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->deleteTranslations(
             $locale,
             $namespace,
@@ -413,8 +434,12 @@ class Translator
         );
     }
 
-    public function sortTranslations(string $locale, string $namespace): PhpTranslations|JsonTranslations
-    {
+    public function sortTranslations(
+        string $locale,
+        ?string $namespace
+    ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->transformTranslations(
             $locale,
             $namespace,
@@ -443,9 +468,11 @@ class Translator
      */
     public function transformTranslations(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         Closure $callback,
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         $translations = $this->getTranslations($locale, $namespace);
         $translations = $callback($translations);
 
@@ -458,9 +485,11 @@ class Translator
 
     public function saveTranslations(
         string $locale,
-        string $namespace,
+        ?string $namespace,
         PhpTranslations|JsonTranslations $translations,
     ): bool {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return $this->storage->put(
             $this->getTranslationsPath($locale, $namespace),
             $translations->toFile()
@@ -469,7 +498,7 @@ class Translator
 
     public function getTranslationsPath(
         string $locale,
-        ?string $namespace = null
+        ?string $namespace
     ): string {
         $namespace ??= static::JSON_NAMESPACE;
 
@@ -480,8 +509,10 @@ class Translator
     }
 
     public function getNewTranslationsCollection(
-        string $namespace
+        ?string $namespace
     ): PhpTranslations|JsonTranslations {
+        $namespace ??= static::JSON_NAMESPACE;
+
         return match ($namespace) {
             static::JSON_NAMESPACE => new JsonTranslations,
             default => new PhpTranslations,
