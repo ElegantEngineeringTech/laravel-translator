@@ -27,6 +27,21 @@ class Translator
         //
     }
 
+    public function getTranslateService(): ?TranslateServiceInterface
+    {
+        return $this->translateService;
+    }
+
+    public function getProofreadService(): ?ProofreadServiceInterface
+    {
+        return $this->proofreadService;
+    }
+
+    public function getSearchcodeService(): ?SearchCodeServiceInterface
+    {
+        return $this->searchcodeService;
+    }
+
     public function getJsonNamespace(): string
     {
         return static::JSON_NAMESPACE;

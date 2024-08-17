@@ -12,6 +12,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 
 /**
+ * @method static ?TranslateServiceInterface getTranslateService()
+ * @method static ?ProofreadServiceInterface getProofreadService()
+ * @method static ?SearchCodeServiceInterface getSearchcodeService()
  * @method static string getJsonNamespace()
  * @method static array<int, string> getLocales()
  * @method static array<int, string> getNamespaces(string $locale)
