@@ -76,7 +76,7 @@ class Translator
             };
         }
 
-        return new PhpTranslations;
+        return $this->getNewTranslationsCollection($namespace);
     }
 
     protected function getTranslationsFileContent(
