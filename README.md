@@ -21,6 +21,12 @@ You can install the package via composer:
 composer require-dev elegantly/laravel-translator --dev
 ```
 
+Unless you are using this package in production, add the following lines in `.gitignore`:
+
+```
+.translator.cache
+```
+
 Then publish the config file with:
 
 ```bash
@@ -267,6 +273,73 @@ Translator::getMissingTranslations(
 ```
 
 ## Find dead translations
+
+> [!IMPORTANT]
+> The deadcode detector can't detect the translation keys if you use string interpolation like `__("countries.{$user->country})`
+
+### Configure code scanner
+
+This package will scan your entire codebase to find translations keys.
+You can customize its behavior to:
+
+-   include or exlude specific paths.
+-   exclude translations keys
+
+#### Define which files/directories should be scanned
+
+You should include all paths where translations keys are suscetible to be used.
+
+Both `.php` and `.blade.php` files are supported. You can customize the paths scanned in the configs:
+
+```php
+return [
+    // ...
+    'searchcode' => [
+        /**
+         * Files or directories to include in the deadcode scan
+         */
+        'paths' => [
+            app_path(), // scan the whole /app directory
+            resource_path(), // scan the whole /resource directory
+        ],
+        // ...
+    ]
+    // ...
+];
+```
+
+#### Define which files/directories should be excluded from the scan
+
+If you need or to speed up the scan, you can exclude paths for the scanner, this is particularly usefull for:
+
+-   tests files that are not rellying to your translations files
+-   whole subdirectories unrelated to your translations
+
+> [!TIP]
+> Excluding paths will speedup the scanner
+
+#### Ignore translations keys from the deadcode detector
+
+Sometimes, translations strings are not used in the codebase but you don't want to consider them as dead.
+For example, you might be storing all the countries name in `/countries.php`.
+
+Sometimes, it's impossible for the scanner to detect your translations string because you are using string interpolation such as `__("countries.{$user->country})`.
+
+In these cases you can ignore translations keys from the deadcode detector in the configs:
+
+```php
+return [
+    // ...
+    'searchcode' => [
+        // ...
+        'ignored_translations' => [
+            'countries', // ignore all translations keys starting with 'countries'
+        ],
+        // ...
+    ]
+    // ...
+];
+```
 
 ### From CLI
 
