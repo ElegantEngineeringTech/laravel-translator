@@ -18,7 +18,7 @@ Manage all your laravel translations easily:
 You can install the package via composer:
 
 ```bash
-composer require-dev elegantly/laravel-translator
+composer require-dev elegantly/laravel-translator --dev
 ```
 
 Then publish the config file with:
