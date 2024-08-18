@@ -1,39 +1,39 @@
-# Laravel Translator - All in one translations file manager
+# Laravel Translator - All-in-One Translation File Manager
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 
-Manage all your laravel translations easily:
+Easily manage all your Laravel translations:
 
--   **Translate** strings to other languages (DeepL, OpenAI or any custom service)
--   **Proofread** your translations strings and automatically fix grammar and syntax (OpenAI, or any custome service)
--   **Find missing** translations strings in all your locales
--   **Find dead** translations keys (keys not used anywhere in your codebase)
--   **Sort** your tranlations in natural order
+-   **Translate** strings into other languages (DeepL, OpenAI, or any custom service).
+-   **Proofread** your translation strings and automatically fix grammar and syntax (OpenAI or any custom service).
+-   **Find missing** translation strings across all your locales.
+-   **Detect unused** translation keys (keys not used anywhere in your codebase).
+-   **Sort** your translations in natural order.
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via Composer:
 
 ```bash
 composer require-dev elegantly/laravel-translator --dev
 ```
 
-Unless you are using this package in production, add the following lines in `.gitignore`:
+If you’re not using this package in production, add the following lines to your `.gitignore` file:
 
 ```
 .translator.cache
 ```
 
-Then publish the config file with:
+Next, publish the config file with:
 
 ```bash
 php artisan vendor:publish --tag="translator-config"
 ```
 
-This is the contents of the published config file:
+Here’s the content of the published config file:
 
 ```php
 return [
@@ -41,7 +41,7 @@ return [
     'lang_path' => lang_path(),
 
     /**
-     * Auto sort translations keys after each manipulations: translate, grammar, ...
+     * Automatically sort translation keys after each manipulation (translate, grammar check, etc.).
      */
     'sort_keys' => false,
 
@@ -61,7 +61,7 @@ return [
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o',
-                'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
+                'prompt' => "Translate the following JSON to the locale '{targetLocale}' while preserving the keys.",
             ],
         ],
     ],
@@ -72,11 +72,11 @@ return [
             'openai' => [
                 'model' => 'gpt-4o',
                 'prompt' => '
-                            Fix the grammar and the syntax the following json string while respecting the following rules:
+                            Fix the grammar and syntax of the following JSON string while respecting the following rules:
                                 - Never change the keys.
-                                - Do not escape nor change HTML tags.
-                                - Do not escape nor change special characters or emojis.
-                                - Do not change the meaning or the tone of the sentences.
+                                - Do not escape or modify HTML tags.
+                                - Do not escape or modify special characters or emojis.
+                                - Do not change the meaning or tone of the sentences.
                             ',
             ],
         ],
@@ -86,7 +86,7 @@ return [
         'service' => 'php-parser',
 
         /**
-         * Files or directories to include in the deadcode scan
+         * Files or directories to include in the dead code scan.
          */
         'paths' => [
             app_path(),
@@ -94,12 +94,12 @@ return [
         ],
 
         /**
-         * Files or directories to exclude from the deadcode scan
+         * Files or directories to exclude from the dead code scan.
          */
         'excluded_paths' => [],
 
         /**
-         * Translations keys to exclude from deadcode detection
+         * Translation keys to exclude from dead code detection.
          */
         'ignored_translations' => [
             // 'validation',
@@ -117,16 +117,20 @@ return [
 ];
 ```
 
-## Translate your strings automatically
+## Automatic Translation
 
-Before translating anyhting, you must chose and setup a translation service. This package includes two services by default:
+Before translating anything, you must choose and set up a translation service.
+
+This package includes two services by default:
 
 -   OpenAI
 -   DeepL
 
-### Setting up OpenAI
+However, you can create your own service if needed.
 
-First configure the OpenAI key in the config file or define the env value:
+### Setting Up OpenAI
+
+First, configure the OpenAI key in the config file or define the environment variables:
 
 ```php
 return [
@@ -144,9 +148,9 @@ return [
 ]
 ```
 
-### Setting up DeepL
+### Setting Up DeepL
 
-First configure the DeepL key in the config file or define the env value:
+First, configure the DeepL key in the config file or define the environment variable:
 
 ```php
 return [
@@ -163,18 +167,18 @@ return [
 ]
 ```
 
-### From CLI
+### From the CLI
 
 ```bash
 php artisan translator:translate
 ```
 
-### From code
+### From Code
 
 ```php
 use Elegantly\Translator\Facades\Translator;
 
-// Translate strings defined in php files
+// Translate strings defined in PHP files
 Translator::translateTranslations(
     source: 'fr',
     target: 'en',
@@ -191,18 +195,19 @@ Translator::translateTranslations(
 );
 ```
 
-## Proofread your translations
+## Proofreading Translations
 
-This package allow you to proofread (i.e fix grammar and syntax) your translations strings.
-For now the package includes one service:
+This package allows you to proofread (i.e., fix grammar and syntax) your translation strings.
+
+Currently, the package includes one service:
 
 -   OpenAI
 
-But you can create you own service if you need.
+However, you can create your own service if needed.
 
-### Setting up OpenAI
+### Setting Up OpenAI
 
-First configure the OpenAI key in the config file or define the env value:
+First, configure the OpenAI key in the config file or define the environment variables:
 
 ```php
 return [
@@ -220,25 +225,25 @@ return [
 ]
 ```
 
-### From CLI
+### From the CLI
 
 ```bash
 php artisan translator:proofread
 ```
 
-### From code
+### From Code
 
 ```php
 use Elegantly\Translator\Facades\Translator;
 
-// proofread translations strings defined in php files
+// Proofread translation strings defined in PHP files
 Translator::proofreadTranslations(
     locale: 'fr',
     namespace: 'auth',
     keys: ['title', ...]
 );
 
-// proofread translations strings defined in JSON files
+// Proofread translation strings defined in JSON files
 Translator::proofreadTranslations(
     locale: 'fr',
     namespace: null,
@@ -246,25 +251,25 @@ Translator::proofreadTranslations(
 );
 ```
 
-## Find missing translations
+## Finding Missing Translations
 
-### From CLI
+### From the CLI
 
 ```bash
 php artisan translator:missing
 ```
 
-### From code
+### From Code
 
 ```php
-// compare /fr/validation.php and /en/validation.php
+// Compare /fr/validation.php and /en/validation.php
 Translator::getMissingTranslations(
     source: 'fr',
     target: 'en',
     namespace: 'validation'
 );
 
-// compare /fr.json and /en.json
+// Compare /fr.json and /en.json
 Translator::getMissingTranslations(
     source: 'fr',
     target: 'en',
@@ -272,35 +277,34 @@ Translator::getMissingTranslations(
 );
 ```
 
-## Find dead translations
+## Finding Unused Translations
 
 > [!IMPORTANT]
-> The deadcode detector can't detect the translation keys if you use string interpolation like `__("countries.{$user->country})`
+> The dead code detector cannot detect translation keys if you use string interpolation, such as `__("countries.{$user->country})`.
 
-### Configure code scanner
+### Configuring the Code Scanner
 
-This package will scan your entire codebase to find translations keys.
-You can customize its behavior to:
+This package scans your entire codebase to find unused translation keys. You can customize its behavior to:
 
--   include or exlude specific paths.
--   exclude translations keys
+-   Include or exclude specific paths.
+-   Exclude translation keys.
 
-#### Define which files/directories should be scanned
+#### Define Which Files/Directories Should Be Scanned
 
-You should include all paths where translations keys are suscetible to be used.
+Include all paths where translation keys are likely to be used.
 
-Both `.php` and `.blade.php` files are supported. You can customize the paths scanned in the configs:
+Both `.php` and `.blade.php` files are supported. You can customize the paths scanned in the config:
 
 ```php
 return [
     // ...
     'searchcode' => [
         /**
-         * Files or directories to include in the deadcode scan
+         * Files or directories to include in the dead code scan.
          */
         'paths' => [
-            app_path(), // scan the whole /app directory
-            resource_path(), // scan the whole /resource directory
+            app_path(), // Scan the entire /app directory
+            resource_path(), // Scan the entire /resource directory
         ],
         // ...
     ]
@@ -308,24 +312,23 @@ return [
 ];
 ```
 
-#### Define which files/directories should be excluded from the scan
+#### Define Which Files/Directories Should Be Excluded from the Scan
 
-If you need or to speed up the scan, you can exclude paths for the scanner, this is particularly usefull for:
+To optimize or speed up the scan, you can exclude certain paths. This is particularly useful for:
 
--   tests files that are not rellying to your translations files
--   whole subdirectories unrelated to your translations
+-   Test files that do not rely on your translation files.
+-   Entire subdirectories unrelated to your translations.
 
 > [!TIP]
-> Excluding paths will speedup the scanner
+> Excluding paths will speed up the scanner.
 
-#### Ignore translations keys from the deadcode detector
+#### Ignore Translation Keys from the Dead Code Detector
 
-Sometimes, translations strings are not used in the codebase but you don't want to consider them as dead.
-For example, you might be storing all the countries name in `/countries.php`.
+Sometimes, translation strings are not used in the codebase, but you don’t want to consider them as unused. For example, you might store all country names in `/countries.php`.
 
-Sometimes, it's impossible for the scanner to detect your translations string because you are using string interpolation such as `__("countries.{$user->country})`.
+Sometimes, the scanner might not detect your translation strings when using string interpolation, such as `__("countries.{$user->country})`.
 
-In these cases you can ignore translations keys from the deadcode detector in the configs:
+In these cases, you can ignore translation keys in the config:
 
 ```php
 return [
@@ -333,7 +336,7 @@ return [
     'searchcode' => [
         // ...
         'ignored_translations' => [
-            'countries', // ignore all translations keys starting with 'countries'
+            'countries', // Ignore all translation keys starting with 'countries'.
         ],
         // ...
     ]
@@ -341,48 +344,48 @@ return [
 ];
 ```
 
-### From CLI
+### From the CLI
 
 ```bash
 php artisan translator:dead
 ```
 
-### From code
+### From Code
 
 ```php
-// compare /fr/validation.php and /en/validation.php
+// Compare /fr/validation.php and /en/validation.php
 Translator::getDeadTranslations(
     locale: 'fr',
     namespace: 'validation'
 );
 
-// compare /fr.json and /en.json
+// Compare /fr.json and /en.json
 Translator::getDeadTranslations(
     locale: 'fr',
     namespace: null
 );
 ```
 
-## Sort & format your translations files
+## Sorting & Formatting Translation Files
 
-### From CLI
+### From the CLI
 
 ```bash
 php artisan translator:sort
 ```
 
-### From code
+### From Code
 
 ```php
 use Elegantly\Translator\Facades\Translator;
 
-// sort translations from `/fr/validation.php`
+// Sort translations from `/fr/validation.php`
 Translator::sortTranslations(
     locale: 'fr',
     namespace: 'validation'
 );
 
-// sort translations from `/fr.json`
+// Sort translations from `/fr.json`
 Translator::sortTranslations(
     locale: 'fr',
     namespace: null
@@ -397,7 +400,7 @@ composer test
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information on recent changes.
 
 ## Contributing
 
@@ -405,7 +408,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security Vulnerabilities
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+Please report any security vulnerabily to me via github or email.
 
 ## Credits
 
@@ -414,4 +417,4 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+This package is licensed under the MIT License. Please see the [License File](LICENSE.md) for more details.

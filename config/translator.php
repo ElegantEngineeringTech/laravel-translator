@@ -7,7 +7,7 @@ return [
     'lang_path' => lang_path(),
 
     /**
-     * Auto sort translations keys after each manipulations: translate, grammar, ...
+     * Automatically sort translation keys after each manipulation (translate, grammar check, etc.).
      */
     'sort_keys' => false,
 
@@ -27,7 +27,7 @@ return [
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o',
-                'prompt' => "Translate the following json to the locale '{targetLocale}' while preserving the keys.",
+                'prompt' => "Translate the following JSON to the locale '{targetLocale}' while preserving the keys.",
             ],
         ],
     ],
@@ -38,11 +38,11 @@ return [
             'openai' => [
                 'model' => 'gpt-4o',
                 'prompt' => '
-                            Fix the grammar and the syntax the following json string while respecting the following rules:
+                            Fix the grammar and syntax of the following JSON string while respecting the following rules:
                                 - Never change the keys.
-                                - Do not escape nor change HTML tags.
-                                - Do not escape nor change special characters or emojis.
-                                - Do not change the meaning or the tone of the sentences.
+                                - Do not escape or modify HTML tags.
+                                - Do not escape or modify special characters or emojis.
+                                - Do not change the meaning or tone of the sentences.
                             ',
             ],
         ],
@@ -52,7 +52,7 @@ return [
         'service' => 'php-parser',
 
         /**
-         * Files or directories to include in the deadcode scan
+         * Files or directories to include in the dead code scan.
          */
         'paths' => [
             app_path(),
@@ -60,12 +60,12 @@ return [
         ],
 
         /**
-         * Files or directories to exclude from the deadcode scan
+         * Files or directories to exclude from the dead code scan.
          */
         'excluded_paths' => [],
 
         /**
-         * Translations keys to exclude from deadcode detection
+         * Translation keys to exclude from dead code detection.
          */
         'ignored_translations' => [
             // 'validation',

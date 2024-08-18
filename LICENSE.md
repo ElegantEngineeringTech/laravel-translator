@@ -1,8 +1,8 @@
 # The Prosperity Public License 3.0.0
 
-Contributor: $name
+Contributor: Quentin Gabriele
 
-Source Code: $address
+Source Code: [GitHub](https://github.com/ElegantEngineeringTech/laravel-translator)
 
 ## Purpose
 
