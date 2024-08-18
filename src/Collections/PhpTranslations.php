@@ -67,7 +67,10 @@ final class PhpTranslations extends Collection implements TranslationsInterface
 
     public function toDotTranslations(): Collection
     {
-        return $this->dot()->toBase();
+        /**
+         * Filtering the array prevent incoherent values such as such as 'key' => []
+         */
+        return $this->dot()->toBase()->filter(fn ($value) => $value !== [] && $value !== null);
     }
 
     public function toTranslationsKeys(): Collection

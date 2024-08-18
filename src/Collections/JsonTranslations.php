@@ -21,7 +21,7 @@ final class JsonTranslations extends Collection implements TranslationsInterface
 
     public function toDotTranslations(): Collection
     {
-        return $this->toBase();
+        return $this->toBase()->filter()->filter(fn ($value) => $value !== [] && $value !== null);
     }
 
     public function toTranslationsKeys(): Collection
