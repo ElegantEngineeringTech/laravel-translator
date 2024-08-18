@@ -20,6 +20,10 @@ it('finds all occurences of __ in php code', function (string $code) {
     "<?php \Illuminate\Support\Facades\Lang::has(key: 'messages.dummy.class');",
     "<?php \Illuminate\Support\Facades\Lang::hasForLocale(key: 'messages.dummy.class');",
     "<?php \Illuminate\Support\Facades\Lang::choice(key: 'messages.dummy.class');",
+    "<?php app('translator')->get('messages.dummy.class');",
+    "<?php app('translator')->has('messages.dummy.class');",
+    "<?php app('translator')->hasForLocale('messages.dummy.class');",
+    "<?php app('translator')->choice('messages.dummy.class');",
 ]);
 
 it('finds all occurences of __ in blade code', function (string $code) {

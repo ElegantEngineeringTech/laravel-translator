@@ -99,7 +99,7 @@ class PhpParserService implements SearchCodeServiceInterface
                 $node->var instanceof FuncCall &&
                 static::isFunCallTo($node->var, 'app', 'abstract', 0, 'translator')
             ) {
-                return in_array($node->name->name, ['get']);
+                return in_array($node->name->name, ['get', 'has', 'hasForLocale', 'choice']);
             }
 
             if ($node instanceof StaticCall && $node->class->name === Lang::class) {
