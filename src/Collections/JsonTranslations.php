@@ -19,21 +19,24 @@ final class JsonTranslations extends Collection implements TranslationsInterface
         return $this->sortKeys(SORT_NATURAL);
     }
 
-    public function toDotTranslations(): Collection
+    public function toDotTranslations(bool $filter = false): Collection
     {
         return $this
             ->toBase()
-            ->filter(fn ($value) => ! blank($value));
+            ->when(
+                $filter,
+                fn ($c) => $c->filter(fn ($value) => ! blank($value))
+            );
     }
 
-    public function toTranslationsKeys(): Collection
+    public function toTranslationsKeys(bool $filter = false): Collection
     {
-        return $this->toDotTranslations()->keys();
+        return $this->toDotTranslations($filter)->keys();
     }
 
-    public function toTranslationsValues(): Collection
+    public function toTranslationsValues(bool $filter = false): Collection
     {
-        return $this->toDotTranslations()->values();
+        return $this->toDotTranslations($filter)->values();
     }
 
     public function diffTranslationsKeys(Collection $translations): Collection

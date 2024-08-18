@@ -1,9 +1,10 @@
 <?php
 
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
 
-it('finds all occurences of __ in code', function (string $code) {
+it('finds all occurences of __ in php code', function (string $code) {
     $results = PhpParserService::scanCode($code);
 
     expect($results)->toHaveLength(1);
@@ -15,6 +16,21 @@ it('finds all occurences of __ in code', function (string $code) {
     "<?php __('messages.dummy.class', [], 'en');",
     "<?php __(key: 'messages.dummy.class');",
     "<?php __(key: 'messages.dummy.class', replace: [], locale: 'en');",
+    "<?php \Illuminate\Support\Facades\Lang::get(key: 'messages.dummy.class');",
+    "<?php \Illuminate\Support\Facades\Lang::has(key: 'messages.dummy.class');",
+    "<?php \Illuminate\Support\Facades\Lang::hasForLocale(key: 'messages.dummy.class');",
+    "<?php \Illuminate\Support\Facades\Lang::choice(key: 'messages.dummy.class');",
+]);
+
+it('finds all occurences of __ in blade code', function (string $code) {
+    $results = PhpParserService::scanCode(Blade::compileString($code));
+
+    expect($results)->toHaveLength(1);
+})->with([
+    "{{ __('messages.dummy.class') }}",
+    "{{ trans('messages.dummy.class') }}",
+    "{{ \Illuminate\Support\Facades\Lang::get('messages.dummy.class') }}",
+    "@lang('messages.dummy.class')",
 ]);
 
 it('gets all the translations keys grouped by files', function () {

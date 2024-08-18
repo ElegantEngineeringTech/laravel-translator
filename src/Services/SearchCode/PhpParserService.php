@@ -6,8 +6,11 @@ use Closure;
 use Elegantly\Translator\Caches\SearchCodeCache;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Lang;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeFinder;
@@ -50,6 +53,32 @@ class PhpParserService implements SearchCodeServiceInterface
             ->files();
     }
 
+    public static function isFunCallTo(
+        FuncCall $node,
+        string $function,
+        string $argName,
+        int $argPosition,
+        string $argValue
+    ) {
+        if ($node->name instanceof Name && $node->name->name !== $function) {
+            return false;
+        }
+
+        $args = collect($node->getArgs());
+
+        if ($args->isEmpty()) {
+            return false;
+        }
+
+        $arg = $args->firstWhere('name.name', $argName) ?? $args->get($argPosition);
+
+        if ($arg->value instanceof String_) {
+            return $arg->value->value === $argValue;
+        }
+
+        return false;
+    }
+
     /**
      * @return string[] All translations keys used in the code
      */
@@ -64,6 +93,19 @@ class PhpParserService implements SearchCodeServiceInterface
 
         /** @var FuncCall[] $results */
         $results = $nodeFinder->find($ast, function (Node $node) {
+
+            if (
+                $node instanceof MethodCall &&
+                $node->var instanceof FuncCall &&
+                static::isFunCallTo($node->var, 'app', 'abstract', 0, 'translator')
+            ) {
+                return in_array($node->name->name, ['get']);
+            }
+
+            if ($node instanceof StaticCall && $node->class->name === Lang::class) {
+                return in_array($node->name->name, ['get', 'has', 'hasForLocale', 'choice']);
+            }
+
             if ($node instanceof FuncCall && $node->name instanceof Name) {
                 return in_array($node->name->name, ['__', 'trans', 'trans_choice']);
             }
@@ -72,8 +114,8 @@ class PhpParserService implements SearchCodeServiceInterface
         });
 
         return collect($results)
-            ->map(function (FuncCall $funcCall) {
-                $args = collect($funcCall->getArgs());
+            ->map(function (FuncCall|StaticCall|MethodCall $node) {
+                $args = collect($node->getArgs());
                 $argKey = $args->firstWhere('name.name', 'key') ?? $args->first();
                 $value = $argKey->value;
 

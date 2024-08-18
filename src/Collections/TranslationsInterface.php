@@ -18,11 +18,11 @@ interface TranslationsInterface
 
     public function sortNatural(): static;
 
-    public function toDotTranslations(): Collection;
+    public function toDotTranslations(bool $filter = false): Collection;
 
-    public function toTranslationsKeys(): Collection;
+    public function toTranslationsKeys(bool $filter = false): Collection;
 
-    public function toTranslationsValues(): Collection;
+    public function toTranslationsValues(bool $filter = false): Collection;
 
     public function diffTranslationsKeys(Collection $translations): Collection;
 
