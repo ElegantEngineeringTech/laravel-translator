@@ -17,8 +17,8 @@ use function Laravel\Prompts\select;
 class TranslateTranslationsCommand extends Command implements PromptsForMissingInput
 {
     public $signature = 'translator:translate 
-                            {from : The locale to translate} 
-                            {to : The locale to translate to}
+                            {source : The locale to translate} 
+                            {target : The locale to translate to}
                             {--namespaces=* : The namespaces to translate}
                             {--service= : The translation service to use}
                             {--all : Translate not only missing keys but all keys}';
@@ -27,9 +27,9 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
 
     public function handle(): int
     {
-        $from = $this->argument('from');
+        $source = $this->argument('source');
 
-        $to = $this->argument('to');
+        $target = $this->argument('target');
 
         $namespaces = $this->option('namespaces');
 
@@ -40,20 +40,20 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
         progress(
             label: 'Translating',
             steps: $namespaces,
-            callback: function (string $namespace, $progress) use ($from, $service, $to, $all) {
+            callback: function (string $namespace, $progress) use ($source, $service, $target, $all) {
                 $progress
                     ->label("Translating {$namespace}")
                     ->hint('Fetching response...');
 
                 if ($all) {
-                    $keys = Translator::getTranslations($from, $namespace)->dot()->keys()->toArray();
+                    $keys = Translator::getTranslations($source, $namespace)->toTranslationsKeys()->toArray();
                 } else {
-                    $keys = Translator::getMissingTranslations($from, $to, $namespace);
+                    $keys = Translator::getMissingTranslations($source, $target, $namespace)->toArray();
                 }
 
                 return Translator::translateTranslations(
-                    source: $from,
-                    target: $to,
+                    source: $source,
+                    target: $target,
                     namespace: $namespace,
                     keys: $keys,
                     service: TranslatorServiceProvider::getTranslateServiceFromConfig($service)
@@ -68,7 +68,7 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
     public function promptForMissingArgumentsUsing()
     {
         return [
-            'from' => function () {
+            'source' => function () {
                 return select(
                     label: 'From what locale would you like to translate?',
                     options: Translator::getLocales(),
@@ -76,14 +76,15 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
                     required: true,
                 );
             },
-            'to' => function () {
-                $options = Translator::getLocales();
+            'target' => function () {
+                $options = collect(Translator::getLocales())
+                    ->diff([$this->argument('source')])
+                    ->values()
+                    ->toArray();
 
                 return select(
-                    label: 'In what locale would you like to translate?',
-                    options: array_values(
-                        array_diff($options, [$this->argument('from')]),
-                    ),
+                    label: 'To what locale would you like to translate?',
+                    options: $options,
                     required: true,
                 );
             },
@@ -97,7 +98,7 @@ class TranslateTranslationsCommand extends Command implements PromptsForMissingI
         }
 
         if (empty($input->getOption('namespaces'))) {
-            $options = Translator::getNamespaces($input->getArgument('from'));
+            $options = Translator::getNamespaces($input->getArgument('source'));
 
             $input->setOption('namespaces', multiselect(
                 label: 'What namespaces would you like to translate?',

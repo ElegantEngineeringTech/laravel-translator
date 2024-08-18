@@ -29,8 +29,7 @@ class SortAllTranslationsCommand extends Command implements PromptsForMissingInp
             label: 'Sorting',
             steps: $locales,
             callback: function (string $locale, $progress) use ($namespaces) {
-                $progress
-                    ->label("Sorting {$locale}");
+                $progress->label("Sorting {$locale}");
 
                 foreach ($namespaces as $namespace) {
                     Translator::sortTranslations($locale, $namespace);

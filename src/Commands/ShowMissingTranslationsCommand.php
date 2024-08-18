@@ -13,7 +13,7 @@ class ShowMissingTranslationsCommand extends Command implements PromptsForMissin
 {
     public $signature = 'translator:missing {locale : The locale of reference}';
 
-    public $description = 'Show all missing translations present in the locale of reference but not in the others languages.';
+    public $description = 'Show all missing translations present in the locale of reference but not in the others locales.';
 
     public function handle(): int
     {
@@ -34,7 +34,7 @@ class ShowMissingTranslationsCommand extends Command implements PromptsForMissin
             )->toArray();
 
         $this->table(
-            headers: ['Language', 'Missing key'],
+            headers: ['Locale', 'Missing key'],
             rows: $rows
         );
 

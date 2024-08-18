@@ -17,11 +17,11 @@ use function Laravel\Prompts\select;
 class ProofreadTranslationsCommand extends Command implements PromptsForMissingInput
 {
     public $signature = 'translator:proofread
-                            {locale : The locale to fix}
-                            {--namespaces=* : The namespaces to fix}
+                            {locale : The locale to proofread}
+                            {--namespaces=* : The namespaces to proofread}
                             {--service= : The service to use}';
 
-    public $description = 'Proofread the translations in the given locale.';
+    public $description = 'Proofread the translations strings from the given locale.';
 
     public function handle(): int
     {
@@ -38,8 +38,7 @@ class ProofreadTranslationsCommand extends Command implements PromptsForMissingI
                 $progress->label("Proofreading {$namespace}");
 
                 $keys = Translator::getTranslations($locale, $namespace)
-                    ->dot()
-                    ->keys()
+                    ->toTranslationsKeys()
                     ->toArray();
 
                 Translator::proofreadTranslations(

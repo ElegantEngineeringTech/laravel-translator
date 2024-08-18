@@ -23,7 +23,6 @@ class ShowDeadTranslationsCommand extends Command implements PromptsForMissingIn
 
     public function handleLocale(string $locale): array
     {
-
         $namespaces = Translator::getNamespaces($locale);
 
         return progress(
@@ -46,9 +45,9 @@ class ShowDeadTranslationsCommand extends Command implements PromptsForMissingIn
     {
         $result = collect($this->handleLocale($locale));
 
-        alert($result->flatten()->count().' dead translations found.');
+        alert($result->flatten()->count().' dead translation keys found.');
 
-        $table = new Table(['Keys'], []);
+        $table = new Table(['Translation Keys'], []);
 
         $length = $result->count();
 
@@ -63,7 +62,11 @@ class ShowDeadTranslationsCommand extends Command implements PromptsForMissingIn
             }
 
             foreach ($items as $item) {
-                $table->rows[] = [new TableCell("{$namespace}.{$item}")];
+                if ($namespace === Translator::getJsonNamespace()) {
+                    $table->rows[] = [new TableCell($item)];
+                } else {
+                    $table->rows[] = [new TableCell("{$namespace}.{$item}")];
+                }
             }
 
             if ($index < $length - 1) {
