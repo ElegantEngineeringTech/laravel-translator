@@ -75,7 +75,7 @@ return [
 
         'services' => [
             'php-parser' => [
-                'cache_path' => base_path('.translator.cache'),
+                'cache_path' => base_path('build/laratranslate/cache'),
             ],
         ],
 
