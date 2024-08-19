@@ -68,9 +68,10 @@ return [
          * Translation keys to exclude from dead code detection.
          */
         'ignored_translations' => [
-            // 'validation',
-            // 'passwords',
-            // 'pagination',
+            'auth',
+            'pagination',
+            'passwords',
+            'validation'
         ],
 
         'services' => [
