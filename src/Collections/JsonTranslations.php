@@ -14,6 +14,11 @@ final class JsonTranslations extends Collection implements TranslationsInterface
         return $this->put($key, $value);
     }
 
+    public function sanitize(): static
+    {
+        return $this;
+    }
+
     public function sortNatural(): static
     {
         return $this->sortKeys(SORT_NATURAL);

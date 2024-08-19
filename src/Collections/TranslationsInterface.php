@@ -16,13 +16,15 @@ interface TranslationsInterface
 
     public function except($keys);
 
+    public function sanitize(): static;
+
     public function sortNatural(): static;
 
-    public function toDotTranslations(bool $filter = false): Collection;
+    public function toDotTranslations(): Collection;
 
-    public function toTranslationsKeys(bool $filter = false): Collection;
+    public function toTranslationsKeys(): Collection;
 
-    public function toTranslationsValues(bool $filter = false): Collection;
+    public function toTranslationsValues(): Collection;
 
     public function diffTranslationsKeys(Collection $translations): Collection;
 

@@ -97,3 +97,47 @@ it('filters (nested) translations using only', function () {
         'd' => 'text',
     ]);
 });
+
+it('sanitize (nested) translations', function () {
+    $translations = new PhpTranslations([
+        'a' => 'text',
+        'b' => [
+            'a' => [],
+            'b' => 'text',
+        ],
+        'c' => [],
+        'd' => 0,
+        'e' => null,
+        'f' => [
+            'a' => [
+                'a' => [],
+            ],
+        ],
+        'g' => [
+            [],
+            [],
+        ],
+    ]);
+
+    expect(
+        $translations->sanitize()->toArray()
+    )->toBe([
+        'a' => 'text',
+        'b' => [
+            'a' => null,
+            'b' => 'text',
+        ],
+        'c' => null,
+        'd' => 0,
+        'e' => null,
+        'f' => [
+            'a' => [
+                'a' => null,
+            ],
+        ],
+        'g' => [
+            null,
+            null,
+        ],
+    ]);
+});

@@ -45,48 +45,64 @@ final class PhpTranslations extends Collection implements TranslationsInterface
         );
     }
 
+    /**
+     * Replace empty (nested) array with null
+     */
+    public function sanitize(): static
+    {
+        return $this->map(function (mixed $value) {
+            return $this->sanitizeRecursive($value);
+        });
+    }
+
+    public function sanitizeRecursive(array|string|int|float|null $value)
+    {
+        if (is_array($value)) {
+            if (empty($value)) {
+                return null;
+            }
+
+            return array_map(fn ($item) => $this->sanitizeRecursive($item), $value);
+        }
+
+        return $value;
+    }
+
     public function sortNatural(): static
     {
-        $this->items = $this->recursiveSortNatural($this->items);
+        $items = $this->items;
 
-        return $this;
+        return new static(
+            $this->recursiveSortNatural($items)
+        );
     }
 
     protected function recursiveSortNatural(array $items): array
     {
         ksort($items, SORT_NATURAL);
 
-        foreach ($items as $key => $item) {
+        return array_map(function ($item) {
             if (is_array($item)) {
-                $items[$key] = $this->recursiveSortNatural($item);
+                return $this->recursiveSortNatural($item);
             }
-        }
 
-        return $items;
+            return $item;
+        }, $items);
     }
 
-    public function toDotTranslations(bool $filter = false): Collection
+    public function toDotTranslations(): Collection
     {
-        /**
-         * Filtering the array prevent incoherent values such as such as 'key' => []
-         */
-        return $this
-            ->dot()
-            ->toBase()
-            ->when(
-                $filter,
-                fn ($c) => $c->filter(fn ($value) => ! blank($value))
-            );
+        return $this->dot()->toBase();
     }
 
-    public function toTranslationsKeys(bool $filter = false): Collection
+    public function toTranslationsKeys(): Collection
     {
-        return $this->toDotTranslations($filter)->keys();
+        return $this->toDotTranslations()->keys();
     }
 
-    public function toTranslationsValues(bool $filter = false): Collection
+    public function toTranslationsValues(): Collection
     {
-        return $this->toDotTranslations($filter)->values();
+        return $this->toDotTranslations()->values();
     }
 
     public function diffTranslationsKeys(Collection $translations): Collection
