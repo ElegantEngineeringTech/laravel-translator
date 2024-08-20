@@ -27,7 +27,12 @@ return [
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o',
-                'prompt' => "Translate the following JSON to the locale '{targetLocale}' while preserving the keys.",
+                'prompt' => "
+                            As an experienced copywriter and translator specializing in website copy, your task is to translate the provided content from a specific website. 
+                            Your translations should maintain the original tone while being adapted to the target language, ensuring they are both relevant and clear. 
+                            The content will be provided in JSON format, and you must translate it to the locale '{targetLocale}'. 
+                            Make sure that all JSON keys remain preserved and unchanged.
+                            ",
             ],
         ],
     ],

@@ -138,7 +138,7 @@ class Translator
 
         return $locales
             ->mapWithKeys(function (string $locale) use ($source) {
-                $namespaces = collect($this->getNamespaces($locale))
+                $namespaces = collect($this->getNamespaces($source))
                     ->mapWithKeys(fn (string $namespace) => [
                         $namespace => $this->getMissingTranslations($source, $locale, $namespace),
                     ])
