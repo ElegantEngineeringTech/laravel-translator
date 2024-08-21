@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 
-Easily manage all your Laravel translations:
+Easily manage all your Laravel translation strings:
 
 -   **Translate** strings into other languages (DeepL, OpenAI, or any custom service).
 -   **Proofread** your translation strings and automatically fix grammar and syntax (OpenAI or any custom service).
