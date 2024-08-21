@@ -96,6 +96,10 @@ it('finds all missing translations', function () {
 
     expect($missing->toArray())->toBe([
         'en' => [
+            '_JSON_' => [
+                'All rights reserved.',
+                'This one is used.',
+            ],
             'messages' => [
                 'home.missing',
                 'empty',
