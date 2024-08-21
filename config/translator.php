@@ -4,32 +4,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Lang Paths
+    | Language Paths
     |--------------------------------------------------------------------------
     |
-    | This is the path were your translation files are stored. In a normal Laravel install, you should not have to change it.
+    | This is the path where your translation files are stored. In a standard Laravel installation, you should not need to change it.
     |
     */
     'lang_path' => lang_path(),
-
 
     /*
     |--------------------------------------------------------------------------
     | Auto Sort Keys
     |--------------------------------------------------------------------------
     |
-    | If set to true, all keys will be sorted automatically after any file manipulation like 'edit', 'translate' or 'proofread'.
+    | If set to true, all keys will be sorted automatically after any file manipulation such as 'edit', 'translate', or 'proofread'.
     |
     */
     'sort_keys' => false,
 
     /*
     |--------------------------------------------------------------------------
-    | Third party services
+    | Third-Party Services
     |--------------------------------------------------------------------------
     |
-    | Define the api key of your third party services. These keys are reused both for 'translate' and 'proofread'.
-    | You can override these config and define specific service options in 'translate.services.openai.key' for example.
+    | Define the API keys for your third-party services. These keys are reused for both 'translate' and 'proofread'.
+    | You can override this configuration and define specific service options, for example, in 'translate.services.openai.key'.
     |
     */
     'services' => [
@@ -45,11 +44,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Translation service
+    | Translation Service
     |--------------------------------------------------------------------------
     |
-    | This is the services that can be used to translate your strings from a local to another one.
-    | You can customize their behaviour here, but you can also define your own service.
+    | These are the services that can be used to translate your strings from one locale to another.
+    | You can customize their behavior here, or you can define your own service.
     |
     */
     'translate' => [
@@ -65,7 +64,7 @@ return [
                             As an experienced copywriter and translator specializing in website copy, your task is to translate the provided content from a specific website. 
                             Your translations should maintain the original tone while being adapted to the target language, ensuring they are both relevant and clear. 
                             The content will be provided in JSON format, and you must translate it to the locale '{targetLocale}'. 
-                            Make sure that all JSON keys remain preserved and unchanged.
+                            Ensure that all JSON keys remain preserved and unchanged.
                             ",
             ],
         ],
@@ -73,11 +72,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Translation service
+    | Proofreading Service
     |--------------------------------------------------------------------------
     |
-    | This is the services that can be used to proofread your strings.
-    | You can customize their behaviour here, but you can also define your own service.
+    | These are the services that can be used to proofread your strings.
+    | You can customize their behavior here, or you can define your own service.
     |
     */
     'proofread' => [
@@ -102,11 +101,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Searchcode / Deadcode Service
+    | Search Code / Dead Code Service
     |--------------------------------------------------------------------------
     |
-    | This is the services that can be used to detect dead translation strings in your codebase.
-    | You can customize their behaviour here, but you can also define your own service.
+    | These are the services that can be used to detect dead translation strings in your codebase.
+    | You can customize their behavior here, or you can define your own service.
     |
     */
     'searchcode' => [
@@ -130,7 +129,7 @@ return [
 
         /**
          * Translation keys to exclude from dead code detection.
-         * By default, we exclude the default Laravel translations.
+         * By default, the default Laravel translations are excluded.
          */
         'ignored_translations' => [
             'auth',
@@ -142,8 +141,8 @@ return [
         'services' => [
             'php-parser' => [
                 /**
-                 * To speed up the detection, all the results of the scan will be stored in a file.
-                 * Feel free to change the path if you need.
+                 * To speed up detection, all the results of the scan will be stored in a file.
+                 * Feel free to change the path if needed.
                  */
                 'cache_path' => base_path('.translator.cache'),
             ],
