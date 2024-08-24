@@ -1,9 +1,11 @@
-# Laravel Translator - All-in-One Translation File Manager
+# All-in-One Translations Manager for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
+
+![laravel-translator](https://repository-images.githubusercontent.com/816339762/eefcad09-87ad-484e-bcc4-5759303dc4b6)
 
 Easily manage all your Laravel translation strings:
 
@@ -12,6 +14,10 @@ Easily manage all your Laravel translation strings:
 -   **Find missing** translation strings across all your locales.
 -   **Detect unused** translation keys (keys not used anywhere in your codebase).
 -   **Sort** your translations in natural order.
+
+## Try Laratranslate - A powerful UI to manage all your translations
+
+[![laratranslate](https://elegantengineering.tech/assets/laratranslate/opengraph.jpg)](https://elegantengineering.tech/laratranslate/)
 
 ## Installation
 
