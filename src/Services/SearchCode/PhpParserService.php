@@ -4,6 +4,7 @@ namespace Elegantly\Translator\Services\SearchCode;
 
 use Closure;
 use Elegantly\Translator\Caches\SearchCodeCache;
+use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Lang;
@@ -149,8 +150,15 @@ class PhpParserService implements SearchCodeServiceInterface
                         ? Blade::compileString($file->getContents())
                         : $file->getContents();
 
-                    $translations = static::scanCode($content);
-
+                    try {
+                        $translations = static::scanCode($content);
+                    } catch (\Throwable $th) {
+                        throw new Exception(
+                            "File can't be parsed: {$file->getPath()}. Your file might contain a syntax error. You can either fix the file or add it to the ignored path.",
+                            code: 422,
+                            previous: $th
+                        );
+                    }
                     $this->cache?->put($key, $translations);
                 }
 
