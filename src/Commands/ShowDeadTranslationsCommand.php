@@ -27,7 +27,7 @@ class ShowDeadTranslationsCommand extends Command implements PromptsForMissingIn
 
         return progress(
             "Scanning files: {$locale}",
-            array_combine($namespaces, $namespaces),
+            $namespaces,
             function (string $namespace, Progress $progress) use ($locale) {
                 $progress->hint($namespace);
 

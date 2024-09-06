@@ -21,11 +21,11 @@ class ShowMissingTranslationsCommand extends Command implements PromptsForMissin
 
         $rows = collect(Translator::getAllMissingTranslations($reference))
             ->flatMap(
-                fn (array $namespaces, string $locale) => collect($namespaces)
+                fn ($namespaces, string $locale) => $namespaces
                     ->flatMap(function (array $keys, string $namespace) use ($locale, $namespaces) {
                         $values = array_map(fn (string $key) => [$locale, "{$namespace}.$key"], $keys);
 
-                        if (array_key_last($namespaces) !== $namespace) {
+                        if ($namespaces->keys()->last() !== $namespace) {
                             $values[] = [new TableSeparator, new TableSeparator];
                         }
 
