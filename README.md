@@ -490,7 +490,7 @@ Please report any security vulnerabily to me via github or email.
 
 ## Credits
 
--   [Quentin Gabriele](https://github.com/40128136+QuentinGab)
+-   [Quentin Gabriele](https://github.com/QuentinGab)
 -   [All Contributors](../../contributors)
 
 ## License
