@@ -101,7 +101,7 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
-                'model' => 'gpt-4o',
+                'model' => 'gpt-4o-mini',
                 'prompt' => "
                             As an experienced copywriter and translator specializing in website copy, your task is to translate the provided content from a specific website.
                             Your translations should maintain the original tone while being adapted to the target language, ensuring they are both relevant and clear.
@@ -129,7 +129,7 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
-                'model' => 'gpt-4o',
+                'model' => 'gpt-4o-mini',
                 'prompt' => '
                             Fix the grammar and syntax of the following JSON string while respecting the following rules:
                                 - Never change the keys.
