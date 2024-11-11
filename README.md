@@ -24,7 +24,7 @@ Easily manage all your Laravel translation strings:
 You can install the package via Composer:
 
 ```bash
-composer require-dev elegantly/laravel-translator --dev
+composer require elegantly/laravel-translator --dev
 ```
 
 If you’re not using this package in production, add the following lines to your `.gitignore` file:

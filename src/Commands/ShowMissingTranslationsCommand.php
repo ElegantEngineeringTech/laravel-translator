@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Symfony\Component\Console\Helper\TableSeparator;
 
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\table;
 
 class ShowMissingTranslationsCommand extends Command implements PromptsForMissingInput
 {
@@ -19,21 +20,31 @@ class ShowMissingTranslationsCommand extends Command implements PromptsForMissin
     {
         $reference = $this->argument('locale');
 
-        $rows = collect(Translator::getAllMissingTranslations($reference))
-            ->flatMap(
-                fn ($namespaces, string $locale) => $namespaces
-                    ->flatMap(function (array $keys, string $namespace) use ($locale, $namespaces) {
-                        $values = array_map(fn (string $key) => [$locale, "{$namespace}.$key"], $keys);
+        $rows = [];
 
-                        if ($namespaces->keys()->last() !== $namespace) {
-                            $values[] = [new TableSeparator, new TableSeparator];
-                        }
+        $missing = Translator::getAllMissingTranslations($reference);
 
-                        return $values;
-                    })
-            )->toArray();
+        foreach ($missing as $locale => $namespaces) {
 
-        $this->table(
+            foreach ($namespaces as $namespace => $translations) {
+
+                foreach ($translations as $translation) {
+                    $rows[] = [$locale, "{$namespace}.{$translation}"];
+                }
+
+                if ($namespaces->keys()->last() !== $namespace) {
+                    $rows[] = [new TableSeparator, new TableSeparator];
+                }
+
+            }
+
+            if ($missing->keys()->last() !== $locale) {
+                $rows[] = [new TableSeparator, new TableSeparator];
+            }
+
+        }
+
+        table(
             headers: ['Locale', 'Missing key'],
             rows: $rows
         );
