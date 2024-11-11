@@ -18,7 +18,7 @@ class ShowMissingTranslationsCommand extends Command implements PromptsForMissin
 
     public function handle(): int
     {
-        $reference = $this->argument('locale');
+        $reference = (string) $this->argument('locale');
 
         $rows = [];
 

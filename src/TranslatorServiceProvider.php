@@ -2,6 +2,7 @@
 
 namespace Elegantly\Translator;
 
+use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\ProofreadTranslationsCommand;
 use Elegantly\Translator\Commands\ShowDeadTranslationsCommand;
 use Elegantly\Translator\Commands\ShowMissingTranslationsCommand;
@@ -31,6 +32,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
             ->name('laravel-translator')
             ->hasConfigFile()
             ->hasCommands([
+                LocalesCommand::class,
                 ShowMissingTranslationsCommand::class,
                 SortAllTranslationsCommand::class,
                 TranslateTranslationsCommand::class,
