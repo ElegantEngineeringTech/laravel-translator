@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class JsonDriver extends Driver
 {
-    public function __construct(
+    final public function __construct(
         public Filesystem $storage,
     ) {
         //
@@ -17,10 +17,12 @@ class JsonDriver extends Driver
 
     public static function make(): static
     {
-        return new static(Storage::build([
-            'driver' => 'local',
-            'root' => config()->string('translator.lang_path'),
-        ]));
+        return new static(
+            storage: Storage::build([
+                'driver' => 'local',
+                'root' => config()->string('translator.lang_path'),
+            ])
+        );
     }
 
     /**
@@ -35,12 +37,7 @@ class JsonDriver extends Driver
             ->toArray();
     }
 
-    public function getNamespaces(string $locale): array
-    {
-        return [];
-    }
-
-    public function getTranslations(string $locale, ?string $namespace = null): JsonTranslations
+    public function getTranslations(string $locale): JsonTranslations
     {
         $path = $this->getFilePath($locale);
 

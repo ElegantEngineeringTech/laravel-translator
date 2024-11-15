@@ -4,10 +4,7 @@ namespace Elegantly\Translator\Collections;
 
 use Illuminate\Support\Collection;
 
-/**
- * @extends Collection<string, string|int|float|null>
- */
-final class JsonTranslations extends Collection implements TranslationsInterface
+final class JsonTranslations extends Translations
 {
     public function set(string|int|null $key, mixed $value): static
     {

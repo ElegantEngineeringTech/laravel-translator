@@ -17,10 +17,12 @@ class PhpDriver extends Driver
 
     public static function make(): static
     {
-        return new static(Storage::build([
-            'driver' => 'local',
-            'root' => config()->string('translator.lang_path'),
-        ]));
+        return new static(
+            storage: Storage::build([
+                'driver' => 'local',
+                'root' => config()->string('translator.lang_path'),
+            ])
+        );
     }
 
     /**
@@ -44,22 +46,37 @@ class PhpDriver extends Driver
             ->toArray();
     }
 
+    public function getTranslations(string $locale): PhpTranslations
+    {
+        $translations = collect($this->getNamespaces($locale))
+            ->mapWithKeys(function ($namespace) use ($locale) {
+                return [$namespace => $this->getTranslationsInNamespace($locale, $namespace)];
+            })
+            ->undot();
+
+        return new PhpTranslations($translations);
+    }
+
     /**
      * This function uses eval and not include
      * Because using 'include' would cache/compile the code in opcache
      * Therefore it would not reflect the changes after the file is edited
+     *
+     * @return array<array-key, mixed>
      */
-    public function getTranslations(string $locale, ?string $namespace = null): PhpTranslations
+    public function getTranslationsInNamespace(string $locale, string $namespace): array
     {
+
         $path = $this->getFilePath($locale, $namespace);
 
         if ($this->storage->exists($path)) {
             $content = $this->storage->get($path);
 
-            return new PhpTranslations(eval('?>'.$content));
+            return eval("?> {$content}");
         }
 
-        return new PhpTranslations;
+        return [];
+
     }
 
     public function getFilePath(string $locale, string $namespace): string

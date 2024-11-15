@@ -5,10 +5,7 @@ namespace Elegantly\Translator\Collections;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-/**
- * @extends Collection<string|int, array|string|int|float|null>
- */
-final class PhpTranslations extends Collection implements TranslationsInterface
+class PhpTranslations extends Translations
 {
     public function set(string|int|null $key, mixed $value): static
     {
