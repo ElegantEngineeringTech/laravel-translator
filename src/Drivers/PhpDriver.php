@@ -3,6 +3,7 @@
 namespace Elegantly\Translator\Drivers;
 
 use Elegantly\Translator\Collections\PhpTranslations;
+use Elegantly\Translator\Collections\Translations;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,11 @@ class PhpDriver extends Driver
                 'root' => config()->string('translator.lang_path'),
             ])
         );
+    }
+
+    public function getFilePath(string $locale, string $namespace): string
+    {
+        return "{$locale}/{$namespace}.php";
     }
 
     /**
@@ -52,7 +58,7 @@ class PhpDriver extends Driver
             ->mapWithKeys(function ($namespace) use ($locale) {
                 return [$namespace => $this->getTranslationsInNamespace($locale, $namespace)];
             })
-            ->undot();
+            ->dot();
 
         return new PhpTranslations($translations);
     }
@@ -72,15 +78,69 @@ class PhpDriver extends Driver
         if ($this->storage->exists($path)) {
             $content = $this->storage->get($path);
 
-            return eval("?> {$content}");
+            return eval("?>{$content}");
         }
 
         return [];
 
     }
 
-    public function getFilePath(string $locale, string $namespace): string
+    public function saveTranslations(string $locale, Translations $translations): Translations
     {
-        return "{$locale}/{$namespace}.php";
+
+        foreach ($translations->undot() as $namespace => $values) {
+
+            $this->storage->put(
+                $this->getFilePath($locale, $namespace),
+                $this->toFile($values)
+            );
+
+        }
+
+        return $translations;
+    }
+
+    /**
+     * Write the lines of the inner array of the language file.
+     */
+    public function toFile(array $values): string
+    {
+        $content = "<?php\n\nreturn [";
+
+        $content .= $this->recursiveToFile($values);
+
+        $content .= "\n];\n";
+
+        return $content;
+    }
+
+    public function recursiveToFile(
+        array $items,
+        string $prefix = '',
+    ): string {
+
+        $output = '';
+
+        foreach ($items as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->recursiveToFile($value, $prefix.'    ');
+
+                if (is_string($key)) {
+                    $output .= "\n{$prefix}    '{$key}' => [{$value}\n    {$prefix}],";
+                } else {
+                    $output .= "\n{$prefix}    [{$value}\n    {$prefix}],";
+                }
+            } else {
+                $value = str_replace('\"', '"', addslashes($value));
+
+                if (is_string($key)) {
+                    $output .= "\n{$prefix}    '{$key}' => '{$value}',";
+                } else {
+                    $output .= "\n{$prefix}    '{$value}',";
+                }
+            }
+        }
+
+        return $output;
     }
 }

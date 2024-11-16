@@ -2,6 +2,10 @@
 
 namespace Elegantly\Translator\Tests;
 
+use Elegantly\Translator\Drivers\JsonDriver;
+use Elegantly\Translator\Drivers\PhpDriver;
+use Elegantly\Translator\Services\SearchCode\PhpParserService;
+use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\TranslatorServiceProvider;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -28,12 +32,37 @@ class TestCase extends Orchestra
         return __DIR__.'/src/resources';
     }
 
+    public function getPhpDriver(): PhpDriver
+    {
+        return new PhpDriver(
+            $this->getStorage()
+        );
+    }
+
+    public function getJsonDriver(): JsonDriver
+    {
+        return new JsonDriver(
+            $this->getStorage()
+        );
+    }
+
     public function getStorage(): Filesystem
     {
         return Storage::build([
             'driver' => 'local',
             'root' => __DIR__.'/src/lang',
         ]);
+    }
+
+    public function getSearchCodeService(): SearchCodeServiceInterface
+    {
+        return new PhpParserService(
+            paths: [
+                $this->getAppPath(),
+                $this->getResourcesPath(),
+            ],
+            excludedPaths: $this->getExcludedPaths()
+        );
     }
 
     protected function setUp(): void

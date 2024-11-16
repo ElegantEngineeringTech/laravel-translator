@@ -3,6 +3,7 @@
 namespace Elegantly\Translator\Drivers;
 
 use Elegantly\Translator\Collections\JsonTranslations;
+use Elegantly\Translator\Collections\Translations;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -25,12 +26,18 @@ class JsonDriver extends Driver
         );
     }
 
+    public function getFilePath(string $locale): string
+    {
+        return "{$locale}.json";
+    }
+
     /**
      * @return string[]
      */
     public function getLocales(): array
     {
         return collect($this->storage->files())
+            ->filter(fn (string $file) => File::extension($file) === 'json')
             ->map(fn (string $file) => File::name($file))
             ->sort(SORT_NATURAL)
             ->values()
@@ -50,8 +57,13 @@ class JsonDriver extends Driver
         return new JsonTranslations;
     }
 
-    public function getFilePath(string $locale): string
+    public function saveTranslations(string $locale, Translations $translations): Translations
     {
-        return "{$locale}.json";
+        $this->storage->put(
+            $this->getFilePath($locale),
+            $translations->toJson(JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+        );
+
+        return $translations;
     }
 }

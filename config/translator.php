@@ -5,7 +5,7 @@ use Elegantly\Translator\Drivers\PhpDriver;
 
 return [
 
-    'drivers' => [
+    'driver' => [
         PhpDriver::class,
         JsonDriver::class,
     ],

@@ -10,12 +10,15 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
  */
 class MissingCommand extends Command implements PromptsForMissingInput
 {
-    public $signature = 'translator:missing';
+    public $signature = 'translator:missing {source?} {target?}';
 
     public $description = 'Display all the translation strings not found in a locale.';
 
     public function handle(): int
     {
+
+        $source = $this->argument('source');
+        $target = $this->argument('target');
 
         return self::SUCCESS;
     }

@@ -6,8 +6,8 @@ use Exception;
 
 class TranslatorException extends Exception
 {
-    public static function write(string $locale, string $namespace): self
+    public static function write(string $locale): self
     {
-        return new self("Writing translations in {$locale}.{$namespace} failed");
+        return new self("Writing translations in {$locale} failed.");
     }
 }

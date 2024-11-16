@@ -20,10 +20,15 @@ class LocalesCommand extends Command implements PromptsForMissingInput
         /** @var class-string<Driver>[] */
         $drivers = (array) $this->argument('driver');
 
-        $locales = array_map(fn ($class) => [
-            $class,
-            implode(', ', $class::make()->getLocales()),
-        ], $drivers);
+        $locales = array_map(function ($class) {
+            $driver = $class::make();
+            $locales = $driver->getLocales();
+
+            return [
+                $class,
+                count($locales).': '.implode(', ', $locales),
+            ];
+        }, $drivers);
 
         $table = new Table(
             headers: ['Driver', 'Locales'],

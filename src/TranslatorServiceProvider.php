@@ -3,11 +3,11 @@
 namespace Elegantly\Translator;
 
 use Elegantly\Translator\Commands\LocalesCommand;
-use Elegantly\Translator\Commands\ProofreadTranslationsCommand;
-use Elegantly\Translator\Commands\ShowDeadTranslationsCommand;
-use Elegantly\Translator\Commands\ShowMissingTranslationsCommand;
-use Elegantly\Translator\Commands\SortAllTranslationsCommand;
-use Elegantly\Translator\Commands\TranslateTranslationsCommand;
+use Elegantly\Translator\Commands\MissingCommand;
+use Elegantly\Translator\Commands\UndefinedCommand;
+use Elegantly\Translator\Drivers\Driver;
+use Elegantly\Translator\Drivers\JsonDriver;
+use Elegantly\Translator\Drivers\PhpDriver;
 use Elegantly\Translator\Services\Proofread\OpenAiService as ProofreadOpenAiService;
 use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
@@ -33,11 +33,8 @@ class TranslatorServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasCommands([
                 LocalesCommand::class,
-                ShowMissingTranslationsCommand::class,
-                SortAllTranslationsCommand::class,
-                TranslateTranslationsCommand::class,
-                ProofreadTranslationsCommand::class,
-                ShowDeadTranslationsCommand::class,
+                UndefinedCommand::class,
+                MissingCommand::class,
             ]);
     }
 
@@ -45,15 +42,24 @@ class TranslatorServiceProvider extends PackageServiceProvider
     {
         $this->app->scoped(Translator::class, function () {
             return new Translator(
-                storage: Storage::build([
-                    'driver' => 'local',
-                    'root' => config('translator.lang_path'),
-                ]),
+                driver: static::getDriverFromConfig(),
                 translateService: static::getTranslateServiceFromConfig(),
                 proofreadService: static::getproofreadServiceFromConfig(),
                 searchcodeService: static::getSearchcodeServiceFromConfig(),
             );
         });
+    }
+
+    public static function getDriverFromConfig(?string $driverName = null): Driver
+    {
+        $driver = $driverName ?? config('translator.driver');
+
+        return match ($driver) {
+            'php', PhpDriver::class => PhpDriver::make(),
+            'json', JsonDriver::class => JsonDriver::make(),
+            '', null => null,
+            default => new $driver,
+        };
     }
 
     public static function getTranslateServiceFromConfig(?string $serviceName = null): ?TranslateServiceInterface
