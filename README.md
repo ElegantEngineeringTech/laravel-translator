@@ -5,100 +5,112 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 
-![laravel-translator](https://repository-images.githubusercontent.com/816339762/eefcad09-87ad-484e-bcc4-5759303dc4b6)
+![Laravel Translator](https://repository-images.githubusercontent.com/816339762/eefcad09-87ad-484e-bcc4-5759303dc4b6)
 
-Easily manage all your Laravel translation strings:
+Easily manage all your Laravel translation strings with powerful features:
 
--   **Translate** strings into other languages (DeepL, OpenAI, or any custom service).
--   **Proofread** your translation strings and automatically fix grammar and syntax (OpenAI or any custom service).
--   **Find missing** translation strings across all your locales.
--   **Detect unused** translation keys (keys not used anywhere in your codebase).
+-   **Translate** strings into other languages using DeepL, OpenAI, or any custom service.
+-   **Proofread** translations to fix grammar and syntax automatically (via OpenAI or a custom service).
+-   **Find missing** translation strings across locales.
+-   **Detect unused** translation keys in your codebase.
 -   **Sort** your translations in natural order.
 
-## Try Laratranslate - A powerful UI to manage all your translations
+## Try Laratranslate – A Powerful UI for Managing Translations
 
-[![laratranslate](https://elegantengineering.tech/assets/laratranslate/opengraph.jpg)](https://elegantengineering.tech/laratranslate/)
+[![Laratranslate](https://elegantengineering.tech/assets/laratranslate/opengraph.jpg)](https://elegantengineering.tech/laratranslate/)
+
+---
 
 ## Installation
 
-You can install the package via Composer:
+Install the package via Composer:
 
 ```bash
 composer require elegantly/laravel-translator --dev
 ```
 
-Next add the following lines to your `.gitignore` file:
+Then, add the following line to your `.gitignore` file:
 
 ```
 .translator.cache
 ```
 
-Next, publish the config file with:
+Next, publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag="translator-config"
 ```
 
-## Configure the Driver
+---
 
-This package relies on the 'driver' paradigm. Out of the box it supoprts the two standard drivers: PHP and JSON.
-But you can create your own driver if you need (for translations stored in database for example).
+## Configuring the Driver
 
-The default driver can be set in the config file:
+This package uses a driver-based architecture. By default, it supports two standard drivers: PHP and JSON.
+You can also create custom drivers for alternative storage methods, such as a database.
+
+Set the default driver in the configuration file:
 
 ```php
 use Elegantly\Translator\Drivers\PhpDriver;
 
 return [
-        /**
-     * Possible values are: 'php', 'json' or any class-string<Driver>
+    /**
+     * Possible values: 'php', 'json', or a class-string implementing Driver.
      */
     'driver' => PhpDriver::class,
 
     //...
-]
+];
 ```
 
-## Sorting & Formatting
+---
 
-### From the CLI
+## Sorting and Formatting
+
+### CLI Commands
+
+Sort translations with the default driver:
 
 ```bash
 php artisan translator:sort
+```
 
+Specify a driver for sorting:
+
+```bash
 php artisan translator:sort --driver=json
 ```
 
-### From Code
+### Using Code
+
+Sort translations programmatically with the default driver:
 
 ```php
 use Elegantly\Translator\Facades\Translator;
 
-// Using the default driver
-Translator::sortTranslations(
-    locale: 'fr',
-);
-
-// Using a specific driver
-Translator::driver('json')->sortTranslations(
-    locale: 'fr',
-);
+Translator::sortTranslations(locale: 'fr');
 ```
+
+Or specify a driver:
+
+```php
+Translator::driver('json')->sortTranslations(locale: 'fr');
+```
+
+---
 
 ## Automatic Translation
 
-Before translating anything, you must choose and set up a translation service.
+Before translating, you need to configure a translation service. The package supports:
 
-This package includes two services by default:
+-   **OpenAI**
+-   **DeepL**
 
--   OpenAI
--   DeepL
+Custom translation services can also be implemented.
 
-However, you can create your own service if needed.
+### Configuring OpenAI
 
-### Setting Up OpenAI
-
-First, configure the OpenAI key in the config file or define the environment variables:
+Define your OpenAI credentials in the configuration file or via environment variables:
 
 ```php
 return [
@@ -113,12 +125,12 @@ return [
     ],
 
     // ...
-]
+];
 ```
 
-### Setting Up DeepL
+### Configuring DeepL
 
-First, configure the DeepL key in the config file or define the environment variable:
+Add your DeepL API key to the configuration file or environment variables:
 
 ```php
 return [
@@ -132,245 +144,213 @@ return [
     ],
 
     // ...
-]
+];
 ```
 
-### From the CLI
+### CLI Translation
 
-Translate missing french translations:
+Translate missing French translations:
 
 ```bash
 php artisan translator:missing en fr --translate
+```
 
+Translate using a specific driver:
+
+```bash
 php artisan translator:missing en fr --translate --driver=json
 ```
 
-Add a new locale and translate from english:
+Add a new locale with translations:
 
 ```bash
 php artisan translator:add-locale fr en --translate
-
-php artisan translator:add-locale fr en --translate --driver=json
 ```
 
-### From Code
+### Programmatic Translation
+
+Translate translations programmatically with the default driver:
 
 ```php
-use Elegantly\Translator\Facades\Translator;
-
-// Translate strings defined the default driver
 Translator::translateTranslations(
-    source: 'fr',
-    target: 'en',
+    source: 'en',
+    target: 'fr',
     keys: ['validation.title', ...]
 );
+```
 
-// Translate strings defined in a specific driver
+Specify a driver for translation:
+
+```php
 Translator::driver('json')->translateTranslations(
-    source: 'fr',
-    target: 'en',
+    source: 'en',
+    target: 'fr',
     keys: ['My Title', ...]
 );
-
 ```
+
+---
 
 ## Proofreading Translations
 
-This package allows you to proofread (i.e., fix grammar and syntax) your translation strings.
+Proofreading corrects grammar and syntax.
 
-Currently, the package includes one service:
+Currently, OpenAI is the only built-in service, but you can implement custom services.
 
--   OpenAI
-
-However, you can create your own service if needed.
-
-### Setting Up OpenAI
-
-First, configure the OpenAI key in the config file or define the environment variables:
-
-```php
-return [
-    // ...
-
-    'services' => [
-        'openai' => [
-            'key' => env('OPENAI_API_KEY'),
-            'organization' => env('OPENAI_ORGANIZATION'),
-            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
-        ],
-    ],
-
-    // ...
-]
-```
-
-### From the CLI
+### CLI Proofreading
 
 ```bash
 php artisan translator:proofread
 ```
 
-### From Code
+### Programmatic Proofreading
+
+Proofread translations with the default driver:
 
 ```php
-use Elegantly\Translator\Facades\Translator;
-
-// Proofread translation strings defined in the default driver
 Translator::proofreadTranslations(
     locale: 'fr',
     keys: ['auth.email', ...]
 );
+```
 
-// Proofread translation strings defined in a specific driver
+Specify a driver:
+
+```php
 Translator::driver('json')->proofreadTranslations(
     locale: 'fr',
     keys: ['My Title', ...]
 );
 ```
 
+---
+
 ## Finding Missing Translations
 
-### From the CLI
+Identify keys defined in one locale but missing in another.
 
-Display the translations keys defined in 'en' locale but missing in 'fr' locale.
+### CLI Usage
 
 ```bash
 php artisan translator:missing en fr
 ```
 
-### From Code
+### Programmatic Usage
 
 ```php
-// Compare /fr/validation.php and /en/validation.php
-Translator::getMissingTranslations(
-    source: 'fr',
-    target: 'en',
-);
+Translator::getMissingTranslations(source: 'en', target: 'fr');
 ```
 
-## Finding Undefined Translations
+---
 
-> [!NOTE]
-> Undefined translations are translations keys found in your codebase but not in the driver.
+## Detecting Undefined Translations
 
-This package scans your entire codebase to find undefined translation keys. You can customize its behavior to:
+Undefined translations are keys found in your codebase but missing in the translation files.
 
--   Include or exclude specific paths.
--   Exclude translation keys.
-
-> [!IMPORTANT]
-> The dead code detector cannot detect translation keys if you use string interpolation, such as `__("countries.{$user->country})`.
-
-### From the CLI
+### CLI Usage
 
 ```bash
 php artisan translator:undefined en
 ```
 
-### From Code
+### Programmatic Usage
 
 ```php
-Translator::getUndefinedTranslations(
-    locale: 'en',
-);
+Translator::getUndefinedTranslations(locale: 'en');
 ```
 
-## Finding Dead Translations
+---
 
-### From the CLI
+## Detecting Dead Translations
+
+Dead translations are keys defined in your files but unused in your codebase.
+
+### CLI Usage
 
 ```bash
 php artisan translator:dead fr
 ```
 
-### From Code
+### Programmatic Usage
 
 ```php
-Translator::getDeadTranslations(
-    locale: 'fr',
-);
+Translator::getDeadTranslations(locale: 'fr');
 ```
 
-## Configure The code scanneur
+---
 
-### Define Which Files/Directories Should Be Scanned
+## Code Scanner Configuration
 
-Include all paths where translation keys are likely to be used.
+### Included Paths
 
-Both `.php` and `.blade.php` files are supported. You can customize the paths scanned in the config:
+Specify paths to scan for translation keys. By default, both `.php` and `.blade.php` files are supported.
 
 ```php
 return [
-    // ...
     'searchcode' => [
-        /**
-         * Files or directories to include in the dead code scan.
-         */
         'paths' => [
-            app_path(), // Scan the entire /app directory
-            resource_path(), // Scan the entire /resource directory
+            app_path(), // Scan /app directory
+            resource_path(), // Scan /resource directory
         ],
-        // ...
-    ]
-    // ...
+    ],
 ];
 ```
 
-### Define Which Files/Directories Should Be Excluded from the Scan
+### Excluded Paths
 
-To optimize or speed up the scan, you can exclude certain paths. This is particularly useful for:
+Exclude irrelevant paths for optimized scanning, such as test files or unrelated directories.
 
--   Test files that do not rely on your translation files.
--   Entire subdirectories unrelated to your translations.
+### Ignored Translation Keys
 
-> [!TIP]
-> Excluding paths will speed up the scanner.
-
-### Ignore Translation Keys from the Search Code Detector
-
-Sometimes, translation strings are not used in the codebase, but you don’t want to consider them as unused. For example, you might store all country names in `/countries.php`.
-
-Sometimes, the scanner might not detect your translation strings when using string interpolation, such as `__("countries.{$user->country})`.
-
-In these cases, you can ignore translation keys in the config:
+Ignore specific translation keys, e.g., keys used dynamically with string interpolation:
 
 ```php
 return [
-    // ...
     'searchcode' => [
-        // ...
         'ignored_translations' => [
-            'countries', // Ignore all translation keys starting with 'countries'.
+            'countries', // Ignore keys starting with 'countries'.
         ],
-        // ...
-    ]
-    // ...
+    ],
 ];
 ```
+
+---
 
 ## Testing
+
+Run tests using:
 
 ```bash
 composer test
 ```
 
+---
+
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on recent changes.
+For recent updates, see the [CHANGELOG](CHANGELOG.md).
+
+---
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Check the [CONTRIBUTING](CONTRIBUTING.md) guide for details.
+
+---
 
 ## Security Vulnerabilities
 
-Please report any security vulnerabily to me via github or email.
+Report security vulnerabilities via GitHub or email.
+
+---
 
 ## Credits
 
 -   [Quentin Gabriele](https://github.com/QuentinGab)
 -   [All Contributors](../../contributors)
 
+---
+
 ## License
 
-This package is licensed under the MIT License. Please see the [License File](LICENSE.md) for more details.
+This package is licensed under the MIT License. See the [License File](LICENSE.md) for more details.
