@@ -4,6 +4,9 @@ use Elegantly\Translator\Drivers\PhpDriver;
 
 return [
 
+    /**
+     * Possible values are: 'php', 'json' or any class-string<Driver>
+     */
     'driver' => PhpDriver::class,
 
     /*
