@@ -5,7 +5,6 @@ namespace Elegantly\Translator\Commands;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 
 use function Laravel\Prompts\intro;
-use function Laravel\Prompts\note;
 use function Laravel\Prompts\table;
 
 /**
@@ -33,7 +32,7 @@ class SortCommand extends TranslatorCommand implements PromptsForMissingInput
                 ->map(function ($value, $key) {
                     return [
                         $key,
-                        str($value)->limit(50)
+                        str($value)->limit(50),
                     ];
                 })->all()
         );
