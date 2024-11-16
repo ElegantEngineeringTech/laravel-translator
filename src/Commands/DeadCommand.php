@@ -11,30 +11,29 @@ use function Laravel\Prompts\table;
 /**
  * Display translations strings found in codebase but not in a locale
  */
-class MissingCommand extends TranslatorCommand implements PromptsForMissingInput
+class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:missing {source} {target} {--driver=}';
+    public $signature = 'translator:dead {locale} {--driver=}';
 
     public $description = 'Display all the translation keys not found in the codebase.';
 
     public function handle(): int
     {
-        $source = (string) $this->argument('source');
-        $target = (string) $this->argument('target');
+        $locale = $this->argument('locale');
 
         $translator = $this->getTranslator();
 
-        $missing = $translator->getMissingTranslations($source, $target);
+        $dead = $translator->getDeadTranslations($locale);
 
         intro('Using driver: '.$translator->driver::class);
 
-        note(count($missing).' missing translations keys detected.');
+        note(count($dead).' dead translations keys detected.');
 
         table(
-            headers: ['Key', "Source {$source}", "Target {$target}"],
-            rows: collect($missing)
+            headers: ['Key'],
+            rows: collect($dead)
                 ->map(function ($value, $key) {
-                    return [$key, $value];
+                    return [$value];
                 })->all()
         );
 

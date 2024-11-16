@@ -4,7 +4,9 @@ namespace Elegantly\Translator\Services\Translate;
 
 interface TranslateServiceInterface
 {
+    /**
+     * @param  array<string, string>  $texts
+     * @return array<string, string>
+     */
     public function translateAll(array $texts, string $targetLocale): array;
-
-    public function translate(string $text, string $targetLocale): ?string;
 }

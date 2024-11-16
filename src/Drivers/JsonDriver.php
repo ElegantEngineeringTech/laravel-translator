@@ -66,4 +66,9 @@ class JsonDriver extends Driver
 
         return $translations;
     }
+
+    public static function collect(): Translations
+    {
+        return new JsonTranslations;
+    }
 }

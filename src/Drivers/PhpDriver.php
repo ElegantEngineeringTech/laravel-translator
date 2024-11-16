@@ -87,8 +87,9 @@ class PhpDriver extends Driver
 
     public function saveTranslations(string $locale, Translations $translations): Translations
     {
+        $undot = $translations->undot()->toArray();
 
-        foreach ($translations->undot() as $namespace => $values) {
+        foreach ($undot as $namespace => $values) {
 
             $this->storage->put(
                 $this->getFilePath($locale, $namespace),
@@ -142,5 +143,10 @@ class PhpDriver extends Driver
         }
 
         return $output;
+    }
+
+    public static function collect(): Translations
+    {
+        return new PhpTranslations;
     }
 }

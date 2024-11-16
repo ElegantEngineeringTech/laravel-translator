@@ -14,7 +14,7 @@ use Illuminate\Support\Arr;
 class Translator
 {
     final public function __construct(
-        public ?Driver $driver = null,
+        public Driver $driver,
         public ?TranslateServiceInterface $translateService = null,
         public ?ProofreadServiceInterface $proofreadService = null,
         public ?SearchCodeServiceInterface $searchcodeService = null,
@@ -22,7 +22,7 @@ class Translator
         //
     }
 
-    public function driver($name): static
+    public function driver(?string $name): static
     {
         return new static(
             driver: TranslatorServiceProvider::getDriverFromConfig($name),
@@ -45,10 +45,15 @@ class Translator
         return $this->driver->getTranslations($locale);
     }
 
+    public function collect(): Translations
+    {
+        return ($this->driver)::collect();
+    }
+
     /**
      * Scan the codebase to find keys not present in the driver
      *
-     * @return array The translations keys defined in the codebase but not defined in the driver
+     * @return array<string, array{ count: int, files: string[] }> The translations keys defined in the codebase but not defined in the driver
      */
     public function getUndefinedTranslations(string $locale): array
     {
@@ -68,7 +73,7 @@ class Translator
     }
 
     /**
-     * @return array The translations keys defined in the driver but not defined in the codebase
+     * @return array<int, scalar|null> The translations keys defined in the driver but not defined in the codebase
      */
     public function getDeadTranslations(string $locale): array
     {
@@ -89,7 +94,7 @@ class Translator
     }
 
     /**
-     * @return array<int, mixed> The keys defined in source locale but not found in target locale
+     * @return array<int, scalar|null> The keys defined in source locale but not found in target locale
      */
     public function getMissingTranslations(
         string $source,
@@ -107,6 +112,9 @@ class Translator
             ->toArray();
     }
 
+    /**
+     * @param  array<string, scalar|null>  $values
+     */
     public function setTranslations(
         string $locale,
         array $values
@@ -128,11 +136,14 @@ class Translator
     public function setTranslation(
         string $locale,
         string $key,
-        mixed $value,
+        string|int|float|bool|null $value,
     ): Translations {
         return $this->setTranslations($locale, [$key => $value]);
     }
 
+    /**
+     * @param  array<int, string>  $keys
+     */
     public function translateTranslations(
         string $source,
         string $target,
@@ -153,13 +164,13 @@ class Translator
             locale: $target,
             callback: function ($translations) use ($source, $target, $keys, $service) {
 
-                $sourceDotTranslations = $this->getTranslations($source)
+                $sourceTranslations = $this->getTranslations($source)
                     ->only($keys)
                     ->filter(fn ($value) => ! blank($value))
                     ->toArray();
 
                 $translatedValues = $service->translateAll(
-                    $sourceDotTranslations,
+                    $sourceTranslations,
                     $target
                 );
 
@@ -183,6 +194,9 @@ class Translator
         );
     }
 
+    /**
+     * @param  array<int, string>  $keys
+     */
     public function proofreadTranslations(
         string $locale,
         array $keys,
@@ -227,6 +241,9 @@ class Translator
         );
     }
 
+    /**
+     * @param  array<int, string>  $keys
+     */
     public function deleteTranslations(
         string $locale,
         array $keys,

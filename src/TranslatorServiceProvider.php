@@ -2,6 +2,9 @@
 
 namespace Elegantly\Translator;
 
+use Elegantly\Translator\Commands\AddLocaleCommand;
+use Elegantly\Translator\Commands\ClearCacheCommand;
+use Elegantly\Translator\Commands\DeadCommand;
 use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
 use Elegantly\Translator\Commands\UndefinedCommand;
@@ -33,12 +36,15 @@ class TranslatorServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasCommands([
                 LocalesCommand::class,
+                AddLocaleCommand::class,
                 UndefinedCommand::class,
+                DeadCommand::class,
                 MissingCommand::class,
+                ClearCacheCommand::class,
             ]);
     }
 
-    public function registeringPackage()
+    public function registeringPackage(): void
     {
         $this->app->scoped(Translator::class, function () {
             return new Translator(

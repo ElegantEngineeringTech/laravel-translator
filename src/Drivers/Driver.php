@@ -19,4 +19,6 @@ abstract class Driver
     abstract public function getTranslations(string $locale): Translations;
 
     abstract public function saveTranslations(string $locale, Translations $translations): Translations;
+
+    abstract public static function collect(): Translations;
 }

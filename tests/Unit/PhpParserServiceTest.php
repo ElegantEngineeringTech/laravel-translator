@@ -26,6 +26,19 @@ it('finds all occurences of __ in php code', function (string $code) {
     "<?php app('translator')->choice('messages.dummy.class');",
 ]);
 
+it('ignore package translations keys in php code', function (string $code) {
+    $results = PhpParserService::scanCode($code);
+
+    expect($results)->toHaveLength(0);
+})->with([
+    "<?php __('package::messages.dummy.class');",
+    "<?php __('package-name::messages.dummy.class');",
+    "<?php __('package-Name::messages.dummy.class');",
+    "<?php __('Package_Name::messages.dummy.class');",
+    "<?php trans('package::messages.dummy.class');",
+    "<?php trans_choice('package::messages.dummy.class', 1);",
+]);
+
 it('finds all occurences of __ in blade code', function (string $code) {
     $results = PhpParserService::scanCode(Blade::compileString($code));
 

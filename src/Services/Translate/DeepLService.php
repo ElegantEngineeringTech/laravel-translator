@@ -3,7 +3,6 @@
 namespace Elegantly\Translator\Services\Translate;
 
 use DeepL\TextResult;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class DeepLService implements TranslateServiceInterface
@@ -35,11 +34,6 @@ class DeepLService implements TranslateServiceInterface
                     ->toArray();
             })
             ->toArray();
-    }
-
-    public function translate(string $text, string $targetLocale): ?string
-    {
-        return Arr::first($this->translateAll([$text], $targetLocale));
     }
 
     public static function getLang(string $locale): string

@@ -2,8 +2,6 @@
 
 namespace Elegantly\Translator\Services\Translate;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use OpenAI;
 
@@ -27,19 +25,17 @@ class OpenAiService implements TranslateServiceInterface
             );
         }
 
-        return OpenAI::factory()
-            ->withApiKey($this->apiKey)
-            ->withOrganization($this->organization)
-            ->withHttpHeader('OpenAI-Beta', 'assistants=v2')
-            ->withHttpClient(new \GuzzleHttp\Client(['timeout' => $this->timeout]))
-            ->make();
+        return OpenAI::client(
+            apiKey: $this->apiKey,
+            organization: $this->organization,
+        );
     }
 
     public function translateAll(array $texts, string $targetLocale): array
     {
         return collect($texts)
             ->chunk(20)
-            ->flatMap(function (Collection $chunk) use ($targetLocale) {
+            ->flatMap(function ($chunk) use ($targetLocale) {
                 $response = $this->getOpenAI()->chat()->create([
                     'model' => $this->model,
                     'response_format' => ['type' => 'json_object'],
@@ -50,7 +46,7 @@ class OpenAiService implements TranslateServiceInterface
                         ],
                         [
                             'role' => 'user',
-                            'content' => json_encode($chunk),
+                            'content' => $chunk->toJson(),
                         ],
                     ],
                 ]);
@@ -61,10 +57,5 @@ class OpenAiService implements TranslateServiceInterface
                 return $translations;
             })
             ->toArray();
-    }
-
-    public function translate(string $text, string $targetLocale): ?string
-    {
-        return Arr::first($this->translateAll([$text], $targetLocale));
     }
 }

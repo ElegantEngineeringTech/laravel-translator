@@ -2,55 +2,30 @@
 
 namespace Elegantly\Translator\Commands;
 
-use Elegantly\Translator\Drivers\Driver;
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
-use Laravel\Prompts\Table;
 
-use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\intro;
+use function Laravel\Prompts\note;
 
-class LocalesCommand extends Command implements PromptsForMissingInput
+class LocalesCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:locales {driver* : The drivers to use}';
+    public $signature = 'translator:locales {--driver=}';
 
-    public $description = 'Retrieve the available locales.';
+    public $description = 'Retrieve the defined locales.';
 
     public function handle(): int
     {
-        /** @var class-string<Driver>[] */
-        $drivers = (array) $this->argument('driver');
+        $translator = $this->getTranslator();
 
-        $locales = array_map(function ($class) {
-            $driver = $class::make();
-            $locales = $driver->getLocales();
+        $locales = $translator->getLocales();
 
-            return [
-                $class,
-                count($locales).': '.implode(', ', $locales),
-            ];
-        }, $drivers);
+        intro('Using driver: '.$translator->driver::class);
 
-        $table = new Table(
-            headers: ['Driver', 'Locales'],
-            rows: $locales
-        );
+        note(count($locales).' locales defined.');
 
-        $table->display();
+        info(implode(', ', $locales));
 
         return self::SUCCESS;
-    }
-
-    public function promptForMissingArgumentsUsing()
-    {
-        return [
-            'driver' => function () {
-                return multiselect(
-                    label: 'What driver would you like to use?',
-                    options: config()->array('translator.drivers'),
-                    default: config()->array('translator.drivers'),
-                );
-            },
-
-        ];
     }
 }

@@ -54,6 +54,22 @@ class PhpParserService implements SearchCodeServiceInterface
             ->files();
     }
 
+    public static function filterTranslationsKeys(?string $key): bool
+    {
+
+        if (blank($key)) {
+            return false;
+        }
+
+        preg_match(
+            '/^(?<package>[a-zA-Z0-9-_]+)::(?<key>.+)$/',
+            $key,
+            $matches
+        );
+
+        return empty($matches);
+    }
+
     public static function isFunCallTo(
         FuncCall $node,
         string $function,
@@ -118,11 +134,14 @@ class PhpParserService implements SearchCodeServiceInterface
             ->map(function (FuncCall|StaticCall|MethodCall $node) {
                 $args = collect($node->getArgs());
                 $argKey = $args->firstWhere('name.name', 'key') ?? $args->first();
+
                 $value = $argKey->value;
 
-                return $value instanceof String_ ? $value->value : null;
+                $translationKey = $value instanceof String_ ? $value->value : null;
+
+                return $translationKey;
             })
-            ->filter()
+            ->filter(fn ($value) => static::filterTranslationsKeys($value))
             ->sort(SORT_NATURAL)
             ->values()
             ->toArray();
