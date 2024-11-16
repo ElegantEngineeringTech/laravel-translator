@@ -1,14 +1,10 @@
 <?php
 
-use Elegantly\Translator\Drivers\JsonDriver;
 use Elegantly\Translator\Drivers\PhpDriver;
 
 return [
 
-    'driver' => [
-        PhpDriver::class,
-        JsonDriver::class,
-    ],
+    'driver' => PhpDriver::class,
 
     /*
     |--------------------------------------------------------------------------
