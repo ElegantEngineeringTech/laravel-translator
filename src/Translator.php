@@ -294,7 +294,7 @@ class Translator
         $translations = $callback($translations);
 
         if ($sort) {
-            $translations->sort(SORT_NATURAL);
+            $translations=$translations->sortKeys(SORT_NATURAL);
         }
 
         return $this->saveTranslations(

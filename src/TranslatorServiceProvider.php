@@ -7,6 +7,7 @@ use Elegantly\Translator\Commands\ClearCacheCommand;
 use Elegantly\Translator\Commands\DeadCommand;
 use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
+use Elegantly\Translator\Commands\SortCommand;
 use Elegantly\Translator\Commands\UndefinedCommand;
 use Elegantly\Translator\Drivers\Driver;
 use Elegantly\Translator\Drivers\JsonDriver;
@@ -35,6 +36,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
             ->name('laravel-translator')
             ->hasConfigFile()
             ->hasCommands([
+                SortCommand::class,
                 LocalesCommand::class,
                 AddLocaleCommand::class,
                 UndefinedCommand::class,
