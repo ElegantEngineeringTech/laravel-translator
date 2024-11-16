@@ -61,11 +61,11 @@ class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInp
                 headers: ['Key', "Source {$source}", "Target {$locale}"],
                 rows: $translated->map(function ($value, $key) use ($translations) {
                     return [
-                        $key,
-                        str($translations[$key])->limit(25)->value(),
-                        str($value)->limit(25)->value(),
+                        (string) $key,
+                        (string) str($translations[$key])->limit(25),
+                        (string) str($value)->limit(25),
                     ];
-                })->all()
+                })->toArray()
             );
         }
 

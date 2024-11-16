@@ -29,12 +29,10 @@ class SortCommand extends TranslatorCommand implements PromptsForMissingInput
         table(
             headers: ['Key', 'Translation'],
             rows: $tranlations
-                ->map(function ($value, $key) {
-                    return [
-                        $key,
-                        str($value)->limit(50),
-                    ];
-                })->all()
+                ->map(fn ($value, $key) => [
+                    (string) $key,
+                    (string) str($value)->limit(50),
+                ])->toArray()
         );
 
         return self::SUCCESS;

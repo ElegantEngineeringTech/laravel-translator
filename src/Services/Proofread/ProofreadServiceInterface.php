@@ -4,7 +4,9 @@ namespace Elegantly\Translator\Services\Proofread;
 
 interface ProofreadServiceInterface
 {
+    /**
+     * @param  array<string, string>  $texts
+     * @return array<string, string>
+     */
     public function proofreadAll(array $texts): array;
-
-    public function proofread(string $text): ?string;
 }

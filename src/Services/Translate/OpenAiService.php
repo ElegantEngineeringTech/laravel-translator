@@ -35,7 +35,7 @@ class OpenAiService implements TranslateServiceInterface
     {
         return collect($texts)
             ->chunk(20)
-            ->flatMap(function ($chunk) use ($targetLocale) {
+            ->map(function ($chunk) use ($targetLocale) {
                 $response = $this->getOpenAI()->chat()->create([
                     'model' => $this->model,
                     'response_format' => ['type' => 'json_object'],
@@ -56,6 +56,7 @@ class OpenAiService implements TranslateServiceInterface
 
                 return $translations;
             })
+            ->collapse()
             ->toArray();
     }
 }

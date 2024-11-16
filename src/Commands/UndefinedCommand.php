@@ -35,7 +35,7 @@ class UndefinedCommand extends TranslatorCommand implements PromptsForMissingInp
                 ->map(function ($value, $key) {
                     return [
                         str($key)->limit(20)->value(),
-                        $value['count'],
+                        (string) $value['count'],
                         implode("\n",
                             array_map(
                                 fn ($file) => str($file)->after(base_path()),
@@ -43,7 +43,7 @@ class UndefinedCommand extends TranslatorCommand implements PromptsForMissingInp
                             )
                         ),
                     ];
-                })->all()
+                })->values()->all()
         );
 
         return self::SUCCESS;

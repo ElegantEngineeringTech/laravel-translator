@@ -13,6 +13,9 @@ class SearchCodeCache
 {
     const FILENAME = 'translationsByFiles.php';
 
+    /**
+     * @var array<string, array{ created_at: int, translations: string[] }>
+     */
     protected ?array $value = null;
 
     public function __construct(public Filesystem $storage)
@@ -20,6 +23,9 @@ class SearchCodeCache
         //
     }
 
+    /**
+     * @return array<string, array{ created_at: int, translations: string[] }>
+     */
     public function getValue(): ?array
     {
         if ($this->value) {
@@ -29,6 +35,9 @@ class SearchCodeCache
         return $this->load();
     }
 
+    /**
+     * @return array<string, array{ created_at: int, translations: string[] }>
+     */
     public function load(): ?array
     {
         if ($this->storage->exists(static::FILENAME)) {

@@ -32,7 +32,7 @@ class PhpDriver extends Driver
     }
 
     /**
-     * @return string[]
+     * @return array<int, string>
      */
     public function getLocales(): array
     {
@@ -42,6 +42,9 @@ class PhpDriver extends Driver
             ->toArray();
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getNamespaces(string $locale): array
     {
         return collect($this->storage->allFiles($locale))
@@ -58,16 +61,17 @@ class PhpDriver extends Driver
             ->mapWithKeys(function ($namespace) use ($locale) {
                 return [$namespace => $this->getTranslationsInNamespace($locale, $namespace)];
             })
-            ->dot();
-
-        return (new PhpTranslations($translations))
+            ->dot()
             ->map(function ($value) {
                 if (is_array($value) && empty($value)) {
                     return null;
                 }
 
                 return $value;
-            });
+            })
+            ->toArray();
+
+        return new PhpTranslations($translations);
     }
 
     /**
@@ -110,6 +114,8 @@ class PhpDriver extends Driver
 
     /**
      * Write the lines of the inner array of the language file.
+     *
+     * @param  array<array-key, mixed>  $values
      */
     public function toFile(array $values): string
     {
@@ -122,6 +128,9 @@ class PhpDriver extends Driver
         return $content;
     }
 
+    /**
+     * @param  array<array-key, mixed>  $items
+     */
     public function recursiveToFile(
         array $items,
         string $prefix = '',

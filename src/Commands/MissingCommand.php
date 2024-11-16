@@ -36,12 +36,10 @@ class MissingCommand extends TranslatorCommand implements PromptsForMissingInput
         table(
             headers: ['Key', "Source {$source}"],
             rows: collect($missing)
-                ->map(function ($value, $key) {
-                    return [
-                        $key,
-                        str($value)->limit(50)->value(),
-                    ];
-                })->all()
+                ->map(fn ($value, $key) => [
+                    (string) $key,
+                    (string) str($value)->limit(50),
+                ])->toArray()
         );
 
         if ($translate) {

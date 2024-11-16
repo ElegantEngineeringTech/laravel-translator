@@ -94,7 +94,7 @@ class Translator
     }
 
     /**
-     * @return array<int, scalar|null> The keys defined in source locale but not found in target locale
+     * @return array<string, scalar|null> The keys defined in source locale but not found in target locale
      */
     public function getMissingTranslations(
         string $source,

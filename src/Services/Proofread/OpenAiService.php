@@ -2,7 +2,6 @@
 
 namespace Elegantly\Translator\Services\Proofread;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use OpenAI;
@@ -39,7 +38,7 @@ class OpenAiService implements ProofreadServiceInterface
     {
         return collect($texts)
             ->chunk(20)
-            ->flatMap(function (Collection $chunk) {
+            ->map(function (Collection $chunk) {
                 $response = $this->getOpenAI()->chat()->create([
                     'model' => $this->model,
                     'response_format' => ['type' => 'json_object'],
@@ -60,11 +59,7 @@ class OpenAiService implements ProofreadServiceInterface
 
                 return $translations;
             })
+            ->collapse()
             ->toArray();
-    }
-
-    public function proofread(string $text): ?string
-    {
-        return Arr::first($this->proofreadAll([$text]));
     }
 }

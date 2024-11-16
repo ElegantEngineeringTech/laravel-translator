@@ -31,8 +31,12 @@ class TranslatorCommand extends Command
         );
     }
 
+    /**
+     * @param  array<int, string>|string  $except
+     * @return array<int, string>
+     */
     public function getLocales(
-        array|string|int|float $except = []
+        array|string $except = []
     ): array {
         return collect($this->getTranslator()->getLocales() ?: [config('app.locale')])
             ->filter(fn ($value) => ! in_array($value, Arr::wrap($except)))
