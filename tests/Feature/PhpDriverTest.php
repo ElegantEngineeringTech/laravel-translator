@@ -88,8 +88,9 @@ it('gets missing translations', function () {
     );
 
     expect($keys)->toBe([
-        'messages.home.missing',
-        'messages.missing',
+        'messages.home.missing' => 'Absent',
+        'messages.empty' => 'Vide',
+        'messages.missing' => 'Absent',
     ]);
 
 });

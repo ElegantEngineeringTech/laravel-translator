@@ -101,14 +101,13 @@ class Translator
         string $target,
     ): array {
 
-        $sourceTranslations = $this->getTranslations($source);
-        $targetTranslations = $this->getTranslations($target);
+        $sourceTranslations = $this->getTranslations($source)->notBlank();
+        $targetTranslations = $this->getTranslations($target)->notBlank();
 
         return $sourceTranslations
             ->filter(function ($value, $key) use ($targetTranslations) {
                 return ! $targetTranslations->has($key);
             })
-            ->keys()
             ->toArray();
     }
 

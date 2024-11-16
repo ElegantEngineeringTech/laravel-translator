@@ -19,4 +19,11 @@ abstract class Translations extends Collection
     {
         $this->items = parent::getArrayableItems($items);
     }
+
+    public function notBlank(): static
+    {
+        return $this->filter(function ($value) {
+            return ! blank($value);
+        });
+    }
 }

@@ -87,8 +87,8 @@ it('gets missing translations', function () {
     );
 
     expect($keys)->toBe([
-        'All rights reserved.',
-        'This one is used.',
+        'All rights reserved.' => 'Tous droits réservés.',
+        'This one is used.' => 'Celui-ci est utilisé.',
     ]);
 
 });

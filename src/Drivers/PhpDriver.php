@@ -60,7 +60,14 @@ class PhpDriver extends Driver
             })
             ->dot();
 
-        return new PhpTranslations($translations);
+        return (new PhpTranslations($translations))
+            ->map(function ($value) {
+                if (is_array($value) && empty($value)) {
+                    return null;
+                }
+
+                return $value;
+            });
     }
 
     /**
