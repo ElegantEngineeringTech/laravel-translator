@@ -20,8 +20,6 @@ use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-use function Orchestra\Testbench\package_path;
-
 class PhpParserService implements SearchCodeServiceInterface
 {
     public ?SearchCodeCache $cache = null;
@@ -210,7 +208,6 @@ class PhpParserService implements SearchCodeServiceInterface
                 }
 
                 $relativePath = str($path)
-                    ->after(package_path())
                     ->after(base_path())
                     ->value();
 

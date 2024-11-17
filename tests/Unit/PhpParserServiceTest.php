@@ -64,14 +64,14 @@ it('gets all the translations keys grouped by files', function () {
     );
 
     expect($service->translationsByFiles())->toBe([
-        '/tests/src/app/DummyClass.php' => [
+        $appPath.'/DummyClass.php' => [
             'messages.dummy.class',
         ],
-        '/tests/src/resources/components/dummy-component.blade.php' => [
+        $resourcesPath.'/components/dummy-component.blade.php' => [
             'messages.dummy.component',
             'messages.dummy.view',
         ],
-        '/tests/src/resources/views/dummy-view.blade.php' => [
+        $resourcesPath.'/views/dummy-view.blade.php' => [
             'This one is used.',
             'messages.dummy.nested',
             'messages.dummy.view',
@@ -97,32 +97,32 @@ it('gets all the files grouped by translations', function () {
         'This one is used.' => [
             'count' => 1,
             'files' => [
-                '/tests/src/resources/views/dummy-view.blade.php',
+                $resourcesPath.'/views/dummy-view.blade.php',
             ],
         ],
         'messages.dummy.class' => [
             'count' => 1,
             'files' => [
-                '/tests/src/app/DummyClass.php',
+                $appPath.'/DummyClass.php',
             ],
         ],
         'messages.dummy.component' => [
             'count' => 1,
             'files' => [
-                '/tests/src/resources/components/dummy-component.blade.php',
+                $resourcesPath.'/components/dummy-component.blade.php',
             ],
         ],
         'messages.dummy.nested' => [
             'count' => 1,
             'files' => [
-                '/tests/src/resources/views/dummy-view.blade.php',
+                $resourcesPath.'/views/dummy-view.blade.php',
             ],
         ],
         'messages.dummy.view' => [
             'count' => 3,
             'files' => [
-                '/tests/src/resources/components/dummy-component.blade.php',
-                '/tests/src/resources/views/dummy-view.blade.php',
+                $resourcesPath.'/components/dummy-component.blade.php',
+                $resourcesPath.'/views/dummy-view.blade.php',
             ],
         ],
 
@@ -143,11 +143,11 @@ it('caches results from files', function () {
         cachePath: Storage::fake('cache')
     );
 
-    $service->cache->put('/tests/src/app/DummyClass.php', [
+    $service->cache->put('/DummyClass.php', [
         'messages.dummy.class',
     ]);
 
-    $result = $service->cache->get('/tests/src/app/DummyClass.php');
+    $result = $service->cache->get('/DummyClass.php');
 
     expect($result['created_at'])->toBeInt();
 
