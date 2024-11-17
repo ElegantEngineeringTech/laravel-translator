@@ -46,7 +46,7 @@ it('gets undefined translations', function () {
         'This one is used.' => [
             'count' => 1,
             'files' => [
-                0 => '/Users/quentingabriele/dev/laravel-translator/tests/src/resources/views/dummy-view.blade.php',
+                0 => '/tests/src/resources/views/dummy-view.blade.php',
             ],
         ],
     ]);

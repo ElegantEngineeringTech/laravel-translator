@@ -35,26 +35,26 @@ it('gets undefined translations', function () {
         'messages.dummy.class' => [
             'count' => 1,
             'files' => [
-                0 => '/Users/quentingabriele/dev/laravel-translator/tests/src/app/DummyClass.php',
+                0 => '/tests/src/app/DummyClass.php',
             ],
         ],
         'messages.dummy.component' => [
             'count' => 1,
             'files' => [
-                0 => '/Users/quentingabriele/dev/laravel-translator/tests/src/resources/components/dummy-component.blade.php',
+                0 => '/tests/src/resources/components/dummy-component.blade.php',
             ],
         ],
         'messages.dummy.nested' => [
             'count' => 1,
             'files' => [
-                0 => '/Users/quentingabriele/dev/laravel-translator/tests/src/resources/views/dummy-view.blade.php',
+                0 => '/tests/src/resources/views/dummy-view.blade.php',
             ],
         ],
         'messages.dummy.view' => [
             'count' => 3,
             'files' => [
-                0 => '/Users/quentingabriele/dev/laravel-translator/tests/src/resources/components/dummy-component.blade.php',
-                1 => '/Users/quentingabriele/dev/laravel-translator/tests/src/resources/views/dummy-view.blade.php',
+                0 => '/tests/src/resources/components/dummy-component.blade.php',
+                1 => '/tests/src/resources/views/dummy-view.blade.php',
             ],
         ],
     ]);

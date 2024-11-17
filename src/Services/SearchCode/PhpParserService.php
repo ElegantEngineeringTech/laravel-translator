@@ -2,7 +2,6 @@
 
 namespace Elegantly\Translator\Services\SearchCode;
 
-use Closure;
 use Elegantly\Translator\Caches\SearchCodeCache;
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -20,6 +19,8 @@ use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+
+use function Orchestra\Testbench\package_path;
 
 class PhpParserService implements SearchCodeServiceInterface
 {
@@ -71,13 +72,8 @@ class PhpParserService implements SearchCodeServiceInterface
             ->files();
     }
 
-    public static function filterTranslationsKeys(?string $key): bool
+    public static function isTranslationKeyFromPackage(string $key): bool
     {
-
-        if (blank($key)) {
-            return false;
-        }
-
         preg_match(
             '/^(?<package>[a-zA-Z0-9-_]+)::(?<key>.+)$/',
             $key,
@@ -85,6 +81,16 @@ class PhpParserService implements SearchCodeServiceInterface
         );
 
         return empty($matches);
+    }
+
+    public static function filterTranslationsKeys(?string $key): bool
+    {
+
+        if (blank($key)) {
+            return false;
+        }
+
+        return static::isTranslationKeyFromPackage($key);
     }
 
     public static function isFunCallTo(
@@ -173,17 +179,13 @@ class PhpParserService implements SearchCodeServiceInterface
             ->toArray();
     }
 
-    /**
-     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
-     */
-    public function translationsByFiles(
-        ?Closure $progress = null,
-    ): array {
+    public function translationsByFiles(): array
+    {
         return collect($this->finder())
-            ->map(function (SplFileInfo $file, string $key) use ($progress) {
+            ->mapWithKeys(function (SplFileInfo $file, string $path) {
 
                 $lastModified = $file->getMTime();
-                $cachedResult = $this->cache?->get($key);
+                $cachedResult = $this->cache?->get($path);
 
                 if (
                     $lastModified && $cachedResult &&
@@ -204,27 +206,26 @@ class PhpParserService implements SearchCodeServiceInterface
                             previous: $th
                         );
                     }
-                    $this->cache?->put($key, $translations);
+                    $this->cache?->put($path, $translations);
                 }
 
-                if ($progress) {
-                    $progress($file, $translations);
-                }
+                $relativePath = str($path)
+                    ->after(package_path())
+                    ->after(base_path())
+                    ->value();
 
-                return $translations;
+                return [
+                    $relativePath => $translations,
+                ];
             })
             ->filter()
             ->sortKeys(SORT_NATURAL)
             ->toArray();
     }
 
-    /**
-     * @param  null|(Closure(string $file, string[] $translations):void)  $progress
-     */
-    public function filesByTranslations(
-        ?Closure $progress = null,
-    ): array {
-        $translations = $this->translationsByFiles($progress);
+    public function filesByTranslations(): array
+    {
+        $translations = $this->translationsByFiles();
 
         $results = [];
 
