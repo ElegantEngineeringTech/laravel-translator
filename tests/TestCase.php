@@ -22,6 +22,11 @@ class TestCase extends Orchestra
         ];
     }
 
+    public function formatPath(string ...$values): string
+    {
+        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, implode('', $values));
+    }
+
     public function getAppPath(): string
     {
         return __DIR__.'/src/app';

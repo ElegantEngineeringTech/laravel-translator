@@ -46,7 +46,7 @@ it('gets undefined translations', function () {
         'This one is used.' => [
             'count' => 1,
             'files' => [
-                0 => $this->getResourcesPath().'/views/dummy-view.blade.php',
+                $this->formatPath($this->getResourcesPath().'/views/dummy-view.blade.php'),
             ],
         ],
     ]);

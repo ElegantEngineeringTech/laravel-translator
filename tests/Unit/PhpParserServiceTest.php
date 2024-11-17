@@ -64,14 +64,14 @@ it('gets all the translations keys grouped by files', function () {
     );
 
     expect($service->translationsByFiles())->toBe([
-        $appPath.'/DummyClass.php' => [
+        $this->formatPath($appPath.'/DummyClass.php') => [
             'messages.dummy.class',
         ],
-        $resourcesPath.'/components/dummy-component.blade.php' => [
+        $this->formatPath($resourcesPath.'/components/dummy-component.blade.php') => [
             'messages.dummy.component',
             'messages.dummy.view',
         ],
-        $resourcesPath.'/views/dummy-view.blade.php' => [
+        $this->formatPath($resourcesPath.'/views/dummy-view.blade.php') => [
             'This one is used.',
             'messages.dummy.nested',
             'messages.dummy.view',
@@ -97,32 +97,32 @@ it('gets all the files grouped by translations', function () {
         'This one is used.' => [
             'count' => 1,
             'files' => [
-                $resourcesPath.'/views/dummy-view.blade.php',
+                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
             ],
         ],
         'messages.dummy.class' => [
             'count' => 1,
             'files' => [
-                $appPath.'/DummyClass.php',
+                $this->formatPath($appPath.'/DummyClass.php'),
             ],
         ],
         'messages.dummy.component' => [
             'count' => 1,
             'files' => [
-                $resourcesPath.'/components/dummy-component.blade.php',
+                $this->formatPath($resourcesPath.'/components/dummy-component.blade.php'),
             ],
         ],
         'messages.dummy.nested' => [
             'count' => 1,
             'files' => [
-                $resourcesPath.'/views/dummy-view.blade.php',
+                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
             ],
         ],
         'messages.dummy.view' => [
             'count' => 3,
             'files' => [
-                $resourcesPath.'/components/dummy-component.blade.php',
-                $resourcesPath.'/views/dummy-view.blade.php',
+                $this->formatPath($resourcesPath.'/components/dummy-component.blade.php'),
+                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
             ],
         ],
 

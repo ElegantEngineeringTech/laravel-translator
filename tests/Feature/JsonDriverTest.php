@@ -35,26 +35,26 @@ it('gets undefined translations', function () {
         'messages.dummy.class' => [
             'count' => 1,
             'files' => [
-                $this->getAppPath().'/DummyClass.php',
+                $this->formatPath($this->getAppPath().'/DummyClass.php'),
             ],
         ],
         'messages.dummy.component' => [
             'count' => 1,
             'files' => [
-                $this->getResourcesPath().'/components/dummy-component.blade.php',
+                $this->formatPath($this->getResourcesPath().'/components/dummy-component.blade.php'),
             ],
         ],
         'messages.dummy.nested' => [
             'count' => 1,
             'files' => [
-                $this->getResourcesPath().'/views/dummy-view.blade.php',
+                $this->formatPath($this->getResourcesPath().'/views/dummy-view.blade.php'),
             ],
         ],
         'messages.dummy.view' => [
             'count' => 3,
             'files' => [
-                $this->getResourcesPath().'/components/dummy-component.blade.php',
-                $this->getResourcesPath().'/views/dummy-view.blade.php',
+                $this->formatPath($this->getResourcesPath().'/components/dummy-component.blade.php'),
+                $this->formatPath($this->getResourcesPath().'/views/dummy-view.blade.php'),
             ],
         ],
     ]);
