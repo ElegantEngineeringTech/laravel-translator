@@ -2,164 +2,164 @@
 
 namespace Elegantly\Translator\Collections;
 
+use Elegantly\Translator\Drivers\PhpDriver;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
+use Illuminate\Support\Str;
 
-/**
- * @extends Collection<string|int, array|string|int|float|null>
- */
-final class PhpTranslations extends Collection implements TranslationsInterface
+class PhpTranslations extends Translations
 {
-    public function set(string|int|null $key, mixed $value): static
-    {
-        Arr::set($this->items, $key, $value);
+    public string $driver = PhpDriver::class;
 
-        return $this;
-    }
-
+    /**
+     * Should mimic the laravel __ method
+     *
+     * $items = ['foo.bar' => 'baz']
+     * - $this->get('foo.bar') === 'baz'
+     * - $this->get('foo') === 'baz'
+     * - $this->get('bar') === null
+     */
     public function get($key, $default = null)
     {
-        return Arr::get($this->items, $key);
-    }
+        $values = [];
 
-    public function forget($keys): static
-    {
-        foreach ($this->getArrayableItems($keys) as $key) {
-            Arr::forget($this->items, $key);
+        foreach ($this->items as $translationKey => $translationValue) {
+            if ($key === $translationKey) {
+                return $translationValue;
+            }
+
+            if (Str::startsWith($translationKey, $key)) {
+                $values[$translationKey] = $translationValue;
+            }
         }
 
-        return $this;
-    }
+        if (! empty($values)) {
+            return Arr::get(
+                Arr::undot($values),
+                $key
+            );
+        }
 
-    public function only($keys): static
-    {
-        return new static(
-            $this->toBase()->dot()->only($keys)->undot()
-        );
-    }
-
-    public function except($keys): static
-    {
-        return new static(
-            $this->toBase()->dot()->except($keys)->undot()
-        );
+        // @phpstan-ignore-next-line
+        return $default;
     }
 
     /**
-     * Replace empty (nested) array with null
+     * Should mimic the laravel __ method
+     *
+     * - 'auth.user.email' === 'auth.user.email' // true
+     * - 'auth.user.email' === 'auth.user' // true
+     * - 'auth.user.email' === 'auth.user.email.label' // false
+     * - 'auth.user.email' === 'auth.admin' // false
      */
-    public function sanitize(): static
+    public static function areTranslationKeysEqual(
+        int|string $translationKey,
+        int|string $key
+    ): bool {
+        return $translationKey === $key || str((string) $translationKey)->startsWith((string) $key);
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $translations
+     */
+    public static function hasTranslationKey(
+        array $translations,
+        int|string $key
+    ): bool {
+
+        foreach ($translations as $translationKey => $translationValue) {
+            if (static::areTranslationKeysEqual($translationKey, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Should mimic the laravel __ method
+     *
+     * $items = ['foo.bar' => 'baz']
+     * - $this->has('foo.bar') === true
+     * - $this->has('foo') === true
+     * - $this->has('bar') === false
+     */
+    public function has($key)
     {
-        return $this->map(function (mixed $value) {
-            return $this->sanitizeRecursive($value);
+        /** @var array<int, array-key> */
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (! static::hasTranslationKey(
+                translations: $this->items,
+                key: $value
+            )) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Should mimic the laravel __ method
+     * $items = ['foo.bar' => 'baz']
+     * - $this->except('foo.bar') === []
+     * - $this->except('foo') === []
+     * - $this->except('bar') === $items
+     */
+    public function except($keys)
+    {
+
+        if ($keys instanceof Enumerable) {
+            $keys = $keys->all();
+        } elseif (! is_array($keys)) {
+            $keys = func_get_args();
+        }
+
+        /** @var array<array-key, array-key> $keys */
+        return $this->filter(function ($translationValue, $translationKey) use ($keys) {
+
+            foreach ($keys as $key) {
+                if (static::areTranslationKeysEqual($translationKey, $key)) {
+                    return false;
+                }
+            }
+
+            return true;
         });
     }
 
-    public function sanitizeRecursive(array|string|int|float|null $value)
-    {
-        if (is_array($value)) {
-            if (empty($value)) {
-                return null;
-            }
-
-            return array_map(fn ($item) => $this->sanitizeRecursive($item), $value);
-        }
-
-        return $value;
-    }
-
-    public function sortNatural(): static
-    {
-        $items = $this->items;
-
-        return new static(
-            $this->recursiveSortNatural($items)
-        );
-    }
-
-    protected function recursiveSortNatural(array $items): array
-    {
-        ksort($items, SORT_NATURAL);
-
-        return array_map(function ($item) {
-            if (is_array($item)) {
-                return $this->recursiveSortNatural($item);
-            }
-
-            return $item;
-        }, $items);
-    }
-
-    public function toDotTranslations(): Collection
-    {
-        return $this->dot()->toBase();
-    }
-
-    public function toTranslationsKeys(): Collection
-    {
-        return $this->toDotTranslations()->keys();
-    }
-
-    public function toTranslationsValues(): Collection
-    {
-        return $this->toDotTranslations()->values();
-    }
-
-    public function diffTranslationsKeys(Collection $translations): Collection
-    {
-        $translationsKeys = $translations
-            ->dot()
-            ->filter(fn ($item) => ! blank($item))
-            ->keys()
-            ->toBase();
-
-        return $this
-            ->toTranslationsKeys()
-            ->diff($translationsKeys)
-            ->values();
-    }
-
     /**
-     * Write the lines of the inner array of the language file.
+     * Should mimic the laravel __ method
+     * $items = ['foo.bar' => 'baz']
+     * - $this->only('foo.bar') === $items
+     * - $this->only('foo') === $items
+     * - $this->only('bar') === []
      */
-    public function toFile(): string
+    public function only($keys)
     {
-        $content = "<?php\n\nreturn [";
-
-        $content .= $this->recursiveToFile($this->items);
-
-        $content .= "\n];\n";
-
-        return $content;
-    }
-
-    public function recursiveToFile(
-        array $items,
-        string $prefix = '',
-    ): string {
-
-        $output = '';
-
-        foreach ($items as $key => $value) {
-            if (is_array($value)) {
-                $value = $this->recursiveToFile($value, $prefix.'    ');
-
-                if (is_string($key)) {
-                    $output .= "\n{$prefix}    '{$key}' => [{$value}\n    {$prefix}],";
-                } else {
-                    $output .= "\n{$prefix}    [{$value}\n    {$prefix}],";
-                }
-            } else {
-                $value = str_replace('\"', '"', addslashes($value));
-
-                if (is_string($key)) {
-                    $output .= "\n{$prefix}    '{$key}' => '{$value}',";
-                } else {
-                    $output .= "\n{$prefix}    '{$value}',";
-                }
-            }
+        if (is_null($keys)) {
+            return new static($this->items);
         }
 
-        return $output;
+        if ($keys instanceof Enumerable) {
+            $keys = $keys->all();
+        }
+
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        /** @var array<array-key, array-key> $keys */
+        return $this->filter(function ($translationValue, $translationKey) use ($keys) {
+
+            foreach ($keys as $key) {
+                if (static::areTranslationKeysEqual($translationKey, $key)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 }

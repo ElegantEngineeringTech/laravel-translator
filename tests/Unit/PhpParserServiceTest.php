@@ -26,6 +26,19 @@ it('finds all occurences of __ in php code', function (string $code) {
     "<?php app('translator')->choice('messages.dummy.class');",
 ]);
 
+it('ignore package translations keys in php code', function (string $code) {
+    $results = PhpParserService::scanCode($code);
+
+    expect($results)->toHaveLength(0);
+})->with([
+    "<?php __('package::messages.dummy.class');",
+    "<?php __('package-name::messages.dummy.class');",
+    "<?php __('package-Name::messages.dummy.class');",
+    "<?php __('Package_Name::messages.dummy.class');",
+    "<?php trans('package::messages.dummy.class');",
+    "<?php trans_choice('package::messages.dummy.class', 1);",
+]);
+
 it('finds all occurences of __ in blade code', function (string $code) {
     $results = PhpParserService::scanCode(Blade::compileString($code));
 
@@ -51,21 +64,21 @@ it('gets all the translations keys grouped by files', function () {
     );
 
     expect($service->translationsByFiles())->toBe([
-        "{$appPath}/DummyClass.php" => [
+        $this->formatPath($appPath.'/DummyClass.php') => [
             'messages.dummy.class',
         ],
-        "{$resourcesPath}/components/dummy-component.blade.php" => [
+        $this->formatPath($resourcesPath.'/components/dummy-component.blade.php') => [
             'messages.dummy.component',
             'messages.dummy.view',
         ],
-        "{$resourcesPath}/views/dummy-view.blade.php" => [
+        $this->formatPath($resourcesPath.'/views/dummy-view.blade.php') => [
             'This one is used.',
             'messages.dummy.nested',
             'messages.dummy.view',
             'messages.dummy.view',
         ],
     ]);
-})->skipOnWindows();
+});
 
 it('gets all the files grouped by translations', function () {
 
@@ -84,37 +97,37 @@ it('gets all the files grouped by translations', function () {
         'This one is used.' => [
             'count' => 1,
             'files' => [
-                "{$resourcesPath}/views/dummy-view.blade.php",
+                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
             ],
         ],
         'messages.dummy.class' => [
             'count' => 1,
             'files' => [
-                "{$appPath}/DummyClass.php",
+                $this->formatPath($appPath.'/DummyClass.php'),
             ],
         ],
         'messages.dummy.component' => [
             'count' => 1,
             'files' => [
-                "{$resourcesPath}/components/dummy-component.blade.php",
+                $this->formatPath($resourcesPath.'/components/dummy-component.blade.php'),
             ],
         ],
         'messages.dummy.nested' => [
             'count' => 1,
             'files' => [
-                "{$resourcesPath}/views/dummy-view.blade.php",
+                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
             ],
         ],
         'messages.dummy.view' => [
             'count' => 3,
             'files' => [
-                "{$resourcesPath}/components/dummy-component.blade.php",
-                "{$resourcesPath}/views/dummy-view.blade.php",
+                $this->formatPath($resourcesPath.'/components/dummy-component.blade.php'),
+                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
             ],
         ],
 
     ]);
-})->skipOnWindows();
+});
 
 it('caches results from files', function () {
 
@@ -127,18 +140,18 @@ it('caches results from files', function () {
             $resourcesPath,
         ],
         excludedPaths: $this->getExcludedPaths(),
-        cacheStorage: Storage::fake('cache')
+        cachePath: Storage::fake('cache')
     );
 
-    $service->cache->put("{$appPath}/DummyClass.php", [
+    $service->cache->put('/DummyClass.php', [
         'messages.dummy.class',
     ]);
 
-    $result = $service->cache->get("{$appPath}/DummyClass.php");
+    $result = $service->cache->get('/DummyClass.php');
 
     expect($result['created_at'])->toBeInt();
 
     expect($result['translations'])->toBe([
         'messages.dummy.class',
     ]);
-})->skipOnWindows();
+});

@@ -2,142 +2,128 @@
 
 use Elegantly\Translator\Collections\PhpTranslations;
 
-it('sorts translations and nested translations', function () {
-    $translations = new PhpTranslations(
-        items: [
-            'c' => null,
-            'b' => null,
-            'a' => [
-                'b' => null,
-                'z' => [
-                    'b' => null,
-                    'a' => null,
-                ],
-                'a' => null,
-            ],
-            'd' => null,
-        ],
-    );
+it('gets the right translation value', function () {
 
-    expect(
-        $translations->sortNatural()->toArray()
-    )->toBe([
-        'a' => [
-            'a' => null,
-            'b' => null,
-            'z' => [
-                'a' => null,
-                'b' => null,
-            ],
-        ],
-        'b' => null,
-        'c' => null,
-        'd' => null,
-    ]);
-});
-
-it('finds missing (nested) translations in another collections', function () {
     $translations = new PhpTranslations([
-        'a' => 'text',
-        'b' => 'text',
-        'c' => [
-            'a' => 'text',
-            'b' => 'text',
-        ],
-        'd' => 'text',
-        'e' => 'text',
-        'f' => [
-            'a' => 'text',
-        ],
+        'a.b' => 'b_value',
+        'c' => 'c_value',
+        'c.d.0' => '0_value',
+        'c.d.1' => '1_value',
+        'e' => '',
+        'f.g' => '',
+        'h.i.j.k' => 'k_value',
+        'h.i.j.l' => 'l_value',
     ]);
 
-    $missingTranslations = $translations->diffTranslationsKeys(
-        new PhpTranslations([
-            'a' => 'text',
-            'c' => [
-                'b' => 'text',
+    expect($translations->get('c'))->toBe('c_value');
+    expect($translations->get('a.b'))->toBe('b_value');
+    expect($translations->get('a'))->toBe([
+        'b' => 'b_value',
+    ]);
+    expect($translations->get('c.d'))->toBe([
+        0 => '0_value',
+        1 => '1_value',
+    ]);
+    expect($translations->get('c.d.1'))->toBe('1_value');
+    expect($translations->get('e'))->toBe('');
+    expect($translations->get('f.g'))->toBe('');
+    expect($translations->get('h'))->toBe([
+        'i' => [
+            'j' => [
+                'k' => 'k_value',
+                'l' => 'l_value',
             ],
-            'd' => '',
-            'e' => null,
-            'f' => [],
-        ])
-    );
-
-    expect($missingTranslations->toArray())->toBe([
-        'b',
-        'c.a',
-        'd',
-        'e',
-        'f.a',
+        ],
     ]);
+
 });
 
-it('filters (nested) translations using only', function () {
+it('compare two translation keys', function ($a, $b, $expected) {
+
+    expect(PhpTranslations::areTranslationKeysEqual($a, $b))->toBe($expected);
+
+})->with([
+    ['a', 'a', true],
+    ['a', 'b', false],
+    ['a', 'a.b', false],
+    ['a.b', 'a.b', true],
+    ['a.b', 'a', true],
+    ['a.b', 'a.b.c', false],
+]);
+
+it('check existance of translation value', function ($has, $expected) {
+
     $translations = new PhpTranslations([
-        'a' => 'text',
-        'b' => 'text',
-        'c' => [
-            'a' => 'text',
-            'b' => 'text',
-        ],
-        'd' => 'text',
-        'e' => 'text',
-        'f' => [
-            'a' => 'text',
-        ],
+        'a.b' => 'b_value',
+        'c' => 'c_value',
     ]);
 
-    expect(
-        $translations->only(['a', 'c.a', 'd'])->toArray()
-    )->toBe([
-        'a' => 'text',
-        'c' => [
-            'a' => 'text',
-        ],
-        'd' => 'text',
-    ]);
-});
+    expect($translations->has($has))->toBe($expected);
 
-it('sanitize (nested) translations', function () {
+})->with([
+    ['a', true],
+    ['a.b', true],
+    ['c', true],
+    ['a.b.c', false],
+    ['a.b.c.d', false],
+    ['e', false],
+]);
+
+it('retreives values except for some translation keys', function ($except, $expected) {
+
     $translations = new PhpTranslations([
-        'a' => 'text',
-        'b' => [
-            'a' => [],
-            'b' => 'text',
-        ],
-        'c' => [],
-        'd' => 0,
-        'e' => null,
-        'f' => [
-            'a' => [
-                'a' => [],
-            ],
-        ],
-        'g' => [
-            [],
-            [],
-        ],
+        'a.b' => 'b_value',
+        'c' => 'c_value',
     ]);
 
-    expect(
-        $translations->sanitize()->toArray()
-    )->toBe([
-        'a' => 'text',
-        'b' => [
-            'a' => null,
-            'b' => 'text',
+    expect($translations->except($except)->toArray())->toBe($expected);
+
+})->with([
+    [
+        ['a'],
+        ['c' => 'c_value'],
+    ],
+    [
+        ['a.b'],
+        ['c' => 'c_value'],
+    ],
+    [
+        ['c'],
+        ['a.b' => 'b_value'],
+    ],
+    [
+        ['a.b.c'],
+        [
+            'a.b' => 'b_value',
+            'c' => 'c_value',
         ],
-        'c' => null,
-        'd' => 0,
-        'e' => null,
-        'f' => [
-            'a' => [
-                'a' => null,
-            ],
-        ],
-        'g' => [
-            null,
-            null,
-        ],
+    ],
+]);
+
+it('retreives only the specified translation keys', function ($only, $expected) {
+
+    $translations = new PhpTranslations([
+        'a.b' => 'b_value',
+        'c' => 'c_value',
     ]);
-});
+
+    expect($translations->only($only)->toArray())->toBe($expected);
+
+})->with([
+    [
+        ['a'],
+        ['a.b' => 'b_value'],
+    ],
+    [
+        ['a.b'],
+        ['a.b' => 'b_value'],
+    ],
+    [
+        ['c'],
+        ['c' => 'c_value'],
+    ],
+    [
+        ['a.b.c'],
+        [],
+    ],
+]);
