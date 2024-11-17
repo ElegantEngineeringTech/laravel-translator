@@ -78,7 +78,7 @@ it('gets all the translations keys grouped by files', function () {
             'messages.dummy.view',
         ],
     ]);
-})->skipOnWindows();
+});
 
 it('gets all the files grouped by translations', function () {
 
@@ -127,7 +127,7 @@ it('gets all the files grouped by translations', function () {
         ],
 
     ]);
-})->skipOnWindows();
+});
 
 it('caches results from files', function () {
 
@@ -154,4 +154,4 @@ it('caches results from files', function () {
     expect($result['translations'])->toBe([
         'messages.dummy.class',
     ]);
-})->skipOnWindows();
+});
