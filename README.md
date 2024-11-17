@@ -149,16 +149,16 @@ return [
 
 ### CLI Translation
 
-Translate missing French translations:
+Translate untranslated French translations:
 
 ```bash
-php artisan translator:missing en fr --translate
+php artisan translator:untranslated en fr --translate
 ```
 
 Translate using a specific driver:
 
 ```bash
-php artisan translator:missing en fr --translate --driver=json
+php artisan translator:untranslated en fr --translate --driver=json
 ```
 
 Add a new locale with translations:
@@ -225,38 +225,38 @@ Translator::driver('json')->proofreadTranslations(
 
 ---
 
-## Finding Missing Translations
+## Finding Untranslated Translations
 
 Identify keys defined in one locale but missing in another.
 
 ### CLI Usage
 
 ```bash
-php artisan translator:missing en fr
+php artisan translator:untranslated en fr
 ```
 
 ### Programmatic Usage
 
 ```php
-Translator::getMissingTranslations(source: 'en', target: 'fr');
+Translator::getUntranslatedTranslations(source: 'en', target: 'fr');
 ```
 
 ---
 
-## Detecting Undefined Translations
+## Detecting Missing Translations
 
 Undefined translations are keys found in your codebase but missing in the translation files.
 
 ### CLI Usage
 
 ```bash
-php artisan translator:undefined en
+php artisan translator:missing en
 ```
 
 ### Programmatic Usage
 
 ```php
-Translator::getUndefinedTranslations(locale: 'en');
+Translator::getMissingTranslations(locale: 'en');
 ```
 
 ---

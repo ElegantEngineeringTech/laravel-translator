@@ -8,7 +8,7 @@ use Elegantly\Translator\Commands\DeadCommand;
 use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
 use Elegantly\Translator\Commands\SortCommand;
-use Elegantly\Translator\Commands\UndefinedCommand;
+use Elegantly\Translator\Commands\UntranslatedCommand;
 use Elegantly\Translator\Drivers\Driver;
 use Elegantly\Translator\Drivers\JsonDriver;
 use Elegantly\Translator\Drivers\PhpDriver;
@@ -39,9 +39,9 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 SortCommand::class,
                 LocalesCommand::class,
                 AddLocaleCommand::class,
-                UndefinedCommand::class,
                 DeadCommand::class,
                 MissingCommand::class,
+                UntranslatedCommand::class,
                 ClearCacheCommand::class,
             ]);
     }

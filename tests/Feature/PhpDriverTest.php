@@ -40,7 +40,7 @@ it('gets undefined translations', function () {
         searchcodeService: $this->getSearchCodeService()
     );
 
-    $keys = $translator->getUndefinedTranslations('fr');
+    $keys = $translator->getMissingTranslations('fr');
 
     expect($keys)->toBe([
         'This one is used.' => [
@@ -82,7 +82,7 @@ it('gets missing translations', function () {
         searchcodeService: $this->getSearchCodeService()
     );
 
-    $keys = $translator->getMissingTranslations(
+    $keys = $translator->getUntranslatedTranslations(
         source: 'fr',
         target: 'en'
     );

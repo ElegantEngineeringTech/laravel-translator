@@ -55,7 +55,7 @@ class Translator
      *
      * @return array<string, array{ count: int, files: string[] }> The translations keys defined in the codebase but not defined in the driver
      */
-    public function getUndefinedTranslations(string $locale): array
+    public function getMissingTranslations(string $locale): array
     {
         if (! $this->searchcodeService) {
             throw TranslatorServiceException::missingSearchcodeService();
@@ -96,7 +96,7 @@ class Translator
     /**
      * @return array<string, scalar|null> The keys defined in source locale but not found in target locale
      */
-    public function getMissingTranslations(
+    public function getUntranslatedTranslations(
         string $source,
         string $target,
     ): array {

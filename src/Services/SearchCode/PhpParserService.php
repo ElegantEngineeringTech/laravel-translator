@@ -23,6 +23,10 @@ class PhpParserService implements SearchCodeServiceInterface
 {
     public ?SearchCodeCache $cache = null;
 
+    /**
+     * @param  array<int, string>  $paths
+     * @param  array<int, string>  $excludedPaths
+     */
     public function __construct(
         public array $paths,
         public array $excludedPaths = [],
@@ -76,7 +80,7 @@ class PhpParserService implements SearchCodeServiceInterface
         string $argName,
         int $argPosition,
         string $argValue
-    ) {
+    ): bool {
         if ($node->name instanceof Name && $node->name->name !== $function) {
             return false;
         }
