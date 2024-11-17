@@ -22,19 +22,22 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function formatPath(string ...$values): string
+    public function formatPath(string $value): string
     {
-        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, implode('', $values));
+        return implode(
+            DIRECTORY_SEPARATOR,
+            explode('/', $value)
+        );
     }
 
     public function getAppPath(): string
     {
-        return __DIR__.'/src/app';
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'src', 'app']);
     }
 
     public function getResourcesPath(): string
     {
-        return __DIR__.'/src/resources';
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'src', 'resources']);
     }
 
     public function getPhpDriver(): PhpDriver
