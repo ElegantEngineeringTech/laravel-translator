@@ -7,6 +7,7 @@ use Elegantly\Translator\Commands\ClearCacheCommand;
 use Elegantly\Translator\Commands\DeadCommand;
 use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
+use Elegantly\Translator\Commands\ProofreadCommand;
 use Elegantly\Translator\Commands\SortCommand;
 use Elegantly\Translator\Commands\UntranslatedCommand;
 use Elegantly\Translator\Drivers\Driver;
@@ -41,6 +42,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 DeadCommand::class,
                 MissingCommand::class,
                 UntranslatedCommand::class,
+                ProofreadCommand::class,
                 ClearCacheCommand::class,
             ]);
     }

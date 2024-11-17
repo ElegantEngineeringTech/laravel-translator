@@ -1,19 +1,21 @@
 # All-in-One Translations Manager for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)  
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3Arun-tests+branch%3Amain)  
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantengineeringtech/laravel-translator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/elegantengineeringtech/laravel-translator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)  
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-translator.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-translator)
 
 ![Laravel Translator](https://repository-images.githubusercontent.com/816339762/eefcad09-87ad-484e-bcc4-5759303dc4b6)
 
 Easily manage all your Laravel translation strings with powerful features:
 
--   **Translate** strings into other languages using DeepL, OpenAI, or any custom service.
--   **Proofread** translations to fix grammar and syntax automatically (via OpenAI or a custom service).
+-   **Translate** strings into other languages using DeepL, OpenAI, or custom services.
+-   **Proofread** translations to fix grammar and syntax automatically (via OpenAI or custom services).
 -   **Find missing** translation strings across locales.
 -   **Detect unused** translation keys in your codebase.
--   **Sort** your translations in natural order.
+-   **Sort** translations in natural order.
+
+---
 
 ## Try Laratranslate – A Powerful UI for Managing Translations
 
@@ -29,13 +31,13 @@ Install the package via Composer:
 composer require elegantly/laravel-translator --dev
 ```
 
-Then, add the following line to your `.gitignore` file:
+Add the following line to your `.gitignore` file:
 
 ```
 .translator.cache
 ```
 
-Next, publish the configuration file:
+Publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag="translator-config"
@@ -46,7 +48,7 @@ php artisan vendor:publish --tag="translator-config"
 ## Configuring the Driver
 
 This package uses a driver-based architecture. By default, it supports two standard drivers: PHP and JSON.
-You can also create custom drivers for alternative storage methods, such as a database.
+You can create custom drivers for alternative storage methods, such as a database.
 
 Set the default driver in the configuration file:
 
@@ -59,7 +61,7 @@ return [
      */
     'driver' => PhpDriver::class,
 
-    //...
+    // ...
 ];
 ```
 
@@ -91,7 +93,7 @@ use Elegantly\Translator\Facades\Translator;
 Translator::sortTranslations(locale: 'fr');
 ```
 
-Or specify a driver:
+Specify a driver:
 
 ```php
 Translator::driver('json')->sortTranslations(locale: 'fr');
@@ -101,7 +103,7 @@ Translator::driver('json')->sortTranslations(locale: 'fr');
 
 ## Automatic Translation
 
-Before translating, you need to configure a translation service. The package supports:
+Before translating, configure a translation service. The package supports:
 
 -   **OpenAI**
 -   **DeepL**
@@ -195,12 +197,12 @@ Translator::driver('json')->translateTranslations(
 
 Proofreading corrects grammar and syntax.
 
-Currently, OpenAI is the only built-in service, but you can implement custom services.
+Currently, OpenAI is the only built-in service, but custom services can be implemented.
 
 ### CLI Proofreading
 
 ```bash
-php artisan translator:proofread
+php artisan translator:proofread en
 ```
 
 ### Programmatic Proofreading
@@ -225,9 +227,9 @@ Translator::driver('json')->proofreadTranslations(
 
 ---
 
-## Finding Untranslated Translations
+## Identifying Untranslated Translations
 
-Identify keys defined in one locale but missing in another.
+Find keys defined in one locale but missing in another.
 
 ### CLI Usage
 
@@ -243,9 +245,9 @@ Translator::getUntranslatedTranslations(source: 'en', target: 'fr');
 
 ---
 
-## Detecting Missing Translations
+## Detecting Undefined Translations
 
-Undefined translations are keys found in your codebase but missing in the translation files.
+Undefined translations are keys found in your codebase but missing in translation files.
 
 ### CLI Usage
 
@@ -289,8 +291,8 @@ Specify paths to scan for translation keys. By default, both `.php` and `.blade.
 return [
     'searchcode' => [
         'paths' => [
-            app_path(), // Scan /app directory
-            resource_path(), // Scan /resource directory
+            app_path(),
+            resource_path(),
         ],
     ],
 ];
@@ -302,7 +304,7 @@ Exclude irrelevant paths for optimized scanning, such as test files or unrelated
 
 ### Ignored Translation Keys
 
-Ignore specific translation keys, e.g., keys used dynamically with string interpolation:
+Ignore specific translation keys:
 
 ```php
 return [
@@ -328,7 +330,7 @@ composer test
 
 ## Changelog
 
-For recent updates, see the [CHANGELOG](CHANGELOG.md).
+See the [CHANGELOG](CHANGELOG.md) for recent updates.
 
 ---
 

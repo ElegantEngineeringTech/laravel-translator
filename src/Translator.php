@@ -166,7 +166,7 @@ class Translator
                 return $translations->merge($translatedValues);
             },
             sort: config()->boolean('translator.sort_keys'),
-        );
+        )->only($keys);
     }
 
     public function translateTranslation(
@@ -215,7 +215,7 @@ class Translator
                 return $translations->merge($proofreadValues);
             },
             sort: config()->boolean('translator.sort_keys'),
-        );
+        )->only($keys);
     }
 
     public function proofreadTranslation(
