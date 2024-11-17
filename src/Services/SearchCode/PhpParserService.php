@@ -180,7 +180,7 @@ class PhpParserService implements SearchCodeServiceInterface
     public function translationsByFiles(): array
     {
         return collect($this->finder())
-            ->mapWithKeys(function (SplFileInfo $file, string $path) {
+            ->map(function (SplFileInfo $file, string $path) {
 
                 $lastModified = $file->getMTime();
                 $cachedResult = $this->cache?->get($path);
@@ -207,13 +207,7 @@ class PhpParserService implements SearchCodeServiceInterface
                     $this->cache?->put($path, $translations);
                 }
 
-                $relativePath = str($path)
-                    ->after(base_path())
-                    ->value();
-
-                return [
-                    $relativePath => $translations,
-                ];
+                return $translations;
             })
             ->filter()
             ->sortKeys(SORT_NATURAL)
