@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static Translations getTranslations(string $locale)
  * @method static array<string, array{ count: int, files: string[] }> getMissingTranslations(string $locale)
  * @method static array<int, scalar|null> getDeadTranslations(string $locale)
- * @method static array<int, scalar|null> getUntranslatedTranslations(string $source, string $target)
+ * @method static Translations getUntranslatedTranslations(string $source, string $target)
  * @method static Translations setTranslations(string $locale, array<string, scalar|null> $values)
  * @method static Translations translateTranslations(string $source, string $target, array<int, string> $keys)
  * @method static Translations proofreadTranslations(string $locale, array<int, string> $keys)

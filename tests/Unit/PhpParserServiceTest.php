@@ -140,7 +140,7 @@ it('caches results from files', function () {
             $resourcesPath,
         ],
         excludedPaths: $this->getExcludedPaths(),
-        cacheStorage: Storage::fake('cache')
+        cachePath: Storage::fake('cache')
     );
 
     $service->cache->put("{$appPath}/DummyClass.php", [

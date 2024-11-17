@@ -31,7 +31,7 @@ class SortCommand extends TranslatorCommand implements PromptsForMissingInput
             rows: $tranlations
                 ->map(fn ($value, $key) => [
                     (string) $key,
-                    (string) str($value)->limit(50),
+                    (string) str((string) $value)->limit(50),
                 ])->toArray()
         );
 

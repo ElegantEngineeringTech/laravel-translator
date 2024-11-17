@@ -19,7 +19,6 @@ use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\DeepLService;
 use Elegantly\Translator\Services\Translate\OpenAiService;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
-use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -60,70 +59,58 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
     public static function getDriverFromConfig(?string $driverName = null): Driver
     {
-        $driver = $driverName ?? config('translator.driver');
+        $driver = $driverName ?? config()->string('translator.driver');
 
         return match ($driver) {
-            'php', PhpDriver::class => PhpDriver::make(),
-            'json', JsonDriver::class => JsonDriver::make(),
-            '', null => null,
-            default => new $driver,
+            'php' => PhpDriver::make(),
+            'json' => JsonDriver::make(),
+            default => $driver::make(),
         };
     }
 
     public static function getTranslateServiceFromConfig(?string $serviceName = null): ?TranslateServiceInterface
     {
+        /** @var string|null $service */
         $service = $serviceName ?? config('translator.translate.service');
 
+        if (! $service) {
+            return null;
+        }
+
         return match ($service) {
-            'deepl', DeepLService::class => new DeepLService(
-                key: config('translator.services.deepl.key')
-            ),
-            'openai', OpenAiService::class => new OpenAiService(
-                apiKey: config('translator.services.openai.key') ?? config('translator.translate.services.openai.key'),
-                organization: config('translator.services.openai.organization') ?? config('translator.translate.services.openai.organization'),
-                timeout: config('translator.services.openai.request_timeout') ?? config('translator.translate.services.openai.request_timeout') ?? 120,
-                model: config('translator.translate.services.openai.model'),
-                prompt: config('translator.translate.services.openai.prompt'),
-            ),
-            '', null => null,
-            default => new $service,
+            'deepl' => DeepLService::make(),
+            'openai' => OpenAiService::make(),
+            default => $service::make(),
         };
     }
 
     public static function getproofreadServiceFromConfig(?string $serviceName = null): ?ProofreadServiceInterface
     {
+        /** @var string|null $service */
         $service = $serviceName ?? config('translator.proofread.service');
 
+        if (! $service) {
+            return null;
+        }
+
         return match ($service) {
-            'openai', ProofreadOpenAiService::class => new ProofreadOpenAiService(
-                apiKey: config('translator.services.openai.key') ?? config('translator.translate.services.openai.key'),
-                organization: config('translator.services.openai.organization') ?? config('translator.translate.services.openai.organization'),
-                timeout: config('translator.services.openai.request_timeout') ?? config('translator.translate.services.openai.request_timeout') ?? 120,
-                model: config('translator.proofread.services.openai.model'),
-                prompt: config('translator.proofread.services.openai.prompt'),
-            ),
-            '', null => null,
-            default => new $service,
+            'openai' => ProofreadOpenAiService::make(),
+            default => $service::make(),
         };
     }
 
     public static function getSearchcodeServiceFromConfig(?string $serviceName = null): ?SearchCodeServiceInterface
     {
+        /** @var string|null $service */
         $service = $serviceName ?? config('translator.searchcode.service');
 
+        if (! $service) {
+            return null;
+        }
+
         return match ($service) {
-            'php-parser', PhpParserService::class => new PhpParserService(
-                paths: config('translator.searchcode.paths'),
-                excludedPaths: config('translator.searchcode.excluded_paths', []),
-                cacheStorage: config('translator.searchcode.services.php-parser.cache_path')
-                    ? Storage::build([
-                        'driver' => 'local',
-                        'root' => config('translator.searchcode.services.php-parser.cache_path'),
-                    ])
-                    : null,
-            ),
-            '', null => null,
-            default => new $service,
+            'php-parser' => PhpParserService::make(),
+            default => $service::make(),
         };
     }
 }

@@ -8,10 +8,12 @@ use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Storage;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeFinder;
@@ -30,11 +32,22 @@ class PhpParserService implements SearchCodeServiceInterface
     public function __construct(
         public array $paths,
         public array $excludedPaths = [],
-        ?Filesystem $cacheStorage = null,
+        null|string|Filesystem $cachePath = null,
     ) {
-        if ($cacheStorage) {
-            $this->cache = new SearchCodeCache($cacheStorage);
+        if ($cachePath) {
+            $this->cache = new SearchCodeCache(
+                storage: is_string($cachePath) ? Storage::build(['driver' => 'local', 'root' => $cachePath]) : $cachePath
+            );
         }
+    }
+
+    public static function make(): self
+    {
+        return new self(
+            paths: config()->array('translator.searchcode.paths'),
+            excludedPaths: config('translator.searchcode.excluded_paths', []),
+            cachePath: config('translator.searchcode.services.php-parser.cache_path')
+        );
     }
 
     public function getCache(): ?SearchCodeCache
@@ -118,16 +131,25 @@ class PhpParserService implements SearchCodeServiceInterface
             if (
                 $node instanceof MethodCall &&
                 $node->var instanceof FuncCall &&
-                static::isFunCallTo($node->var, 'app', 'abstract', 0, 'translator')
+                static::isFunCallTo($node->var, 'app', 'abstract', 0, 'translator') &&
+                $node->name instanceof Identifier
             ) {
                 return in_array($node->name->name, ['get', 'has', 'hasForLocale', 'choice']);
             }
 
-            if ($node instanceof StaticCall && $node->class->name === Lang::class) {
+            if (
+                $node instanceof StaticCall &&
+                $node->class instanceof Name &&
+                $node->class->name === Lang::class &&
+                $node->name instanceof Identifier
+            ) {
                 return in_array($node->name->name, ['get', 'has', 'hasForLocale', 'choice']);
             }
 
-            if ($node instanceof FuncCall && $node->name instanceof Name) {
+            if (
+                $node instanceof FuncCall &&
+                $node->name instanceof Name
+            ) {
                 return in_array($node->name->name, ['__', 'trans', 'trans_choice']);
             }
 

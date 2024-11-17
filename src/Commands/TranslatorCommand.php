@@ -70,6 +70,7 @@ class TranslatorCommand extends Command
                 return select(
                     label: 'What is the target locale?',
                     options: $this->getLocales(
+                        // @phpstan-ignore-next-line
                         except: $this->argument('source'),
                     ),
                     required: true,

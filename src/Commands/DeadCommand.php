@@ -30,11 +30,17 @@ class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
         note(count($dead).' dead translations keys detected.');
 
         table(
-            headers: ['Key'],
-            rows: collect($dead)
+            headers: ['Key', "Translation {$locale}"],
+            rows: $dead
+                ->toBase()
                 ->map(function ($value, $key) {
-                    return [$value];
-                })->all()
+                    return [
+                        $key,
+                        str((string) $value)->limit(50)->value(),
+                    ];
+                })
+                ->values()
+                ->all()
         );
 
         return self::SUCCESS;

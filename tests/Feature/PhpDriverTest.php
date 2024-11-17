@@ -59,9 +59,9 @@ it('gets dead translations', function () {
         searchcodeService: $this->getSearchCodeService()
     );
 
-    $keys = $translator->getDeadTranslations('fr');
+    $dead = $translator->getDeadTranslations('fr');
 
-    expect($keys)->toBe([
+    expect($dead->keys()->toArray())->toBe([
         'messages.hello',
         'messages.add',
         'messages.home.title',
@@ -69,9 +69,6 @@ it('gets dead translations', function () {
         'messages.home.missing',
         'messages.empty',
         'messages.missing',
-        'messages.dummy.nested.0',
-        'messages.dummy.nested.1',
-        'messages.dummy.nested.2',
     ]);
 
 });
@@ -82,12 +79,12 @@ it('gets missing translations', function () {
         searchcodeService: $this->getSearchCodeService()
     );
 
-    $keys = $translator->getUntranslatedTranslations(
+    $untranlated = $translator->getUntranslatedTranslations(
         source: 'fr',
         target: 'en'
     );
 
-    expect($keys)->toBe([
+    expect($untranlated->toArray())->toBe([
         'messages.home.missing' => 'Absent',
         'messages.empty' => 'Vide',
         'messages.missing' => 'Absent',

@@ -9,7 +9,6 @@ use Elegantly\Translator\Exceptions\TranslatorServiceException;
 use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
-use Illuminate\Support\Arr;
 
 class Translator
 {
@@ -73,33 +72,25 @@ class Translator
     }
 
     /**
-     * @return array<int, scalar|null> The translations keys defined in the driver but not defined in the codebase
+     * The translations defined in the driver but not defined in the codebase
      */
-    public function getDeadTranslations(string $locale): array
+    public function getDeadTranslations(string $locale): Translations
     {
         if (! $this->searchcodeService) {
             throw TranslatorServiceException::missingSearchcodeService();
         }
 
-        $translations = $this->getTranslations($locale);
+        $defined = $this->searchcodeService->filesByTranslations();
 
-        $keys = $this->searchcodeService->filesByTranslations();
-
-        return $translations
-            ->filter(function ($value, $key) use ($keys) {
-                return ! Arr::has($keys, $key);
-            })
-            ->keys()
-            ->toArray();
+        return $this
+            ->getTranslations($locale)
+            ->except(array_keys($defined));
     }
 
-    /**
-     * @return array<string, scalar|null> The keys defined in source locale but not found in target locale
-     */
     public function getUntranslatedTranslations(
         string $source,
         string $target,
-    ): array {
+    ): Translations {
 
         $sourceTranslations = $this->getTranslations($source)->notBlank();
         $targetTranslations = $this->getTranslations($target)->notBlank();
@@ -107,8 +98,7 @@ class Translator
         return $sourceTranslations
             ->filter(function ($value, $key) use ($targetTranslations) {
                 return ! $targetTranslations->has($key);
-            })
-            ->toArray();
+            });
     }
 
     /**
@@ -278,10 +268,7 @@ class Translator
     }
 
     /**
-     *  @template T of Translations
-     *
-     * @param  Closure(T $translations):T  $callback
-     * @return T
+     * @param  Closure(Translations $translations):Translations  $callback
      */
     public function transformTranslations(
         string $locale,
@@ -304,12 +291,6 @@ class Translator
 
     }
 
-    /**
-     * @template T of Translations
-     *
-     * @param  T  $translations
-     * @return T
-     */
     public function saveTranslations(
         string $locale,
         Translations $translations,

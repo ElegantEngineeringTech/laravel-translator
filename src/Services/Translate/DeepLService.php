@@ -13,6 +13,13 @@ class DeepLService implements TranslateServiceInterface
         //
     }
 
+    public static function make(): self
+    {
+        return new self(
+            key: config('translator.services.deepl.key')
+        );
+    }
+
     public function translateAll(array $texts, string $targetLocale): array
     {
         $deepl = new \DeepL\Translator($this->key);

@@ -9,4 +9,6 @@ interface ProofreadServiceInterface
      * @return array<string, string>
      */
     public function proofreadAll(array $texts): array;
+
+    public static function make(): self;
 }

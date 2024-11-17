@@ -67,9 +67,9 @@ it('gets dead translations', function () {
         searchcodeService: $this->getSearchCodeService()
     );
 
-    $keys = $translator->getDeadTranslations('fr');
+    $dead = $translator->getDeadTranslations('fr');
 
-    expect($keys)->toBe([
+    expect($dead->keys()->all())->toBe([
         'All rights reserved.',
     ]);
 
@@ -86,7 +86,7 @@ it('gets missing translations', function () {
         target: 'en'
     );
 
-    expect($keys)->toBe([
+    expect($keys->toArray())->toBe([
         'All rights reserved.' => 'Tous droits réservés.',
         'This one is used.' => 'Celui-ci est utilisé.',
     ]);

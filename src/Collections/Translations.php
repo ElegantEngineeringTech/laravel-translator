@@ -6,7 +6,7 @@ use Elegantly\Translator\Drivers\Driver;
 use Illuminate\Support\Collection;
 
 /**
- * @extends Collection<array-key, scalar|null>
+ * @extends Collection<string, scalar|null>
  */
 abstract class Translations extends Collection
 {

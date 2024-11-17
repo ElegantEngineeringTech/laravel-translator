@@ -7,6 +7,8 @@ use Elegantly\Translator\Caches\SearchCodeCache;
 
 interface SearchCodeServiceInterface
 {
+    public static function make(): self;
+
     public function getCache(): ?SearchCodeCache;
 
     /**

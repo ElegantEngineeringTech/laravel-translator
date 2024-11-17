@@ -9,4 +9,6 @@ interface TranslateServiceInterface
      * @return array<string, string>
      */
     public function translateAll(array $texts, string $targetLocale): array;
+
+    public static function make(): self;
 }

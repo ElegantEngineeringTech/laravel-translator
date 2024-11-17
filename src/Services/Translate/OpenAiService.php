@@ -17,6 +17,17 @@ class OpenAiService implements TranslateServiceInterface
         //
     }
 
+    public static function make(): self
+    {
+        return new self(
+            apiKey: config('translator.services.openai.key') ?? config('translator.translate.services.openai.key'),
+            organization: config('translator.services.openai.organization') ?? config('translator.translate.services.openai.organization'),
+            timeout: config('translator.services.openai.request_timeout') ?? config('translator.translate.services.openai.request_timeout') ?? 120,
+            model: config('translator.translate.services.openai.model'),
+            prompt: config('translator.translate.services.openai.prompt'),
+        );
+    }
+
     public function getOpenAI(): \OpenAI\Client
     {
         if (blank($this->apiKey)) {

@@ -24,7 +24,7 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
         $translator = $this->getTranslator();
 
         $missing = $translator->getUntranslatedTranslations($source, $target);
-        $count = count($missing);
+        $count = $missing->count();
 
         intro('Using driver: '.$translator->driver::class);
 
@@ -32,10 +32,10 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
 
         table(
             headers: ['Key', "Source {$source}"],
-            rows: collect($missing)
+            rows: $missing
                 ->map(fn ($value, $key) => [
-                    (string) $key,
-                    (string) str($value)->limit(50),
+                    $key,
+                    (string) str((string) $value)->limit(50),
                 ])->toArray()
         );
 
@@ -45,21 +45,24 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
                 return $translator->translateTranslations(
                     source: $source,
                     target: $target,
-                    keys: array_keys($missing)
+                    keys: $missing->toBase()->keys()->all()
                 );
 
             }, "Translating the {$count} translations from '{$source}' to '{$target}'");
 
             table(
                 headers: ['Key', "Source {$source}", "Target {$target}"],
-                rows: collect($translated)
+                rows: $translated
+                    ->toBase()
                     ->map(function ($value, $key) use ($missing) {
                         return [
                             $key,
-                            str($missing[$key] ?? null)->limit(25)->value(),
-                            str($value)->limit(25)->value(),
+                            str((string) $missing[$key])->limit(25)->value(),
+                            str((string) $value)->limit(25)->value(),
                         ];
-                    })->all()
+                    })
+                    ->values()
+                    ->all()
             );
         }
 
