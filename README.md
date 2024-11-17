@@ -245,9 +245,9 @@ Translator::getUntranslatedTranslations(source: 'en', target: 'fr');
 
 ---
 
-## Detecting Undefined Translations
+## Detecting Missing Translations
 
-Undefined translations are keys found in your codebase but missing in translation files.
+Missing translations are keys found in your codebase but missing in translation files.
 
 ### CLI Usage
 
