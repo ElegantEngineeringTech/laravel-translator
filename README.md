@@ -23,6 +23,35 @@ Easily manage all your Laravel translation strings with powerful features:
 
 ---
 
+# Table of Contents
+
+1. [Installation](#installation)
+2. [Configuring the Driver](#configuring-the-driver)
+3. [Sorting and Formatting](#sorting-and-formatting)
+    - [CLI Commands](#cli-commands)
+    - [Using Code](#using-code)
+4. [Automatic Translation](#automatic-translation)
+    - [Configuring OpenAI](#configuring-openai)
+    - [Configuring DeepL](#configuring-deepl)
+    - [CLI Translation](#cli-translation)
+    - [Programmatic Translation](#programmatic-translation)
+5. [Proofreading Translations](#proofreading-translations)
+    - [CLI Proofreading](#cli-proofreading)
+    - [Programmatic Proofreading](#programmatic-proofreading)
+6. [Identifying Untranslated Translations](#identifying-untranslated-translations)
+    - [CLI Usage](#cli-usage)
+    - [Programmatic Usage](#programmatic-usage)
+7. [Detecting Missing Translations](#detecting-missing-translations)
+    - [CLI Usage](#cli-usage-1)
+    - [Programmatic Usage](#programmatic-usage-1)
+8. [Detecting Dead Translations](#detecting-dead-translations)
+    - [CLI Usage](#cli-usage-2)
+    - [Programmatic Usage](#programmatic-usage-2)
+9. [Code Scanner Configuration](#code-scanner-configuration)
+    - [Included Paths](#included-paths)
+    - [Excluded Paths](#excluded-paths)
+    - [Ignored Translation Keys](#ignored-translation-keys)
+
 ## Installation
 
 Install the package via Composer:
