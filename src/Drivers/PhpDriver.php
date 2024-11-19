@@ -104,7 +104,9 @@ class PhpDriver extends Driver
 
             $this->storage->put(
                 $this->getFilePath($locale, $namespace),
-                $this->toFile($values)
+                $this->toFile(
+                    is_array($values) ? $values : []
+                )
             );
 
         }
