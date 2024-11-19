@@ -251,8 +251,22 @@ Missing translations are keys found in your codebase but missing in translation 
 
 ### CLI Usage
 
+Find the missing keys in your default driver:
+
 ```bash
 php artisan translator:missing en
+```
+
+Specify a driver:
+
+```bash
+php artisan translator:missing en --driver=json
+```
+
+Add the missing keys to your driver:
+
+```bash
+php artisan translator:missing en --sync
 ```
 
 ### Programmatic Usage
