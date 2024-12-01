@@ -13,13 +13,14 @@ use function Laravel\Prompts\table;
  */
 class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:dead {locale} {--driver=}';
+    public $signature = 'translator:dead {locale} {--sync : Delete the dead keys from your driver} {--driver=}';
 
     public $description = 'Display all the translation keys not found in the codebase.';
 
     public function handle(): int
     {
         $locale = $this->argument('locale');
+        $sync = (bool) $this->option('sync');
 
         $translator = $this->getTranslator();
 
@@ -42,6 +43,17 @@ class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
                 ->values()
                 ->all()
         );
+
+        if ($sync) {
+
+            $translator->deleteTranslations(
+                locale: $locale,
+                keys: $dead->keys()->toArray()
+            );
+
+            note(count($dead).' dead translations deleted from the driver.');
+
+        }
 
         return self::SUCCESS;
     }

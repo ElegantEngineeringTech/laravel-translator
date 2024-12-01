@@ -63,7 +63,7 @@ class PhpDriver extends Driver
             })
             ->dot()
             ->map(function ($value) {
-                if (is_array($value) && empty($value)) {
+                if (empty($value)) {
                     return null;
                 }
 
