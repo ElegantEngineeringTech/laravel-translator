@@ -5,8 +5,6 @@ namespace Elegantly\Translator\Commands;
 use Elegantly\Translator\Facades\Translator;
 use Illuminate\Console\Command;
 
-use function Laravel\Prompts\info;
-
 class ClearCacheCommand extends Command
 {
     public $signature = 'translator:clear-cache';
@@ -17,7 +15,7 @@ class ClearCacheCommand extends Command
     {
         Translator::clearCache();
 
-        info('Cache cleared');
+        $this->components->info('Translator cache cleared.');
 
         return self::SUCCESS;
     }
