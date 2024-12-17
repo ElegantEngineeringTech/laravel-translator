@@ -63,7 +63,7 @@ composer require elegantly/laravel-translator --dev
 Add the following line to your `.gitignore` file:
 
 ```
-.translator.cache
+storage/.translator.cache
 ```
 
 Publish the configuration file:

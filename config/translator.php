@@ -151,7 +151,7 @@ return [
                  * To speed up detection, all the results of the scan will be stored in a file.
                  * Feel free to change the path if needed.
                  */
-                'cache_path' => base_path('.translator.cache'),
+                'cache_path' => storage_path('.translator.cache'),
             ],
         ],
 
