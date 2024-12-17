@@ -2,6 +2,7 @@
 
 namespace Elegantly\Translator\Services\SearchCode;
 
+use Closure;
 use Elegantly\Translator\Caches\SearchCodeCache;
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -177,10 +178,21 @@ class PhpParserService implements SearchCodeServiceInterface
             ->toArray();
     }
 
-    public function translationsByFiles(): array
-    {
-        return collect($this->finder())
-            ->map(function (SplFileInfo $file, string $path) {
+    public function translationsByFiles(
+        ?Closure $progress = null,
+        ?Closure $start = null,
+        ?Closure $end = null,
+    ): array {
+        $finder = $this->finder();
+
+        $total = $finder->count();
+
+        if ($start) {
+            $start($total);
+        }
+
+        $translations = collect($finder)
+            ->map(function (SplFileInfo $file, string $path) use ($progress) {
 
                 $lastModified = $file->getMTime();
                 $cachedResult = $this->cache?->get($path);
@@ -207,16 +219,33 @@ class PhpParserService implements SearchCodeServiceInterface
                     $this->cache?->put($path, $translations);
                 }
 
+                if ($progress) {
+                    $progress($path);
+                }
+
                 return $translations;
             })
             ->filter()
             ->sortKeys(SORT_NATURAL)
             ->toArray();
+
+        if ($end) {
+            $end();
+        }
+
+        return $translations;
     }
 
-    public function filesByTranslations(): array
-    {
-        $translations = $this->translationsByFiles();
+    public function filesByTranslations(
+        ?Closure $progress = null,
+        ?Closure $start = null,
+        ?Closure $end = null,
+    ): array {
+        $translations = $this->translationsByFiles(
+            progress: $progress,
+            start: $start,
+            end: $end
+        );
 
         $results = [];
 

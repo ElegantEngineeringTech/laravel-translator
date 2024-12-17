@@ -2,6 +2,7 @@
 
 namespace Elegantly\Translator\Services\SearchCode;
 
+use Closure;
 use Elegantly\Translator\Caches\SearchCodeCache;
 
 interface SearchCodeServiceInterface
@@ -11,12 +12,26 @@ interface SearchCodeServiceInterface
     public function getCache(): ?SearchCodeCache;
 
     /**
+     * @param  null|(Closure(string $path):void)  $progress
+     * @param  null|(Closure(int $total):void)  $start
+     * @param  null|(Closure():void)  $end
      * @return array<string, string[]>
      */
-    public function translationsByFiles(): array;
+    public function translationsByFiles(
+        ?Closure $progress = null,
+        ?Closure $start = null,
+        ?Closure $end = null,
+    ): array;
 
     /**
+     * @param  null|(Closure(string $path):void)  $progress
+     * @param  null|(Closure(int $total):void)  $start
+     * @param  null|(Closure():void)  $end
      * @return array<string, array{ count: int, files: string[] }>
      */
-    public function filesByTranslations(): array;
+    public function filesByTranslations(
+        ?Closure $progress = null,
+        ?Closure $start = null,
+        ?Closure $end = null,
+    ): array;
 }
