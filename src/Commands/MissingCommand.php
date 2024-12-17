@@ -4,7 +4,6 @@ namespace Elegantly\Translator\Commands;
 
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 
-use function Laravel\Prompts\info;
 use function Laravel\Prompts\intro;
 use function Laravel\Prompts\progress;
 use function Laravel\Prompts\table;
@@ -28,7 +27,7 @@ class MissingCommand extends TranslatorCommand implements PromptsForMissingInput
         $missingCount = count($missing);
 
         if ($missingCount === 0) {
-            info('No missing keys found for locale: ' . $locale);
+            $this->components->info('No missing keys found for locale: ' . $locale);
             return self::SUCCESS;
         }
 
