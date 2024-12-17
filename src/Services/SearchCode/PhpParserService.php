@@ -193,6 +193,9 @@ class PhpParserService implements SearchCodeServiceInterface
 
         $translations = collect($finder)
             ->map(function (SplFileInfo $file, string $path) use ($progress) {
+                if ($progress) {
+                    $progress($path);
+                }
 
                 $lastModified = $file->getMTime();
                 $cachedResult = $this->cache?->get($path);
@@ -217,10 +220,6 @@ class PhpParserService implements SearchCodeServiceInterface
                         );
                     }
                     $this->cache?->put($path, $translations);
-                }
-
-                if ($progress) {
-                    $progress($path);
                 }
 
                 return $translations;

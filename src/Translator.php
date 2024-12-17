@@ -52,17 +52,28 @@ class Translator
     /**
      * Scan the codebase to find keys not present in the driver
      *
+     * @param  null|(Closure(string $path):void)  $progress
+     * @param  null|(Closure(int $total):void)  $start
+     * @param  null|(Closure():void)  $end
      * @return array<string, array{ count: int, files: string[] }> The translations keys defined in the codebase but not defined in the driver
      */
-    public function getMissingTranslations(string $locale): array
-    {
+    public function getMissingTranslations(
+        string $locale,
+        ?Closure $progress = null,
+        ?Closure $start = null,
+        ?Closure $end = null,
+    ): array {
         if (! $this->searchcodeService) {
             throw TranslatorServiceException::missingSearchcodeService();
         }
 
         $translations = $this->getTranslations($locale);
 
-        $keys = $this->searchcodeService->filesByTranslations();
+        $keys = $this->searchcodeService->filesByTranslations(
+            progress: $progress,
+            start: $start,
+            end: $end
+        );
 
         return collect($keys)
             ->filter(function ($value, $key) use ($translations) {

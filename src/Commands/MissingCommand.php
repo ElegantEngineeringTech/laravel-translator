@@ -3,6 +3,7 @@
 namespace Elegantly\Translator\Commands;
 
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Laravel\Prompts\Progress;
 
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\intro;
@@ -15,32 +16,50 @@ class MissingCommand extends TranslatorCommand implements PromptsForMissingInput
 
     public $description = 'Display all the translation keys found in the codebase but not in the driver.';
 
+    public function formatPath(string $path): string
+    {
+        return (string) str($path)->after(base_path());
+    }
+
     public function handle(): int
     {
         $locale = $this->argument('locale');
         $sync = (bool) $this->option('sync');
 
+        /** @var null|Progress<int> $progress */
+        $progress = null;
+
         $translator = $this->getTranslator();
 
-        $missing = $translator->getMissingTranslations($locale);
+        $missing = $translator->getMissingTranslations(
+            $locale,
+            start: function (int $total) use (&$progress) {
+                $progress = new Progress('Scanning your codebase', $total);
+                $progress->start();
+            },
+            progress: function (string $path) use (&$progress) {
+                $progress?->hint($this->formatPath($path));
+                $progress?->advance();
+            },
+            end: fn () => $progress?->finish(),
+        );
+
+        $count = count($missing);
 
         intro('Using driver: '.$translator->driver::class);
 
-        note(count($missing).' missing keys detected.');
+        note("{$count} missing keys detected.");
 
         table(
             headers: ['Key', 'Count', 'Files'],
             rows: collect($missing)
                 ->map(function ($value, $key) {
                     return [
-                        str($key)->limit(20)->value(),
+                        (string) str($key)->limit(20),
                         (string) $value['count'],
-                        implode("\n",
-                            array_map(
-                                fn ($file) => str($file)->after(base_path()),
-                                $value['files'],
-                            )
-                        ),
+                        collect($value['files'])
+                            ->map(fn ($file) => $this->formatPath($file))
+                            ->join("\n"),
                     ];
                 })->values()->all()
         );
@@ -52,7 +71,7 @@ class MissingCommand extends TranslatorCommand implements PromptsForMissingInput
                 values: array_map(fn () => null, $missing)
             );
 
-            info(count($missing).' missing keys added to the driver.');
+            info("{$count} missing keys added to the driver.");
 
         }
 
