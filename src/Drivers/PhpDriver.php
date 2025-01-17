@@ -89,7 +89,12 @@ class PhpDriver extends Driver
         if ($this->storage->exists($path)) {
             $content = $this->storage->get($path);
 
-            return eval("?>{$content}");
+            return eval(
+                str($content)
+                    ->after('<?php')
+                    ->after('declare(strict_types=1);')
+                    ->value()
+            );
         }
 
         return [];
