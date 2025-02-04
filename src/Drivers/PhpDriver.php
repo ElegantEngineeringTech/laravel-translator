@@ -126,7 +126,7 @@ class PhpDriver extends Driver
      */
     public function toFile(array $values): string
     {
-        $content = "<?php\n\nreturn [";
+        $content = "<?php\n\ndeclare(strict_types=1);\n\nreturn [";
 
         $content .= $this->recursiveToFile($values);
 
