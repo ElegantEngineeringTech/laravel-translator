@@ -31,6 +31,8 @@ it('gets translations', function () {
         'messages.dummy.nested.0' => 'used',
         'messages.dummy.nested.1' => 'as',
         'messages.dummy.nested.2' => 'array',
+        'messages.register' => 'S\'inscrire',
+        'messages.registered' => 'Inscrit?',
     ]);
 });
 
@@ -69,6 +71,8 @@ it('gets dead translations', function () {
         'messages.home.missing',
         'messages.empty',
         'messages.missing',
+        'messages.register',
+        'messages.registered',
     ]);
 
 });
@@ -88,6 +92,7 @@ it('gets missing translations', function () {
         'messages.home.missing' => 'Absent',
         'messages.empty' => 'Vide',
         'messages.missing' => 'Absent',
+        'messages.register' => 'S\'inscrire',
     ]);
 
 });

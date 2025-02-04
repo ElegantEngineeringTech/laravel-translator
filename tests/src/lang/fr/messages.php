@@ -20,4 +20,6 @@ return [
             'array',
         ],
     ],
+    'register' => 'S\'inscrire',
+    'registered' => 'Inscrit?',
 ];

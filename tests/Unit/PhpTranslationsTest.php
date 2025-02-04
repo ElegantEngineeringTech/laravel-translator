@@ -49,6 +49,8 @@ it('compare two translation keys', function ($a, $b, $expected) {
     ['a.b', 'a.b', true],
     ['a.b', 'a', true],
     ['a.b', 'a.b.c', false],
+    ['a.bcd', 'a.bc', false],
+    ['a.bc.d', 'a.bc', true],
 ]);
 
 it('check existance of translation value', function ($has, $expected) {

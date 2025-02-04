@@ -56,7 +56,11 @@ class PhpTranslations extends Translations
         int|string $translationKey,
         int|string $key
     ): bool {
-        return $translationKey === $key || str((string) $translationKey)->startsWith((string) $key);
+        if ($translationKey === $key) {
+            return true;
+        }
+
+        return str((string) $translationKey)->startsWith("{$key}.");
     }
 
     /**
