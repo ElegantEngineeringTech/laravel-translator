@@ -26,28 +26,29 @@ Easily manage all your Laravel translation strings with powerful features:
 # Table of Contents
 
 1. [Installation](#installation)
-2. [Configuring the Driver](#configuring-the-driver)
-3. [Sorting and Formatting](#sorting-and-formatting)
+1. [Configuring the Driver](#configuring-the-driver)
+1. [Configuring the Locales](#configuring-the-locales)
+1. [Sorting and Formatting](#sorting-and-formatting)
     - [CLI Commands](#cli-commands)
     - [Using Code](#using-code)
-4. [Automatic Translation](#automatic-translation)
+1. [Automatic Translation](#automatic-translation)
     - [Configuring OpenAI](#configuring-openai)
     - [Configuring DeepL](#configuring-deepl)
     - [CLI Translation](#cli-translation)
     - [Programmatic Translation](#programmatic-translation)
-5. [Proofreading Translations](#proofreading-translations)
+1. [Proofreading Translations](#proofreading-translations)
     - [CLI Proofreading](#cli-proofreading)
     - [Programmatic Proofreading](#programmatic-proofreading)
-6. [Identifying Untranslated Translations](#identifying-untranslated-translations)
+1. [Identifying Untranslated Translations](#identifying-untranslated-translations)
     - [CLI Usage](#cli-usage)
     - [Programmatic Usage](#programmatic-usage)
-7. [Detecting Missing Translations](#detecting-missing-translations)
+1. [Detecting Missing Translations](#detecting-missing-translations)
     - [CLI Usage](#cli-usage-1)
     - [Programmatic Usage](#programmatic-usage-1)
-8. [Detecting Dead Translations](#detecting-dead-translations)
+1. [Detecting Dead Translations](#detecting-dead-translations)
     - [CLI Usage](#cli-usage-2)
     - [Programmatic Usage](#programmatic-usage-2)
-9. [Code Scanner Configuration](#code-scanner-configuration)
+1. [Code Scanner Configuration](#code-scanner-configuration)
     - [Included Paths](#included-paths)
     - [Excluded Paths](#excluded-paths)
     - [Ignored Translation Keys](#ignored-translation-keys)
@@ -94,6 +95,22 @@ return [
 ];
 ```
 
+## Configuring the Locales
+
+By default, this package will attempt to determine the locales defined in your application by scanning your `lang` directory.
+
+To set the locales manually, use the following configuration:
+
+````php
+return [
+    // ...
+
+    'locales' => ['en', 'fr', 'es'],
+
+    // ...
+];
+
+
 ---
 
 ## Sorting and Formatting
@@ -104,7 +121,7 @@ Sort translations with the default driver:
 
 ```bash
 php artisan translator:sort
-```
+````
 
 Specify a driver for sorting:
 

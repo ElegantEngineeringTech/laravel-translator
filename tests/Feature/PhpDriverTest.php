@@ -2,12 +2,32 @@
 
 use Elegantly\Translator\Translator;
 
-it('gets locales', function () {
+it('gets locales from the directory', function () {
     $translator = new Translator(
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['en', 'fr']);
+    expect($translator->getLocales())->toBe(['en', 'fr', 'pt_BR']);
+});
+
+it('gets locales from the config', function () {
+    config()->set('translator.locales', ['fr']);
+
+    $translator = new Translator(
+        driver: $this->getPhpDriver(),
+    );
+
+    expect($translator->getLocales())->toBe(['fr']);
+});
+
+it('gets locales from the config when null', function () {
+    config()->set('translator.locales', null);
+
+    $translator = new Translator(
+        driver: $this->getPhpDriver(),
+    );
+
+    expect($translator->getLocales())->toBe(['dummy', 'en', 'fr', 'pt_BR']);
 });
 
 it('gets translations', function () {

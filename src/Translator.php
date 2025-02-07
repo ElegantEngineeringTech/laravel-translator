@@ -36,6 +36,17 @@ class Translator
      */
     public function getLocales(): array
     {
+        if ($locales = TranslatorServiceProvider::getLocalesFromConfig()) {
+            return $locales;
+        }
+
+        if ($validator = TranslatorServiceProvider::getLocaleValidator()) {
+            return array_values(array_filter(
+                $this->driver->getLocales(),
+                fn ($locale) => $validator::make()->isValid($locale),
+            ));
+        }
+
         return $this->driver->getLocales();
     }
 

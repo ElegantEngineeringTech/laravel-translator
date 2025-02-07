@@ -1,6 +1,7 @@
 <?php
 
 use Elegantly\Translator\Drivers\PhpDriver;
+use Elegantly\Translator\Support\LocaleValidator;
 
 return [
 
@@ -28,6 +29,21 @@ return [
     |
     */
     'sort_keys' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locales
+    |--------------------------------------------------------------------------
+    |
+    | If set to an array such as ['en', 'es', 'fr']:
+    | -> Translator::getLocales() will return this array.
+    | If set to a class implementing `\Elegantly\Translator\Contracts\ValidateLocales`:
+    | -> The locales will be those found in the lang directory and filtered according to the class.
+    | If set to `null`:
+    | -> The locales will be those found in the lang directory.
+    |
+    */
+    'locales' => LocaleValidator::class,
 
     /*
     |--------------------------------------------------------------------------

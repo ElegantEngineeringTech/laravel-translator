@@ -10,6 +10,7 @@ use Elegantly\Translator\Commands\MissingCommand;
 use Elegantly\Translator\Commands\ProofreadCommand;
 use Elegantly\Translator\Commands\SortCommand;
 use Elegantly\Translator\Commands\UntranslatedCommand;
+use Elegantly\Translator\Contracts\ValidateLocales;
 use Elegantly\Translator\Drivers\Driver;
 use Elegantly\Translator\Drivers\JsonDriver;
 use Elegantly\Translator\Drivers\PhpDriver;
@@ -53,7 +54,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
             return new Translator(
                 driver: static::getDriverFromConfig(),
                 translateService: static::getTranslateServiceFromConfig(),
-                proofreadService: static::getproofreadServiceFromConfig(),
+                proofreadService: static::getProofreadServiceFromConfig(),
                 searchcodeService: static::getSearchcodeServiceFromConfig(),
             );
         });
@@ -86,7 +87,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         };
     }
 
-    public static function getproofreadServiceFromConfig(?string $serviceName = null): ?ProofreadServiceInterface
+    public static function getProofreadServiceFromConfig(?string $serviceName = null): ?ProofreadServiceInterface
     {
         /** @var string|null $service */
         $service = $serviceName ?? config('translator.proofread.service');
@@ -114,5 +115,35 @@ class TranslatorServiceProvider extends PackageServiceProvider
             'php-parser' => PhpParserService::make(),
             default => $service::make(),
         };
+    }
+
+    /**
+     * @return ?array<int, string>
+     */
+    public static function getLocalesFromConfig(): ?array
+    {
+        /** @var array<int, string>|class-string<ValidateLocales> */
+        $locales = config('translator.locales');
+
+        if (is_array($locales)) {
+            return $locales;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|class-string<ValidateLocales>
+     */
+    public static function getLocaleValidator(): ?string
+    {
+        /** @var array<int, string>|class-string<ValidateLocales> */
+        $validator = config('translator.locales');
+
+        if (is_array($validator)) {
+            return null;
+        }
+
+        return $validator;
     }
 }

@@ -36,7 +36,7 @@ class PhpDriver extends Driver
      */
     public function getLocales(): array
     {
-        return collect($this->storage->allDirectories())
+        return collect($this->storage->directories())
             ->sort(SORT_NATURAL)
             ->values()
             ->toArray();
