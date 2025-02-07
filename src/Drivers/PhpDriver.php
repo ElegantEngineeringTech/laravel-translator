@@ -150,6 +150,8 @@ class PhpDriver extends Driver
                 $value = $this->recursiveToFile($value, $prefix.'    ');
 
                 if (is_string($key)) {
+                    $key = str_replace('\"', '"', addslashes($key));
+
                     $output .= "\n{$prefix}    '{$key}' => [{$value}\n    {$prefix}],";
                 } else {
                     $output .= "\n{$prefix}    [{$value}\n    {$prefix}],";
@@ -158,6 +160,7 @@ class PhpDriver extends Driver
                 $value = str_replace('\"', '"', addslashes($value));
 
                 if (is_string($key)) {
+                    $key = str_replace('\"', '"', addslashes($key));
                     $output .= "\n{$prefix}    '{$key}' => '{$value}',";
                 } else {
                     $output .= "\n{$prefix}    '{$value}',";
