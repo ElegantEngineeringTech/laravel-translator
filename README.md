@@ -101,7 +101,7 @@ By default, this package will attempt to determine the locales defined in your a
 
 To set the locales manually, use the following configuration:
 
-````php
+```php
 return [
     // ...
 
@@ -109,7 +109,7 @@ return [
 
     // ...
 ];
-
+```
 
 ---
 
@@ -121,7 +121,7 @@ Sort translations with the default driver:
 
 ```bash
 php artisan translator:sort
-````
+```
 
 Specify a driver for sorting:
 
