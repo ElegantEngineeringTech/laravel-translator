@@ -21,6 +21,7 @@ use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\DeepLService;
 use Elegantly\Translator\Services\Translate\OpenAiService;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
+use Elegantly\Translator\Support\LocaleValidator;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -138,7 +139,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
     public static function getLocaleValidator(): ?string
     {
         /** @var array<int, string>|class-string<ValidateLocales> */
-        $validator = config('translator.locales');
+        $validator = config('translator.locales', LocaleValidator::class);
 
         if (is_array($validator)) {
             return null;
