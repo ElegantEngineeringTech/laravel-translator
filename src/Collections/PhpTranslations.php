@@ -6,6 +6,7 @@ namespace Elegantly\Translator\Collections;
 
 use Elegantly\Translator\Drivers\PhpDriver;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
 
@@ -14,11 +15,13 @@ class PhpTranslations extends Translations
     public string $driver = PhpDriver::class;
 
     /**
-     * Should mimic the laravel __ method
+     * Should then mimic the laravel __ method
+     *
+     * ! $this->items are dotted !
      *
      * $items = ['foo.bar' => 'baz']
      * - $this->get('foo.bar') === 'baz'
-     * - $this->get('foo') === 'baz'
+     * - $this->get('foo') === [ 'bar' => 'baz']
      * - $this->get('bar') === null
      */
     public function get($key, $default = null)
@@ -54,7 +57,7 @@ class PhpTranslations extends Translations
      * - 'auth.user.email' === 'auth.user.email.label' // false
      * - 'auth.user.email' === 'auth.admin' // false
      */
-    public static function areTranslationKeysEqual(
+    public static function isSubTranslationKey(
         int|string $translationKey,
         int|string $key
     ): bool {
@@ -62,7 +65,7 @@ class PhpTranslations extends Translations
             return true;
         }
 
-        return str((string) $translationKey)->startsWith("{$key}.");
+        return Str::startsWith((string) $translationKey, "{$key}.");
     }
 
     /**
@@ -74,7 +77,7 @@ class PhpTranslations extends Translations
     ): bool {
 
         foreach ($translations as $translationKey => $translationValue) {
-            if (static::areTranslationKeysEqual($translationKey, $key)) {
+            if (static::isSubTranslationKey($translationKey, $key)) {
                 return true;
             }
         }
@@ -93,7 +96,7 @@ class PhpTranslations extends Translations
     public function has($key)
     {
         /** @var array<int, array-key> */
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = Arr::wrap($key);
 
         foreach ($keys as $value) {
             if (! static::hasTranslationKey(
@@ -128,7 +131,7 @@ class PhpTranslations extends Translations
         return $this->filter(function ($translationValue, $translationKey) use ($keys) {
 
             foreach ($keys as $key) {
-                if (static::areTranslationKeysEqual($translationKey, $key)) {
+                if (static::isSubTranslationKey($translationKey, $key)) {
                     return false;
                 }
             }
@@ -160,12 +163,85 @@ class PhpTranslations extends Translations
         return $this->filter(function ($translationValue, $translationKey) use ($keys) {
 
             foreach ($keys as $key) {
-                if (static::areTranslationKeysEqual($translationKey, $key)) {
+                if (static::isSubTranslationKey($translationKey, $key)) {
                     return true;
                 }
             }
 
             return false;
         });
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $values
+     */
+    public static function toDot(array $values): static
+    {
+        $translations = collect($values)
+            ->mapWithKeys(fn ($value, $key) => [static::prepareTranslations($key) => static::prepareTranslations($value)])
+            ->dot();
+
+        return new static($translations);
+    }
+
+    /**
+     * @param  array<array-key, mixed>|Translations  $translations
+     * @return Collection<string, mixed>
+     */
+    public static function toUndot(Translations|array $translations): Collection
+    {
+        return collect($translations)
+            ->undot()
+            ->mapWithKeys(fn ($value, $key) => [static::unprepareTranslations($key) => static::unprepareTranslations($value)]);
+    }
+
+    /**
+     * Dot in translations keys might break the initial array structure
+     * To prevent that, we encode the dots in unicode
+     */
+    public static function prepareTranslations(mixed $values): mixed
+    {
+        if (is_string($values)) {
+            return Str::replace('.', '&#46;', $values);
+        }
+
+        if (! is_array($values)) {
+            return $values;
+        }
+
+        if (empty($values)) {
+            return null;
+        }
+
+        return collect($values)
+            ->mapWithKeys(fn ($value, $key) => [
+                static::prepareTranslations($key) => static::prepareTranslations($value),
+            ])
+            ->all();
+    }
+
+    /**
+     * Dot in translations keys might break the initial array structure
+     * To prevent that, we encode the dots in unicode
+     */
+    public static function unprepareTranslations(mixed $values): mixed
+    {
+        if (is_string($values)) {
+            return Str::replace('&#46;', '.', $values);
+        }
+
+        if (! is_array($values)) {
+            return $values;
+        }
+
+        if (empty($values)) {
+            return null;
+        }
+
+        return collect($values)
+            ->mapWithKeys(fn ($value, $key) => [
+                static::unprepareTranslations($key) => static::unprepareTranslations($value),
+            ])
+            ->all();
     }
 }

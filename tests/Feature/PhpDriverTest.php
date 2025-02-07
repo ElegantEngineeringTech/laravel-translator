@@ -118,3 +118,31 @@ it('gets missing translations', function () {
     ]);
 
 });
+
+it('replaces dot with unicode', function () {
+    $translator = new Translator(
+        driver: $this->getPhpDriver(),
+    );
+
+    $translations = $translator->getTranslations('fr_CA');
+
+    expect($translations->toArray())->toBe([
+        'dotted.This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+    ]);
+
+});
+
+it('doesn\' break keys with dot', function () {
+    $translator = new Translator(
+        driver: $this->getPhpDriver(),
+    );
+
+    $translations = $translator->getTranslations('fr_CA');
+
+    $translator->saveTranslations('fr_CA', $translations);
+
+    expect($translator->getTranslations('fr_CA')->toArray())->toBe([
+        'dotted.This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+    ]);
+
+});

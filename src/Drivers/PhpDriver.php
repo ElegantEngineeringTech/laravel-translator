@@ -41,7 +41,7 @@ class PhpDriver extends Driver
         return collect($this->storage->directories())
             ->sort(SORT_NATURAL)
             ->values()
-            ->toArray();
+            ->all();
     }
 
     /**
@@ -54,26 +54,18 @@ class PhpDriver extends Driver
             ->map(fn (string $file) => File::name($file))
             ->sort(SORT_NATURAL)
             ->values()
-            ->toArray();
+            ->all();
     }
 
     public function getTranslations(string $locale): PhpTranslations
     {
-        $translations = collect($this->getNamespaces($locale))
+        $values = collect($this->getNamespaces($locale))
             ->mapWithKeys(function ($namespace) use ($locale) {
                 return [$namespace => $this->getTranslationsInNamespace($locale, $namespace)];
             })
-            ->dot()
-            ->map(function ($value) {
-                if (empty($value)) {
-                    return null;
-                }
+            ->all();
 
-                return $value;
-            })
-            ->toArray();
-
-        return new PhpTranslations($translations);
+        return PhpTranslations::toDot($values);
     }
 
     /**
@@ -105,7 +97,7 @@ class PhpDriver extends Driver
 
     public function saveTranslations(string $locale, Translations $translations): Translations
     {
-        $undot = $translations->undot()->toArray();
+        $undot = PhpTranslations::toUndot($translations)->all();
 
         foreach ($undot as $namespace => $values) {
 

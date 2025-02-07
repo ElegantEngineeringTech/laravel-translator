@@ -42,7 +42,7 @@ it('gets the right translation value', function () {
 
 it('compare two translation keys', function ($a, $b, $expected) {
 
-    expect(PhpTranslations::areTranslationKeysEqual($a, $b))->toBe($expected);
+    expect(PhpTranslations::isSubTranslationKey($a, $b))->toBe($expected);
 
 })->with([
     ['a', 'a', true],
@@ -52,14 +52,17 @@ it('compare two translation keys', function ($a, $b, $expected) {
     ['a.b', 'a', true],
     ['a.b', 'a.b.c', false],
     ['a.bcd', 'a.bc', false],
+    ['a.bc', 'a.bc', true],
     ['a.bc.d', 'a.bc', true],
+    ['a.bc', 'a.bc.d', false],
 ]);
 
-it('check existance of translation value', function ($has, $expected) {
+it('check existence of translation value', function ($has, $expected) {
 
     $translations = new PhpTranslations([
         'a.b' => 'b_value',
         'c' => 'c_value',
+        'a.bc.d' => 'd_value',
     ]);
 
     expect($translations->has($has))->toBe($expected);
@@ -71,6 +74,9 @@ it('check existance of translation value', function ($has, $expected) {
     ['a.b.c', false],
     ['a.b.c.d', false],
     ['e', false],
+    ['a.bcd', false],
+    ['a.bc', true],
+    ['a.bc.d', true],
 ]);
 
 it('retreives values except for some translation keys', function ($except, $expected) {
@@ -131,3 +137,31 @@ it('retreives only the specified translation keys', function ($only, $expected) 
         [],
     ],
 ]);
+
+it('encodes dot to unicode', function () {
+
+    $translations = PhpTranslations::toDot([
+        'This key contains a dot. In the middle' => [
+            'And it.has children.' => 'And it has children.',
+        ],
+    ]);
+
+    expect($translations->toArray())->toBe([
+        'This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+    ]);
+
+});
+
+it('decodes dot from unicode', function () {
+
+    $translations = PhpTranslations::toUndot([
+        'This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+    ]);
+
+    expect($translations->toArray())->toBe([
+        'This key contains a dot. In the middle' => [
+            'And it.has children.' => 'And it has children.',
+        ],
+    ]);
+
+});
