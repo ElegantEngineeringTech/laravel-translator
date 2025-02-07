@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Elegantly\Translator;
 
 use Elegantly\Translator\Commands\AddLocaleCommand;

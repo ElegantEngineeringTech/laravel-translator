@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Elegantly\Translator\Drivers\PhpDriver;
 use Elegantly\Translator\Support\LocaleValidator;
 

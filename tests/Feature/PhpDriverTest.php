@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Elegantly\Translator\Translator;
 
 it('gets locales from the directory', function () {
@@ -7,7 +9,7 @@ it('gets locales from the directory', function () {
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['en', 'fr', 'pt_BR']);
+    expect($translator->getLocales())->toBe(['en', 'fr', 'fr_CA', 'pt_BR']);
 });
 
 it('gets locales from the config', function () {
@@ -27,7 +29,7 @@ it('gets locales from the config when null', function () {
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['dummy', 'en', 'fr', 'pt_BR']);
+    expect($translator->getLocales())->toBe(['dummy', 'en', 'fr', 'fr_CA', 'pt_BR']);
 });
 
 it('gets translations', function () {

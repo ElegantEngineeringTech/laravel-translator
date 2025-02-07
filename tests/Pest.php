@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Elegantly\Translator\Caches\SearchCodeCache;
 use Elegantly\Translator\Tests\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;

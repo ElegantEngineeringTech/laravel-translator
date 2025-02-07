@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Elegantly\Translator\Services\Translate;
 
 use DeepL\TextResult;
@@ -47,7 +49,7 @@ class DeepLService implements TranslateServiceInterface
     {
         return match ($locale) {
             'en' => 'EN-US',
-            default => strtoupper($locale),
+            default => mb_strtoupper($locale),
         };
     }
 }

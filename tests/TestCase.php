@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Elegantly\Translator\Tests;
 
 use Elegantly\Translator\Drivers\JsonDriver;

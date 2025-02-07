@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Elegantly\Translator\Support;
 
 use Elegantly\Translator\Contracts\ValidateLocales;

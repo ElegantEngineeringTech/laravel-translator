@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Elegantly\Translator\Translator;
 
 it('gets locales', function () {

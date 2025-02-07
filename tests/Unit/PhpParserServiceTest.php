@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
