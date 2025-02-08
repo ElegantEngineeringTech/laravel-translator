@@ -18,14 +18,44 @@ class JsonDriver extends Driver
         //
     }
 
-    public static function make(): static
+    public static function make(array $config = []): static
     {
         return new static(
             storage: Storage::build([
                 'driver' => 'local',
                 'root' => config()->string('translator.lang_path'),
+                ...$config,
             ])
         );
+    }
+
+    public function getKey(): string
+    {
+        return $this->storage->path('');
+    }
+
+    /**
+     * @return static[]
+     */
+    public function getSubDrivers(): array
+    {
+        return collect($this->storage->directories())
+            ->flatMap(function (string $directory) {
+                $subdriver = static::make([
+                    'root' => $this->storage->path($directory),
+                ]);
+
+                return [
+                    $subdriver,
+                    ...$subdriver->getSubDrivers(),
+                ];
+            })
+            ->filter(function ($driver) {
+                return ! empty($driver->getLocales());
+            })
+            ->sortBy(fn ($driver) => $driver->getKey())
+            ->values()
+            ->all();
     }
 
     public function getFilePath(string $locale): string

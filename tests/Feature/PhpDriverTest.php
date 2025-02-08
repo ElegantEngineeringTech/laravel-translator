@@ -29,7 +29,7 @@ it('gets locales from the config when null', function () {
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['dummy', 'en', 'fr', 'fr_CA', 'pt_BR']);
+    expect($translator->getLocales())->toBe(['en', 'fr', 'fr_CA', 'not_a_locale', 'pt_BR', 'sublang', 'vendorlang']);
 });
 
 it('gets translations', function () {

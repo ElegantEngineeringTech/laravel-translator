@@ -10,8 +10,20 @@ abstract class Driver
 {
     /**
      * Make an instance based on configs
+     *
+     * @param  array<array-key, mixed>  $config
      */
-    abstract public static function make(): static;
+    abstract public static function make(array $config = []): static;
+
+    /**
+     * A unique identifier for the driver
+     */
+    abstract public function getKey(): string;
+
+    /**
+     * @return static[]
+     */
+    abstract public function getSubDrivers(): array;
 
     /**
      * @return array<int, string>

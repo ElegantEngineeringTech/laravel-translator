@@ -18,14 +18,47 @@ class PhpDriver extends Driver
         //
     }
 
-    public static function make(): static
+    public static function make(array $config = []): static
     {
         return new static(
             storage: Storage::build([
                 'driver' => 'local',
                 'root' => config()->string('translator.lang_path'),
+                ...$config,
             ])
         );
+    }
+
+    public function getKey(): string
+    {
+        return $this->storage->path('');
+    }
+
+    /**
+     * @return static[]
+     */
+    public function getSubDrivers(): array
+    {
+        return collect($this->storage->directories())
+            ->flatMap(function (string $directory) {
+                $subdriver = static::make([
+                    'root' => $this->storage->path($directory),
+                ]);
+
+                return [
+                    $subdriver,
+                    ...$subdriver->getSubDrivers(),
+                ];
+            })
+            ->filter(function ($driver) {
+                return collect($driver->getLocales())
+                    ->contains(function ($locale) use ($driver) {
+                        return ! empty($driver->getNamespaces($locale));
+                    });
+            })
+            ->sortBy(fn ($driver) => $driver->getKey())
+            ->values()
+            ->all();
     }
 
     public function getFilePath(string $locale, string $namespace): string
@@ -49,7 +82,7 @@ class PhpDriver extends Driver
      */
     public function getNamespaces(string $locale): array
     {
-        return collect($this->storage->allFiles($locale))
+        return collect($this->storage->files($locale))
             ->filter(fn (string $file) => File::extension($file) === 'php')
             ->map(fn (string $file) => File::name($file))
             ->sort(SORT_NATURAL)
