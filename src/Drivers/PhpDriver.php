@@ -130,7 +130,7 @@ class PhpDriver extends Driver
     }
 
     /**
-     * @param  array<array-key, scalar|scalar[]>  $items
+     * @param  array<array-key, null|scalar|array<array-key, null|scalar>>  $items
      */
     public function recursiveToFile(
         array $items,
@@ -157,6 +157,12 @@ class PhpDriver extends Driver
 
                 if (is_string($value)) {
                     $value = "'".str_replace('\"', '"', addslashes($value))."'";
+                } elseif (is_null($value)) {
+                    $value = 'null';
+                } elseif (is_bool($value)) {
+                    $value = $value ? 'true' : 'false';
+                } else {
+                    $value = (string) $value;
                 }
 
                 if (is_string($key)) {
