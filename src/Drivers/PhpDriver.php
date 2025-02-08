@@ -130,7 +130,7 @@ class PhpDriver extends Driver
     }
 
     /**
-     * @param  array<array-key, mixed>  $items
+     * @param  array<array-key, scalar|scalar[]>  $items
      */
     public function recursiveToFile(
         array $items,
@@ -140,24 +140,29 @@ class PhpDriver extends Driver
         $output = '';
 
         foreach ($items as $key => $value) {
+
+            if (is_string($key)) {
+                $key = str_replace('\"', '"', addslashes($key));
+            }
+
             if (is_array($value)) {
                 $value = $this->recursiveToFile($value, $prefix.'    ');
 
                 if (is_string($key)) {
-                    $key = str_replace('\"', '"', addslashes($key));
-
                     $output .= "\n{$prefix}    '{$key}' => [{$value}\n    {$prefix}],";
                 } else {
                     $output .= "\n{$prefix}    [{$value}\n    {$prefix}],";
                 }
             } else {
-                $value = str_replace('\"', '"', addslashes($value));
+
+                if (is_string($value)) {
+                    $value = "'".str_replace('\"', '"', addslashes($value))."'";
+                }
 
                 if (is_string($key)) {
-                    $key = str_replace('\"', '"', addslashes($key));
-                    $output .= "\n{$prefix}    '{$key}' => '{$value}',";
+                    $output .= "\n{$prefix}    '{$key}' => {$value},";
                 } else {
-                    $output .= "\n{$prefix}    '{$value}',";
+                    $output .= "\n{$prefix}    {$value},";
                 }
             }
         }
