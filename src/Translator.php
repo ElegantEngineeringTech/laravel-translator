@@ -23,10 +23,10 @@ class Translator
         //
     }
 
-    public function driver(?string $name): static
+    public function driver(null|string|Driver $name): static
     {
         return new static(
-            driver: TranslatorServiceProvider::getDriverFromConfig($name),
+            driver: $name instanceof Driver ? $name : TranslatorServiceProvider::getDriverFromConfig($name),
             translateService: $this->translateService,
             proofreadService: $this->proofreadService,
             searchcodeService: $this->searchcodeService

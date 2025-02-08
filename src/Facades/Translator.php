@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Elegantly\Translator\Facades;
 
 use Elegantly\Translator\Collections\Translations;
+use Elegantly\Translator\Drivers\Driver;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \Elegantly\Translator\Translator driver(?string $name)
+ * @method static \Elegantly\Translator\Translator driver(null|string|Driver $name)
  * @method static array<int, string> getLocales()
  * @method static Translations getTranslations(string $locale)
  * @method static array<string, array{ count: int, files: string[] }> getMissingTranslations(string $locale)
