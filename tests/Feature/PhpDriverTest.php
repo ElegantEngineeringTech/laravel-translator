@@ -127,12 +127,12 @@ it('replaces dot with unicode', function () {
     $translations = $translator->getTranslations('fr_CA');
 
     expect($translations->toArray())->toBe([
-        'dotted.This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+        'dotted.This key contains a dot&#46; In the middle.And it &#46; ha&#46;s children&#46;' => 'And it has children&#46;',
     ]);
 
 });
 
-it('doesn\' break keys with dot', function () {
+it('doesn\'t break keys with dot', function () {
     $translator = new Translator(
         driver: $this->getPhpDriver(),
     );
@@ -142,7 +142,7 @@ it('doesn\' break keys with dot', function () {
     $translator->saveTranslations('fr_CA', $translations);
 
     expect($translator->getTranslations('fr_CA')->toArray())->toBe([
-        'dotted.This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+        'dotted.This key contains a dot&#46; In the middle.And it &#46; ha&#46;s children&#46;' => 'And it has children&#46;',
     ]);
 
 });
