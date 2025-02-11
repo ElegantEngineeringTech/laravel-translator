@@ -125,9 +125,7 @@ use Elegantly\Translator\Support\LocaleValidator;
 
 return [
     // ...
-
     'locales' => LocaleValidator::class,
-
     // ...
 ];
 ```
@@ -139,9 +137,7 @@ To set the locales manually, use the following configuration:
 ```php
 return [
     // ...
-
     'locales' => ['en', 'fr', 'es'],
-
     // ...
 ];
 ```
