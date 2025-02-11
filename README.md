@@ -89,6 +89,9 @@ php artisan vendor:publish --tag="translator-config"
 
 This package uses a driver-based architecture. By default, it supports two standard drivers: PHP and JSON.
 
+-   Use the `PHP` driver if you store your translation strings in `.php` files, such as `/lang/en/message.php`.
+-   Use the `JSON` driver if you store your translation strings in `.json` files, such as `/lang/fr.json`.
+
 You can also create custom drivers for alternative storage methods, such as a database.
 
 Set the default driver in the configuration file:
@@ -107,11 +110,29 @@ return [
 ```
 
 > [!NOTE]
-> All features are supported in both PHP and JSON translation files.
+> All features are supported in both the PHP and JSON drivers.
 
 ## Configuring the Locales
 
+### Automatic Detection
+
 By default, this package will attempt to determine the locales defined in your application by scanning your `lang` directory.
+
+You can customize this behavior in the configuration file.
+
+```php
+use Elegantly\Translator\Support\LocaleValidator;
+
+return [
+    // ...
+
+    'locales' => LocaleValidator::class,
+
+    // ...
+];
+```
+
+### Manual Setup
 
 To set the locales manually, use the following configuration:
 
