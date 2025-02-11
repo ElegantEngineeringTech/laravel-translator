@@ -29,6 +29,8 @@ Easily manage all your Laravel translation strings with powerful features:
 1. [Installation](#installation)
 1. [Configuring the Driver](#configuring-the-driver)
 1. [Configuring the Locales](#configuring-the-locales)
+    - [Automatic Detection](#automatic-detection)
+    - [Manual Setup](#manual-setup)
 1. [Sorting and Formatting](#sorting-and-formatting)
     - [CLI Commands](#cli-commands)
     - [Using Code](#using-code)
