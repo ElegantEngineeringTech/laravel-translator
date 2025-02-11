@@ -25,6 +25,7 @@ Easily manage all your Laravel translation strings with powerful features:
 
 # Table of Contents
 
+1. [How does it work?](#how-does-it-work)
 1. [Installation](#installation)
 1. [Configuring the Driver](#configuring-the-driver)
 1. [Configuring the Locales](#configuring-the-locales)
@@ -42,16 +43,25 @@ Easily manage all your Laravel translation strings with powerful features:
 1. [Identifying Untranslated Translations](#identifying-untranslated-translations)
     - [CLI Usage](#cli-usage)
     - [Programmatic Usage](#programmatic-usage)
+1. [Code Scanner Configuration](#code-scanner-configuration)
+    - [Requirements](#requirements)
+    - [Included Paths](#included-paths)
+    - [Excluded Paths](#excluded-paths)
+    - [Ignored Translation Keys](#ignored-translation-keys)
 1. [Detecting Missing Translations](#detecting-missing-translations)
     - [CLI Usage](#cli-usage-1)
     - [Programmatic Usage](#programmatic-usage-1)
 1. [Detecting Dead Translations](#detecting-dead-translations)
     - [CLI Usage](#cli-usage-2)
     - [Programmatic Usage](#programmatic-usage-2)
-1. [Code Scanner Configuration](#code-scanner-configuration)
-    - [Included Paths](#included-paths)
-    - [Excluded Paths](#excluded-paths)
-    - [Ignored Translation Keys](#ignored-translation-keys)
+
+## How does it work?
+
+This package will directly modify your translation files like `/lang/en/messages.php` or `/lang/fr.json` for example.
+
+Both `PHP` and `JSON` files are supported.
+
+Advanced features like dead translations detection will scan your entire codebase to find unused translation strings.
 
 ## Installation
 
@@ -78,7 +88,8 @@ php artisan vendor:publish --tag="translator-config"
 ## Configuring the Driver
 
 This package uses a driver-based architecture. By default, it supports two standard drivers: PHP and JSON.
-You can create custom drivers for alternative storage methods, such as a database.
+
+You can also create custom drivers for alternative storage methods, such as a database.
 
 Set the default driver in the configuration file:
 
@@ -94,6 +105,9 @@ return [
     // ...
 ];
 ```
+
+> [!NOTE]
+> All features are supported in both PHP and JSON translation files.
 
 ## Configuring the Locales
 
@@ -149,6 +163,8 @@ Translator::driver('json')->sortTranslations(locale: 'fr');
 
 ## Automatic Translation
 
+Service: `translate`.
+
 Before translating, configure a translation service. The package supports:
 
 -   **OpenAI**
@@ -197,7 +213,13 @@ return [
 
 ### CLI Translation
 
-Translate untranslated French translations:
+Display all keys defined in the source locale (English) but not translated in the target (French):
+
+```bash
+php artisan translator:untranslated en fr
+```
+
+Translate untranslated English strings into French:
 
 ```bash
 php artisan translator:untranslated en fr --translate
@@ -209,7 +231,7 @@ Translate using a specific driver:
 php artisan translator:untranslated en fr --translate --driver=json
 ```
 
-Add a new locale with translations:
+Add a new locale (French) with their translations from a source (English):
 
 ```bash
 php artisan translator:add-locale fr en --translate
@@ -241,11 +263,17 @@ Translator::driver('json')->translateTranslations(
 
 ## Proofreading Translations
 
-Proofreading corrects grammar and syntax.
+Service: `proofread`.
+
+Proofreading corrects the grammar and syntax of your translation strings.
 
 Currently, OpenAI is the only built-in service, but custom services can be implemented.
 
+To configure OpenAI, see [Configuring OpenAI](#configuring-openai).
+
 ### CLI Proofreading
+
+Proofread all strings in the target locale (English).
 
 ```bash
 php artisan translator:proofread en
@@ -279,6 +307,8 @@ Find keys defined in one locale but missing in another.
 
 ### CLI Usage
 
+Display all keys defined in the source locale (English) but not in the target locale (French).
+
 ```bash
 php artisan translator:untranslated en fr
 ```
@@ -291,13 +321,112 @@ Translator::getUntranslatedTranslations(source: 'en', target: 'fr');
 
 ---
 
+## Code Scanner Configuration
+
+Service: `searchcode`.
+
+Both the detection of dead and missing translations rely on scanning your code.
+
+-   **Missing translations** are keys found in your codebase but missing in translation files.
+-   **Dead translations** are keys defined in your translation files but unused in your codebase.
+
+### Requirements
+
+At the moment, this package can only scan the following files:
+
+-   `.php`
+-   `.blade.php`
+
+> [!NOTE]
+> If you use a React or Vue frontend, it would not be able to scan those files, making this feature irrelevant.
+
+The default detector uses `nikic/php-parser` to scan all your `.php` files, including the Blade ones.
+
+In order to be able to detect your keys, you will have to use one of the following Laravel function:
+
+-   `__(...)`,
+-   `trans(...)`
+-   `trans_choice(...)`
+-   `\Illuminate\Support\Facades\Lang::get(...)`
+-   `\Illuminate\Support\Facades\Lang::has(...)`
+-   `\Illuminate\Support\Facades\Lang::hasForLocale(...)`
+-   `\Illuminate\Support\Facades\Lang::choice(...)`
+-   `app('translator')->get(...)`
+-   `app('translator')->has(...)`
+-   `app('translator')->hasForLocale(...)`
+-   `app('translator')->choice(...)`
+
+Or one of the following Laravel Blade directive:
+
+-   `@lang(...)`
+
+Here is some example of do's and don'ts:
+
+```php
+__('messages.home.title'); // ✅ 'messages.home.title' is detected
+
+foreach(__('messages.welcome.lines') as $line){
+    // ✅ 'messages.welcome.lines' and all of its children are detected.
+}
+
+$key = 'messages.home.title';
+__($key); // ❌ no key is detected
+```
+
+### Included Paths
+
+Specify paths to scan for translation keys. By default, both `.php` and `.blade.php` files are supported.
+
+```php
+return [
+    'searchcode' => [
+        'paths' => [
+            app_path(),
+            resource_path(),
+        ],
+    ],
+];
+```
+
+### Excluded Paths
+
+Exclude irrelevant paths for optimized scanning, such as test files or unrelated directories.
+
+```php
+return [
+    'searchcode' => [
+        'excluded_paths' => [
+            'tests'
+        ],
+    ],
+];
+```
+
+### Ignored Translation Keys
+
+Ignore specific translation keys:
+
+```php
+return [
+    'searchcode' => [
+        'ignored_translations' => [
+            'countries', // Ignore keys starting with 'countries'.
+        ],
+    ],
+];
+```
+
+---
+
 ## Detecting Missing Translations
+
+Service: `searchcode`.
 
 Missing translations are keys found in your codebase but missing in translation files.
 
 ### CLI Usage
 
-Find the missing keys in your default driver:
+Find keys defined in your codebase but missing in your locale (English) using your default driver:
 
 ```bash
 php artisan translator:missing en
@@ -325,12 +454,14 @@ Translator::getMissingTranslations(locale: 'en');
 
 ## Detecting Dead Translations
 
-Dead translations are keys defined in your files but unused in your codebase.
+Service: `searchcode`.
+
+Dead translations are keys defined in your locale (English) but unused in your codebase.
 
 ### CLI Usage
 
 ```bash
-php artisan translator:dead fr
+php artisan translator:dead en
 ```
 
 ### Programmatic Usage
@@ -338,45 +469,6 @@ php artisan translator:dead fr
 ```php
 Translator::getDeadTranslations(locale: 'fr');
 ```
-
----
-
-## Code Scanner Configuration
-
-### Included Paths
-
-Specify paths to scan for translation keys. By default, both `.php` and `.blade.php` files are supported.
-
-```php
-return [
-    'searchcode' => [
-        'paths' => [
-            app_path(),
-            resource_path(),
-        ],
-    ],
-];
-```
-
-### Excluded Paths
-
-Exclude irrelevant paths for optimized scanning, such as test files or unrelated directories.
-
-### Ignored Translation Keys
-
-Ignore specific translation keys:
-
-```php
-return [
-    'searchcode' => [
-        'ignored_translations' => [
-            'countries', // Ignore keys starting with 'countries'.
-        ],
-    ],
-];
-```
-
----
 
 ## Testing
 
