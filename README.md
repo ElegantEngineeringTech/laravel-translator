@@ -31,6 +31,11 @@ Easily manage all your Laravel translation strings with powerful features:
 1. [Configuring the Locales](#configuring-the-locales)
     - [Automatic Detection](#automatic-detection)
     - [Manual Setup](#manual-setup)
+1. [Configuring the Code Scanner](#configuring-the-code-scanner)
+    - [Requirements](#requirements)
+    - [Included Paths](#included-paths)
+    - [Excluded Paths](#excluded-paths)
+    - [Ignored Translation Keys](#ignored-translation-keys)
 1. [Sorting and Formatting](#sorting-and-formatting)
     - [CLI Commands](#cli-commands)
     - [Using Code](#using-code)
@@ -45,11 +50,6 @@ Easily manage all your Laravel translation strings with powerful features:
 1. [Identifying Untranslated Translations](#identifying-untranslated-translations)
     - [CLI Usage](#cli-usage)
     - [Programmatic Usage](#programmatic-usage)
-1. [Code Scanner Configuration](#code-scanner-configuration)
-    - [Requirements](#requirements)
-    - [Included Paths](#included-paths)
-    - [Excluded Paths](#excluded-paths)
-    - [Ignored Translation Keys](#ignored-translation-keys)
 1. [Detecting Missing Translations](#detecting-missing-translations)
     - [CLI Usage](#cli-usage-1)
     - [Programmatic Usage](#programmatic-usage-1)
@@ -141,6 +141,108 @@ return [
     // ...
     'locales' => ['en', 'fr', 'es'],
     // ...
+];
+```
+
+---
+
+## Configuring the Code Scanner
+
+Service: `searchcode`.
+
+Features:
+
+-   [Detecting Missing Translations](#detecting-missing-translations)
+-   [Detecting Dead Translations](#detecting-dead-translations)
+
+Both the detection of dead and missing translations rely on scanning your code.
+
+-   **Missing translations** are keys found in your codebase but missing in translation files.
+-   **Dead translations** are keys defined in your translation files but unused in your codebase.
+
+### Requirements
+
+At the moment, this package can only scan the following files:
+
+-   `.php`
+-   `.blade.php`
+
+> [!NOTE]
+> If you use a React or Vue frontend, it would not be able to scan those files, making this feature irrelevant.
+
+The default detector uses `nikic/php-parser` to scan all your `.php` files, including the Blade ones.
+
+In order to be able to detect your keys, you will have to use one of the following Laravel function:
+
+-   `__(...)`,
+-   `trans(...)`
+-   `trans_choice(...)`
+-   `\Illuminate\Support\Facades\Lang::get(...)`
+-   `\Illuminate\Support\Facades\Lang::has(...)`
+-   `\Illuminate\Support\Facades\Lang::hasForLocale(...)`
+-   `\Illuminate\Support\Facades\Lang::choice(...)`
+-   `app('translator')->get(...)`
+-   `app('translator')->has(...)`
+-   `app('translator')->hasForLocale(...)`
+-   `app('translator')->choice(...)`
+
+Or one of the following Laravel Blade directive:
+
+-   `@lang(...)`
+
+Here is some example of do's and don'ts:
+
+```php
+__('messages.home.title'); // ✅ 'messages.home.title' is detected
+
+foreach(__('messages.welcome.lines') as $line){
+    // ✅ 'messages.welcome.lines' and all of its children are detected.
+}
+
+$key = 'messages.home.title';
+__($key); // ❌ no key is detected
+```
+
+### Included Paths
+
+Specify paths to scan for translation keys. By default, both `.php` and `.blade.php` files are supported.
+
+```php
+return [
+    'searchcode' => [
+        'paths' => [
+            app_path(),
+            resource_path(),
+        ],
+    ],
+];
+```
+
+### Excluded Paths
+
+Exclude irrelevant paths for optimized scanning, such as test files or unrelated directories.
+
+```php
+return [
+    'searchcode' => [
+        'excluded_paths' => [
+            'tests'
+        ],
+    ],
+];
+```
+
+### Ignored Translation Keys
+
+Ignore specific translation keys:
+
+```php
+return [
+    'searchcode' => [
+        'ignored_translations' => [
+            'countries', // Ignore keys starting with 'countries'.
+        ],
+    ],
 ];
 ```
 
@@ -340,106 +442,10 @@ Translator::getUntranslatedTranslations(source: 'en', target: 'fr');
 
 ---
 
-## Code Scanner Configuration
-
-Service: `searchcode`.
-
-Both the detection of dead and missing translations rely on scanning your code.
-
--   **Missing translations** are keys found in your codebase but missing in translation files.
--   **Dead translations** are keys defined in your translation files but unused in your codebase.
-
-### Requirements
-
-At the moment, this package can only scan the following files:
-
--   `.php`
--   `.blade.php`
-
-> [!NOTE]
-> If you use a React or Vue frontend, it would not be able to scan those files, making this feature irrelevant.
-
-The default detector uses `nikic/php-parser` to scan all your `.php` files, including the Blade ones.
-
-In order to be able to detect your keys, you will have to use one of the following Laravel function:
-
--   `__(...)`,
--   `trans(...)`
--   `trans_choice(...)`
--   `\Illuminate\Support\Facades\Lang::get(...)`
--   `\Illuminate\Support\Facades\Lang::has(...)`
--   `\Illuminate\Support\Facades\Lang::hasForLocale(...)`
--   `\Illuminate\Support\Facades\Lang::choice(...)`
--   `app('translator')->get(...)`
--   `app('translator')->has(...)`
--   `app('translator')->hasForLocale(...)`
--   `app('translator')->choice(...)`
-
-Or one of the following Laravel Blade directive:
-
--   `@lang(...)`
-
-Here is some example of do's and don'ts:
-
-```php
-__('messages.home.title'); // ✅ 'messages.home.title' is detected
-
-foreach(__('messages.welcome.lines') as $line){
-    // ✅ 'messages.welcome.lines' and all of its children are detected.
-}
-
-$key = 'messages.home.title';
-__($key); // ❌ no key is detected
-```
-
-### Included Paths
-
-Specify paths to scan for translation keys. By default, both `.php` and `.blade.php` files are supported.
-
-```php
-return [
-    'searchcode' => [
-        'paths' => [
-            app_path(),
-            resource_path(),
-        ],
-    ],
-];
-```
-
-### Excluded Paths
-
-Exclude irrelevant paths for optimized scanning, such as test files or unrelated directories.
-
-```php
-return [
-    'searchcode' => [
-        'excluded_paths' => [
-            'tests'
-        ],
-    ],
-];
-```
-
-### Ignored Translation Keys
-
-Ignore specific translation keys:
-
-```php
-return [
-    'searchcode' => [
-        'ignored_translations' => [
-            'countries', // Ignore keys starting with 'countries'.
-        ],
-    ],
-];
-```
-
----
-
 ## Detecting Missing Translations
 
 Service: `searchcode`.
+Configuration: [Configuring the Code Scanner](#configuring-the-code-scanner)
 
 Missing translations are keys found in your codebase but missing in translation files.
 
@@ -474,6 +480,7 @@ Translator::getMissingTranslations(locale: 'en');
 ## Detecting Dead Translations
 
 Service: `searchcode`.
+Configuration: [Configuring the Code Scanner](#configuring-the-code-scanner)
 
 Dead translations are keys defined in your locale (English) but unused in your codebase.
 
