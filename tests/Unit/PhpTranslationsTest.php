@@ -147,7 +147,7 @@ it('encodes dot to unicode', function () {
     ]);
 
     expect($translations->toArray())->toBe([
-        'This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+        'This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children.',
     ]);
 
 });
@@ -155,10 +155,10 @@ it('encodes dot to unicode', function () {
 it('decodes dot from unicode', function () {
 
     $translations = PhpTranslations::toUndot([
-        'This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children&#46;',
+        'This key contains a dot&#46; In the middle.And it&#46;has children&#46;' => 'And it has children.',
     ]);
 
-    expect($translations->toArray())->toBe([
+    expect($translations)->toBe([
         'This key contains a dot. In the middle' => [
             'And it.has children.' => 'And it has children.',
         ],

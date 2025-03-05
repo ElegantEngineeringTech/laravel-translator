@@ -130,7 +130,7 @@ class PhpDriver extends Driver
 
     public function saveTranslations(string $locale, Translations $translations): Translations
     {
-        $undot = PhpTranslations::toUndot($translations)->all();
+        $undot = PhpTranslations::toUndot($translations);
 
         foreach ($undot as $namespace => $values) {
 
