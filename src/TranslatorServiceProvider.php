@@ -7,6 +7,7 @@ namespace Elegantly\Translator;
 use Elegantly\Translator\Commands\AddLocaleCommand;
 use Elegantly\Translator\Commands\ClearCacheCommand;
 use Elegantly\Translator\Commands\DeadCommand;
+use Elegantly\Translator\Commands\ExportCommand;
 use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
 use Elegantly\Translator\Commands\ProofreadCommand;
@@ -16,6 +17,8 @@ use Elegantly\Translator\Contracts\ValidateLocales;
 use Elegantly\Translator\Drivers\Driver;
 use Elegantly\Translator\Drivers\JsonDriver;
 use Elegantly\Translator\Drivers\PhpDriver;
+use Elegantly\Translator\Services\Exporter\CsvExporterService;
+use Elegantly\Translator\Services\Exporter\ExporterInterface;
 use Elegantly\Translator\Services\Proofread\OpenAiService as ProofreadOpenAiService;
 use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
@@ -48,6 +51,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 UntranslatedCommand::class,
                 ProofreadCommand::class,
                 ClearCacheCommand::class,
+                ExportCommand::class,
             ]);
     }
 
@@ -59,6 +63,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 translateService: static::getTranslateServiceFromConfig(),
                 proofreadService: static::getProofreadServiceFromConfig(),
                 searchcodeService: static::getSearchcodeServiceFromConfig(),
+                exporter: static::getExporterServiceFromConfig(),
             );
         });
     }
@@ -116,6 +121,21 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
         return match ($service) {
             'php-parser' => PhpParserService::make(),
+            default => $service::make(),
+        };
+    }
+
+    public static function getExporterServiceFromConfig(?string $serviceName = null): ?ExporterInterface
+    {
+        /** @var string|null $service */
+        $service = $serviceName ?? config('translator.exporter.service', CsvExporterService::class);
+
+        if (! $service) {
+            return null;
+        }
+
+        return match ($service) {
+            'csv' => CsvExporterService::make(),
             default => $service::make(),
         };
     }

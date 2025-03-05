@@ -56,6 +56,12 @@ Easily manage all your Laravel translation strings with powerful features:
 1. [Detecting Dead Translations](#detecting-dead-translations)
     - [CLI Usage](#cli-usage-2)
     - [Programmatic Usage](#programmatic-usage-2)
+1. [Export to a CSV](#export-to-a-csv)
+    - [CLI Usage](#cli-usage-3)
+    - [Programmatic Usage](#programmatic-usage-3)
+1. [Import from a CSV](#import-from-a-csv)
+    - [CLI Usage](#cli-usage-4)
+    - [Programmatic Usage](#programmatic-usage-4)
 
 ## How does it work?
 
@@ -494,6 +500,50 @@ php artisan translator:dead en
 
 ```php
 Translator::getDeadTranslations(locale: 'fr');
+```
+
+## Export to a CSV
+
+Service: `exporter`
+
+Export all your translation strings to a CSV file in the following format:
+
+| Key                 | English | French    |
+| ------------------- | ------- | --------- |
+| messages.auth.login | Login   | Connexion |
+
+### CLI Usage
+
+```bash
+php artisan translator:export /path/to/my/file.csv
+```
+
+### Programmatic Usage
+
+```php
+$path = Translator::exportTranslations('/path/to/my/file.csv');
+```
+
+## Import from a CSV
+
+Service: `exporter`
+
+Import translation strings from a CSV file. Ensure your CSV follows the format below:
+
+| Key                 | English | French    |
+| ------------------- | ------- | --------- |
+| messages.auth.login | Login   | Connexion |
+
+### CLI Usage
+
+```bash
+php artisan translator:import /path/to/my/file.csv
+```
+
+### Programmatic Usage
+
+```php
+$translations = Translator::importTranslations('/path/to/my/file.csv');
 ```
 
 ## Testing

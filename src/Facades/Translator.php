@@ -6,6 +6,7 @@ namespace Elegantly\Translator\Facades;
 
 use Elegantly\Translator\Collections\Translations;
 use Elegantly\Translator\Drivers\Driver;
+use Elegantly\Translator\Services\Exporter\ExporterInterface;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static Translations deleteTranslations(string $locale, array<int, string> $keys)
  * @method static Translations sortTranslations(string $locale)
  * @method static Translations saveTranslations(string $locale, Translations $translations)
+ * @method static string exportTranslations(string $path, ?ExporterInterface $exporter = null)
+ * @method static array<string, array<int|string, scalar>> importTranslations(string $path, ?ExporterInterface $exporter = null)
  * @method static void clearCache()
  *
  * @see \Elegantly\Translator\Translator

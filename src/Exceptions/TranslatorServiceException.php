@@ -22,4 +22,9 @@ class TranslatorServiceException extends Exception
     {
         return new self('The searchcode service is missing. Please define a searchcode service in configs.');
     }
+
+    public static function missingExporterService(): self
+    {
+        return new self('The exporter service is missing. Please define an exporter service in configs.');
+    }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Elegantly\Translator\Drivers\PhpDriver;
+use Elegantly\Translator\Services\Exporter\CsvExporterService;
 use Elegantly\Translator\Support\LocaleValidator;
 
 return [
@@ -173,6 +174,19 @@ return [
             ],
         ],
 
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exporter/Importer Service
+    |--------------------------------------------------------------------------
+    |
+    | These are the services that can be used to export and import your translations.
+    | You can customize their behavior here, or you can define your own service.
+    |
+    */
+    'exporter' => [
+        'service' => CsvExporterService::class,
     ],
 
 ];

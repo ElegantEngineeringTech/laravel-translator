@@ -8,6 +8,7 @@ use Closure;
 use Elegantly\Translator\Collections\Translations;
 use Elegantly\Translator\Drivers\Driver;
 use Elegantly\Translator\Exceptions\TranslatorServiceException;
+use Elegantly\Translator\Services\Exporter\ExporterInterface;
 use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
@@ -19,6 +20,7 @@ class Translator
         public ?TranslateServiceInterface $translateService = null,
         public ?ProofreadServiceInterface $proofreadService = null,
         public ?SearchCodeServiceInterface $searchcodeService = null,
+        public ?ExporterInterface $exporter = null,
     ) {
         //
     }
@@ -29,7 +31,8 @@ class Translator
             driver: $name instanceof Driver ? $name : TranslatorServiceProvider::getDriverFromConfig($name),
             translateService: $this->translateService,
             proofreadService: $this->proofreadService,
-            searchcodeService: $this->searchcodeService
+            searchcodeService: $this->searchcodeService,
+            exporter: $this->exporter,
         );
     }
 
@@ -325,6 +328,56 @@ class Translator
             $translations
         );
 
+    }
+
+    public function exportTranslations(
+        string $path,
+        ?ExporterInterface $exporter = null
+    ): string {
+        $exporter = $exporter ?? $this->exporter;
+
+        if (! $exporter) {
+            throw TranslatorServiceException::missingExporterService();
+        }
+
+        $locales = $this->getLocales();
+
+        $translationsByLocale = collect($locales)
+            ->mapWithKeys(fn ($locale) => [$locale => $this->getTranslations($locale)])
+            ->all();
+
+        return $exporter->export($translationsByLocale, $path);
+
+    }
+
+    /**
+     * @return array<string, array<int|string, scalar>>
+     */
+    public function importTranslations(
+        string $path,
+        ?ExporterInterface $exporter = null
+    ): array {
+        $exporter = $exporter ?? $this->exporter;
+
+        if (! $exporter) {
+            throw TranslatorServiceException::missingExporterService();
+        }
+
+        $translationsByLocale = $exporter->import($path);
+
+        foreach ($translationsByLocale as $locale => $values) {
+
+            $this->transformTranslations(
+                locale: $locale,
+                callback: function ($translations) use ($values) {
+                    return $translations->merge($values);
+                },
+                sort: config()->boolean('translator.sort_keys'),
+            );
+
+        }
+
+        return $translationsByLocale;
     }
 
     public function clearCache(): void
