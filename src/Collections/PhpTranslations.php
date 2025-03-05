@@ -177,7 +177,7 @@ class PhpTranslations extends Translations
     public static function toDot(array $values): static
     {
         return new static(
-            Arr::dot(static::prepareTranslations($values))
+            Arr::dot(static::prepareTranslations($values) ?? [])
         );
     }
 
@@ -189,7 +189,7 @@ class PhpTranslations extends Translations
     {
         $translations = $translations instanceof Translations ? $translations->all() : $translations;
 
-        return static::unprepareTranslations(Arr::undot((array) $translations));
+        return static::unprepareTranslations(Arr::undot($translations));
     }
 
     /**
