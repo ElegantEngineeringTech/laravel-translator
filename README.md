@@ -14,6 +14,7 @@ Easily manage all your Laravel translation strings with powerful features:
 -   **Find missing** translation strings across locales.
 -   **Detect unused** translation keys in your codebase.
 -   **Sort** translations in natural order.
+-   **Import & Export** translations in a CSV file.
 
 ---
 
