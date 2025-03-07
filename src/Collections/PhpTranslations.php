@@ -189,7 +189,7 @@ class PhpTranslations extends Translations
     {
         $translations = $translations instanceof Translations ? $translations->all() : $translations;
 
-        return static::unprepareTranslations(Arr::undot($translations));
+        return static::unprepareTranslations(Arr::undot($translations)) ?? [];
     }
 
     /**
