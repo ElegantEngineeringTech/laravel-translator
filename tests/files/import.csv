@@ -1,3 +1,5 @@
 ﻿key,en,fr
 messages.hello,Hello,Bonjour
 messages.add,Add,Ajouter
+messages.nested.foo,Foo,
+messages.nested,,Nested

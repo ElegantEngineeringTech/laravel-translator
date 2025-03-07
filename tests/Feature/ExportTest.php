@@ -23,6 +23,12 @@ it('exports all locales and keys to a csv file', function () {
     Storage::disk('csv')->assertExists($file);
 });
 
+/**
+ * Warning
+ *
+ * Conflicts might occur when keys are different between locales
+ * If `en` define `auth.message.title` and `fr` define `auth.message`, `auth.message.title` might be overriden
+ */
 it('imports all locales and keys from a csv file', function () {
     $translator = new Translator(
         driver: $this->getPhpDriver(),
@@ -35,10 +41,12 @@ it('imports all locales and keys from a csv file', function () {
         'en' => [
             'messages.hello' => 'Hello',
             'messages.add' => 'Add',
+            'messages.nested.foo' => 'Foo',
         ],
         'fr' => [
             'messages.hello' => 'Bonjour',
             'messages.add' => 'Ajouter',
+            'messages.nested' => 'Nested',
         ],
     ]);
 

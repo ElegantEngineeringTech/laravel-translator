@@ -74,7 +74,9 @@ class CsvExporterService implements ExporterInterface
                     $translationsByLocale[$locale] = [];
                 }
 
-                $translationsByLocale[$locale][$key] = $value;
+                if ($value) {
+                    $translationsByLocale[$locale][$key] = $value;
+                }
 
             }
 
