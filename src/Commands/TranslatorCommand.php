@@ -16,6 +16,7 @@ class TranslatorCommand extends Command
 {
     public function getDriverName(): ?string
     {
+        /** @var string */
         return $this->option('driver');
     }
 

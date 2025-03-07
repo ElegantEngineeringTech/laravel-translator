@@ -21,6 +21,7 @@ class ProofreadCommand extends TranslatorCommand implements PromptsForMissingInp
 
     public function handle(): int
     {
+        /** @var string $locale */
         $locale = $this->argument('locale');
 
         $translator = $this->getTranslator();

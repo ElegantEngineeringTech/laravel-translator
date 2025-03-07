@@ -19,8 +19,10 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
 
     public function handle(): int
     {
-        $source = (string) $this->argument('source');
-        $target = (string) $this->argument('target');
+        /** @var string $source */
+        $source = $this->argument('source');
+        /** @var string $target */
+        $target = $this->argument('target');
         $translate = (bool) $this->option('translate');
 
         $translator = $this->getTranslator();

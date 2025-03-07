@@ -21,6 +21,7 @@ class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
 
     public function handle(): int
     {
+        /** @var string $locale */
         $locale = $this->argument('locale');
         $sync = (bool) $this->option('sync');
 

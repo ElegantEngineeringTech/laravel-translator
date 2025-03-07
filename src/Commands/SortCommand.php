@@ -20,6 +20,7 @@ class SortCommand extends TranslatorCommand implements PromptsForMissingInput
 
     public function handle(): int
     {
+        /** @var string $locale */
         $locale = $this->argument('locale');
 
         $translator = $this->getTranslator();

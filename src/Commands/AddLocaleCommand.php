@@ -21,8 +21,10 @@ class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInp
 
     public function handle(): int
     {
-        $locale = (string) $this->argument('locale');
-        $source = (string) $this->argument('source');
+        /** @var string $locale */
+        $locale = $this->argument('locale');
+        /** @var string $source */
+        $source = $this->argument('source');
         $translate = (bool) $this->option('translate');
 
         $translator = $this->getTranslator();
