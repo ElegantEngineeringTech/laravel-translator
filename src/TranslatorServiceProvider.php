@@ -70,7 +70,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
 
     public static function getDriverFromConfig(?string $driverName = null): Driver
     {
-        $driver = $driverName ?? config()->string('translator.driver');
+        $driver = $driverName ?? config('translator.driver');
 
         return match ($driver) {
             'php' => PhpDriver::make(),

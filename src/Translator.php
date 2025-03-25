@@ -145,7 +145,7 @@ class Translator
             callback: function ($translations) use ($values) {
                 return $translations->merge($values);
             },
-            sort: config()->boolean('translator.sort_keys'),
+            sort: (bool) config('translator.sort_keys'),
         );
     }
 
@@ -192,7 +192,7 @@ class Translator
 
                 return $translations->merge($translatedValues);
             },
-            sort: config()->boolean('translator.sort_keys'),
+            sort: (bool) config('translator.sort_keys'),
         )->only($keys);
     }
 
@@ -241,7 +241,7 @@ class Translator
 
                 return $translations->merge($proofreadValues);
             },
-            sort: config()->boolean('translator.sort_keys'),
+            sort: (bool) config('translator.sort_keys'),
         )->only($keys);
     }
 
@@ -372,7 +372,7 @@ class Translator
                 callback: function ($translations) use ($values) {
                     return $translations->merge($values);
                 },
-                sort: config()->boolean('translator.sort_keys'),
+                sort: (bool) config('translator.sort_keys'),
             );
 
         }

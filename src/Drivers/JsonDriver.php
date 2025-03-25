@@ -23,7 +23,7 @@ class JsonDriver extends Driver
         return new static(
             storage: Storage::build([
                 'driver' => 'local',
-                'root' => config()->string('translator.lang_path'),
+                'root' => config('translator.lang_path'),
                 ...$config,
             ])
         );

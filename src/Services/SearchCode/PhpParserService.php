@@ -46,7 +46,7 @@ class PhpParserService implements SearchCodeServiceInterface
     public static function make(): self
     {
         return new self(
-            paths: config()->array('translator.searchcode.paths'),
+            paths: config('translator.searchcode.paths'),
             excludedPaths: config('translator.searchcode.excluded_paths', []),
             cachePath: config('translator.searchcode.services.php-parser.cache_path')
         );
