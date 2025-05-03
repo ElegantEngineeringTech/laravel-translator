@@ -509,9 +509,9 @@ Service: `exporter`
 
 Export all your translation strings to a CSV file in the following format:
 
-| Key                 | English | French    |
-| ------------------- | ------- | --------- |
-| messages.auth.login | Login   | Connexion |
+| Key                 | en    | fr        |
+| ------------------- | ----- | --------- |
+| messages.auth.login | Login | Connexion |
 
 ### CLI Usage
 
@@ -531,9 +531,9 @@ Service: `exporter`
 
 Import translation strings from a CSV file. Ensure your CSV follows the format below:
 
-| Key                 | English | French    |
-| ------------------- | ------- | --------- |
-| messages.auth.login | Login   | Connexion |
+| Key                 | en    | fr        |
+| ------------------- | ----- | --------- |
+| messages.auth.login | Login | Connexion |
 
 ### CLI Usage
 
