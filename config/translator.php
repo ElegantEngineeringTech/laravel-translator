@@ -65,9 +65,6 @@ return [
             'base_uri' => env('OPENAI_BASE_URI'),
             'project' => env('OPENAI_PROJECT'),
         ],
-        'deepl' => [
-            'key' => env('DEEPL_KEY'),
-        ],
     ],
 
     /*
@@ -81,7 +78,7 @@ return [
     */
     'translate' => [
         /**
-         * Supported: 'openai', 'deepl', 'MyOwnServiceClass::name'
+         * Supported: 'openai', 'MyOwnServiceClass::name'
          * Define your own service using the class's name: 'MyOwnServiceClass::class'
          */
         'service' => null,

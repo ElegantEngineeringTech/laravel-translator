@@ -9,8 +9,8 @@
 
 Easily manage all your Laravel translation strings with powerful features:
 
--   **Translate** strings into other languages using DeepL, OpenAI, or custom services.
--   **Proofread** translations to fix grammar and syntax automatically (via OpenAI or custom services).
+-   **Translate** strings into other languages using OpenAI, Claude, Gemini or custom services.
+-   **Proofread** translations to fix grammar and syntax automatically (using OpenAI, Claude, Gemini or custom service).
 -   **Find missing** translation strings across locales.
 -   **Detect unused** translation keys in your codebase.
 -   **Sort** translations in natural order.
