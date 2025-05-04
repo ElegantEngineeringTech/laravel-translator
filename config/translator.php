@@ -62,6 +62,8 @@ return [
             'key' => env('OPENAI_API_KEY'),
             'organization' => env('OPENAI_ORGANIZATION'),
             'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
+            'base_uri' => env('OPENAI_BASE_URI'),
+            'project' => env('OPENAI_PROJECT'),
         ],
         'deepl' => [
             'key' => env('DEEPL_KEY'),
@@ -86,12 +88,12 @@ return [
         'services' => [
             'openai' => [
                 'model' => 'gpt-4o-mini',
-                'prompt' => "
-                            As an experienced copywriter and translator specializing in website copy, your task is to translate the provided content from a specific website. 
-                            Your translations should maintain the original tone while being adapted to the target language, ensuring they are both relevant and clear. 
-                            The content will be provided in JSON format, and you must translate it to the locale '{targetLocale}'. 
-                            Ensure that all JSON keys remain preserved and unchanged.
-                            ",
+                'prompt' => '
+                           You are an experienced copywriter and translator with a focus on website content.
+                           Your task is to translate the provided website copy, formatted in JSON, into the target locale: {targetLocale}.
+                           Preserve all JSON keys exactly as they are. 
+                           Adapt the tone, clarity, and relevance of the content to suit the target language while staying true to the original intent.
+                        ',
             ],
         ],
     ],
@@ -115,11 +117,11 @@ return [
             'openai' => [
                 'model' => 'gpt-4o-mini',
                 'prompt' => '
-                            Fix the grammar and syntax of the following JSON string while respecting the following rules:
-                                - Never change the keys.
-                                - Do not escape or modify HTML tags.
-                                - Do not escape or modify special characters or emojis.
-                                - Do not change the meaning or tone of the sentences.
+                            Correct the grammar and syntax of the following JSON string while strictly adhering to these rules:
+                            - Do not modify the JSON keys.
+                            - Do not escape or alter HTML tags.
+                            - Do not escape or change special characters or emojis.
+                            - Preserve the original meaning and tone of each sentence.
                             ',
             ],
         ],

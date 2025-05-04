@@ -10,9 +10,7 @@ use OpenAI;
 class OpenAiService implements TranslateServiceInterface
 {
     public function __construct(
-        public string $apiKey,
-        public ?string $organization,
-        public int $timeout,
+        public \OpenAI\Client $client,
         public string $model,
         public string $prompt,
     ) {
@@ -22,26 +20,34 @@ class OpenAiService implements TranslateServiceInterface
     public static function make(): self
     {
         return new self(
-            apiKey: config('translator.services.openai.key') ?? config('translator.translate.services.openai.key'),
-            organization: config('translator.services.openai.organization') ?? config('translator.translate.services.openai.organization'),
-            timeout: config('translator.services.openai.request_timeout') ?? config('translator.translate.services.openai.request_timeout') ?? 120,
+            client: static::makeClient(),
             model: config('translator.translate.services.openai.model'),
             prompt: config('translator.translate.services.openai.prompt'),
         );
     }
 
-    public function getOpenAI(): \OpenAI\Client
+    public static function makeClient(): \OpenAI\Client
     {
-        if (blank($this->apiKey)) {
-            throw throw new InvalidArgumentException(
-                'The OpenAI API Key is missing. Please publish the [translator.php] configuration file and set the [translator.translate.services.openai.key].'
+        $baseUri = config('translator.translate.services.openai.base_uri') ?? config('translator.services.openai.base_uri') ?? 'api.openai.com/v1';
+        $apiKey = config('translator.translate.services.openai.key') ?? config('translator.services.openai.key');
+        $organization = config('translator.translate.services.openai.organization') ?? config('translator.services.openai.organization');
+        $project = config('translator.translate.services.openai.project') ?? config('translator.services.openai.project');
+        $timeout = config('translator.translate.services.openai.request_timeout') ?? config('translator.services.openai.request_timeout') ?? 120;
+
+        if (blank($apiKey)) {
+            throw new InvalidArgumentException(
+                'The OpenAI API Key is missing. Please publish the [translator.php] configuration file and set the [translator.services.openai.key] value.'
             );
         }
 
-        return OpenAI::client(
-            apiKey: $this->apiKey,
-            organization: $this->organization,
-        );
+        return OpenAI::factory()
+            ->withBaseUri($baseUri)
+            ->withApiKey($apiKey)
+            ->withOrganization($organization)
+            ->withProject($project)
+            ->withHttpHeader('OpenAI-Beta', 'assistants=v2')
+            ->withHttpClient(new \GuzzleHttp\Client(['timeout' => $timeout]))
+            ->make();
     }
 
     public function translateAll(array $texts, string $targetLocale): array
@@ -49,7 +55,7 @@ class OpenAiService implements TranslateServiceInterface
         return collect($texts)
             ->chunk(20)
             ->map(function ($chunk) use ($targetLocale) {
-                $response = $this->getOpenAI()->chat()->create([
+                $response = $this->client->chat()->create([
                     'model' => $this->model,
                     'response_format' => ['type' => 'json_object'],
                     'messages' => [

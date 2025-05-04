@@ -42,7 +42,7 @@ Easily manage all your Laravel translation strings with powerful features:
     - [Using Code](#using-code)
 1. [Automatic Translation](#automatic-translation)
     - [Configuring OpenAI](#configuring-openai)
-    - [Configuring DeepL](#configuring-deepl)
+    - [Using Claude](#using-claude)
     - [CLI Translation](#cli-translation)
     - [Programmatic Translation](#programmatic-translation)
 1. [Proofreading Translations](#proofreading-translations)
@@ -296,7 +296,7 @@ Service: `translate`.
 Before translating, configure a translation service. The package supports:
 
 -   **OpenAI**
--   **DeepL**
+-   Any model compatible with the OpenAI SDK
 
 Custom translation services can also be implemented.
 
@@ -313,6 +313,8 @@ return [
             'key' => env('OPENAI_API_KEY'),
             'organization' => env('OPENAI_ORGANIZATION'),
             'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
+            'base_uri' => env('OPENAI_BASE_URI'),
+            'project' => env('OPENAI_PROJECT'),
         ],
     ],
 
@@ -320,24 +322,28 @@ return [
 ];
 ```
 
-### Configuring DeepL
+### Using Claude
 
-Add your DeepL API key to the configuration file or environment variables:
+Anthropic offers an [API compatible with the OpenAI SDK](https://docs.anthropic.com/en/api/openai-sdk). To integrate Claude using this SDK, you simply need to update the `base_uri` to point to Anthropic's endpoint and use your Anthropic API key.
+
+Here’s a sample configuration in PHP:
 
 ```php
 return [
     // ...
 
     'services' => [
-        // ...
-        'deepl' => [
-            'key' => env('DEEPL_KEY'),
+        'openai' => [
+            'key' => env('ANTHROPIC_API_KEY'),
+            'base_uri' => 'https://api.anthropic.com/v1',
         ],
     ],
 
     // ...
 ];
 ```
+
+> 💡 **Note:** Ensure your `ANTHROPIC_API_KEY` is set in your environment variables.
 
 ### CLI Translation
 

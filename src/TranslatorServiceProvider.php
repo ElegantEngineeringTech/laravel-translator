@@ -23,7 +23,6 @@ use Elegantly\Translator\Services\Proofread\OpenAiService as ProofreadOpenAiServ
 use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
-use Elegantly\Translator\Services\Translate\DeepLService;
 use Elegantly\Translator\Services\Translate\OpenAiService;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Elegantly\Translator\Support\LocaleValidator;
@@ -89,7 +88,6 @@ class TranslatorServiceProvider extends PackageServiceProvider
         }
 
         return match ($service) {
-            'deepl' => DeepLService::make(),
             'openai' => OpenAiService::make(),
             default => $service::make(),
         };

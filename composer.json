@@ -20,7 +20,6 @@
     ],
     "require": {
         "php": "^8.2",
-        "deeplcom/deepl-php": "^1.7",
         "illuminate/contracts": "^10.0||^11.0||^12.0",
         "nikic/php-parser": "^5.1",
         "openai-php/laravel": "^0.11",
