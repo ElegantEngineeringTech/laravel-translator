@@ -62,7 +62,7 @@ return [
             'key' => env('OPENAI_API_KEY'),
             'organization' => env('OPENAI_ORGANIZATION'),
             'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
-            'base_uri' => env('OPENAI_BASE_URI'),
+            'base_uri' => env('OPENAI_BASE_URL'),
             'project' => env('OPENAI_PROJECT'),
         ],
     ],
