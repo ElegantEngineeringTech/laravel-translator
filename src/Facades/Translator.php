@@ -7,10 +7,16 @@ namespace Elegantly\Translator\Facades;
 use Elegantly\Translator\Collections\Translations;
 use Elegantly\Translator\Drivers\Driver;
 use Elegantly\Translator\Services\Exporter\ExporterInterface;
+use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
+use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
+use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \Elegantly\Translator\Translator driver(null|string|Driver $name)
+ * @method static withProofreadService(ProofreadServiceInterface $service)
+ * @method static withTranslateService(TranslateServiceInterface $service)
+ * @method static withSearchcodeService(SearchCodeServiceInterface $service)
  * @method static array<int, string> getLocales()
  * @method static Translations getTranslations(string $locale)
  * @method static array<string, array{ count: int, files: string[] }> getMissingTranslations(string $locale)

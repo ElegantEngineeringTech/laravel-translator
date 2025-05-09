@@ -36,6 +36,39 @@ class Translator
         );
     }
 
+    public function withProofreadService(ProofreadServiceInterface $service): static
+    {
+        return new static(
+            driver: $this->driver,
+            translateService: $this->translateService,
+            proofreadService: $service,
+            searchcodeService: $this->searchcodeService,
+            exporter: $this->exporter
+        );
+    }
+
+    public function withTranslateService(TranslateServiceInterface $service): static
+    {
+        return new static(
+            driver: $this->driver,
+            translateService: $service,
+            proofreadService: $this->proofreadService,
+            searchcodeService: $this->searchcodeService,
+            exporter: $this->exporter
+        );
+    }
+
+    public function withSearchcodeService(SearchCodeServiceInterface $service): static
+    {
+        return new static(
+            driver: $this->driver,
+            translateService: $this->translateService,
+            proofreadService: $this->proofreadService,
+            searchcodeService: $service,
+            exporter: $this->exporter
+        );
+    }
+
     /**
      * @return array<int, string>
      */
