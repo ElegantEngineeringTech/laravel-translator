@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static Translations getUntranslatedTranslations(string $source, string $target)
  * @method static Translations setTranslations(string $locale, array<string, scalar|null> $values)
  * @method static Translations translateTranslations(string $source, string $target, array<int, string> $keys)
- * @method static Translations proofreadTranslations(string $locale, array<int, string> $keys)
+ * @method static Translations proofreadTranslations(string $locale, array<int, string> $keys, ?ProofreadServiceInterface $service = null)
  * @method static Translations deleteTranslations(string $locale, array<int, string> $keys)
  * @method static Translations sortTranslations(string $locale)
  * @method static Translations saveTranslations(string $locale, Translations $translations)
