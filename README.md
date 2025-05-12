@@ -20,7 +20,7 @@ Easily manage all your Laravel translation strings with powerful features:
 
 ## Try Laratranslate – A Powerful UI for Managing Translations
 
-[![Laratranslate](https://elegantengineering.tech/assets/laratranslate/opengraph.jpg)](https://elegantengineering.tech/laratranslate/)
+[![Laratranslate](https://elegantly.dev/assets/laratranslate/opengraph.jpg)](https://elegantly.dev/laratranslate/)
 
 ---
 
