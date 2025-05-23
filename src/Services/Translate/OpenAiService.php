@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elegantly\Translator\Services\Translate;
 
+use Closure;
 use InvalidArgumentException;
 use OpenAI;
 
@@ -32,7 +33,7 @@ class OpenAiService implements TranslateServiceInterface
         $apiKey = config('translator.translate.services.openai.key') ?? config('translator.services.openai.key');
         $organization = config('translator.translate.services.openai.organization') ?? config('translator.services.openai.organization');
         $project = config('translator.translate.services.openai.project') ?? config('translator.services.openai.project');
-        $timeout = config('translator.translate.services.openai.request_timeout') ?? config('translator.services.openai.request_timeout') ?? 120;
+        $timeout = static::getTimeout();
 
         if (blank($apiKey)) {
             throw new InvalidArgumentException(
@@ -50,32 +51,64 @@ class OpenAiService implements TranslateServiceInterface
             ->make();
     }
 
+    public static function getTimeout(): int
+    {
+        return (int) (config('translator.translate.services.openai.request_timeout') ?? config('translator.services.openai.request_timeout') ?? 120);
+    }
+
+    /**
+     * @template TValue
+     *
+     * @param  (Closure():TValue)  $callback
+     * @return TValue
+     */
+    protected function withTemporaryTimeout(int $limit, Closure $callback): mixed
+    {
+        $initial = (int) ini_get('max_execution_time');
+
+        set_time_limit($limit);
+
+        try {
+            return $callback();
+        } catch (\Throwable $th) {
+            throw $th;
+        } finally {
+            set_time_limit($initial);
+        }
+    }
+
     public function translateAll(array $texts, string $targetLocale): array
     {
-        return collect($texts)
-            ->chunk(20)
-            ->map(function ($chunk) use ($targetLocale) {
-                $response = $this->client->chat()->create([
-                    'model' => $this->model,
-                    'response_format' => ['type' => 'json_object'],
-                    'messages' => [
-                        [
-                            'role' => 'system',
-                            'content' => str_replace('{targetLocale}', $targetLocale, $this->prompt),
-                        ],
-                        [
-                            'role' => 'user',
-                            'content' => $chunk->toJson(),
-                        ],
-                    ],
-                ]);
+        return $this->withTemporaryTimeout(
+            static::getTimeout(),
+            function () use ($texts, $targetLocale) {
+                return collect($texts)
+                    ->chunk(50)
+                    ->map(function ($chunk) use ($targetLocale) {
+                        $response = $this->client->chat()->create([
+                            'model' => $this->model,
+                            'response_format' => ['type' => 'json_object'],
+                            'messages' => [
+                                [
+                                    'role' => 'system',
+                                    'content' => str_replace('{targetLocale}', $targetLocale, $this->prompt),
+                                ],
+                                [
+                                    'role' => 'user',
+                                    'content' => $chunk->toJson(),
+                                ],
+                            ],
+                        ]);
 
-                $content = $response->choices[0]->message->content;
-                $translations = json_decode($content, true);
+                        $content = $response->choices[0]->message->content;
+                        $translations = json_decode($content, true);
 
-                return $translations;
-            })
-            ->collapse()
-            ->toArray();
+                        return $translations;
+                    })
+                    ->collapse()
+                    ->toArray();
+            }
+        );
+
     }
 }
