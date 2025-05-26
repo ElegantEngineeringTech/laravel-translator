@@ -48,7 +48,7 @@ class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInp
             $translations->map(fn () => null)
         );
 
-        info("{$source} added with {$count} keys.");
+        info("{$locale} added with {$count} keys.");
 
         if ($translate) {
             $translated = spin(function () use ($translator, $source, $locale, $translations) {
