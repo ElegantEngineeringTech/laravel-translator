@@ -98,7 +98,9 @@ class PhpDriver extends Driver
             })
             ->all();
 
-        return PhpTranslations::toDot($values);
+        return new PhpTranslations(
+            PhpTranslations::prepareTranslations($values)
+        );
     }
 
     /**
@@ -128,11 +130,17 @@ class PhpDriver extends Driver
 
     }
 
+    /**
+     * @template T of Translations
+     *
+     * @param  T  $translations
+     * @return T
+     */
     public function saveTranslations(string $locale, Translations $translations): Translations
     {
-        $undot = PhpTranslations::toUndot($translations);
+        $items = PhpTranslations::unprepareTranslations($translations->toArray());
 
-        foreach ($undot as $namespace => $values) {
+        foreach ($items as $namespace => $values) {
 
             $this->storage->put(
                 $this->getFilePath($locale, $namespace),
@@ -209,7 +217,7 @@ class PhpDriver extends Driver
         return $output;
     }
 
-    public static function collect(): Translations
+    public static function collect(): PhpTranslations
     {
         return new PhpTranslations;
     }

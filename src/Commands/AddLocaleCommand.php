@@ -56,20 +56,22 @@ class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInp
                 return $translator->translateTranslations(
                     source: $source,
                     target: $locale,
-                    keys: $translations->keys()->toArray()
+                    keys: $translations->dot()->keys()->toArray()
                 );
 
             }, "Translating the {$count} missing translations from '{$source}' to '{$locale}'");
 
             table(
                 headers: ['Key', "Source {$source}", "Target {$locale}"],
-                rows: $translated->map(function ($value, $key) use ($translations) {
-                    return [
-                        (string) $key,
-                        (string) str((string) $translations[$key])->limit(25),
-                        (string) str((string) $value)->limit(25),
-                    ];
-                })->toArray()
+                rows: $translated
+                    ->dot()
+                    ->map(function ($value, $key) use ($translations) {
+                        return [
+                            (string) $key,
+                            (string) str((string) $translations->get($key))->limit(25),
+                            (string) str((string) $value)->limit(25),
+                        ];
+                    })->toArray()
             );
         }
 

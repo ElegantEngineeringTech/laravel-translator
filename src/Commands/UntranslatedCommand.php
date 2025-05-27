@@ -37,6 +37,7 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
         table(
             headers: ['Key', "Source {$source}"],
             rows: $missing
+                ->dot()
                 ->map(fn ($value, $key) => [
                     $key,
                     (string) str((string) $value)->limit(50),
@@ -49,7 +50,7 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
                 return $translator->translateTranslations(
                     source: $source,
                     target: $target,
-                    keys: $missing->toBase()->keys()->all()
+                    keys: $missing->dot()->keys()->all()
                 );
 
             }, "Translating the {$count} translations from '{$source}' to '{$target}'");
@@ -57,11 +58,11 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
             table(
                 headers: ['Key', "Source {$source}", "Target {$target}"],
                 rows: $translated
-                    ->toBase()
+                    ->dot()
                     ->map(function ($value, $key) use ($missing) {
                         return [
-                            $key,
-                            str((string) $missing[$key])->limit(25)->value(),
+                            (string) $key,
+                            str((string) $missing->get($key))->limit(25)->value(),
                             str((string) $value)->limit(25)->value(),
                         ];
                     })
