@@ -16,7 +16,7 @@ class PhpTranslations extends Translations
     {
         return new Collection(
             Arr::dot(
-                static::prepareTranslations($this->items)
+                static::prepareTranslations($this->items) ?? []
             )
         );
     }
