@@ -69,6 +69,93 @@ it('checks existence of translation value', function ($key, $expected) use ($tra
     ['h.i.j.k', true],
 ]);
 
+it('sets a translation value using dot notation', function ($key, $value, $expected) use ($translations) {
+
+    expect($translations->set($key, $value)->toArray())->toBe($expected);
+
+})->with([
+    [
+        '_a',
+        '_a_value',
+        [
+            'a' => [
+                'b' => 'b_value',
+            ],
+            'c' => [
+                'd' => ['0_value', '1_value'],
+            ],
+            'e' => '',
+            'f' => [
+                'g' => '',
+            ],
+            'h' => [
+                'i' => [
+                    'j' => [
+                        'k' => 'k_value',
+                        'l' => 'l_value',
+                    ],
+                ],
+            ],
+            '_a' => '_a_value',
+        ],
+    ],
+    [
+        '_a._b._c',
+        '_c_value',
+        [
+            'a' => [
+                'b' => 'b_value',
+            ],
+            'c' => [
+                'd' => ['0_value', '1_value'],
+            ],
+            'e' => '',
+            'f' => [
+                'g' => '',
+            ],
+            'h' => [
+                'i' => [
+                    'j' => [
+                        'k' => 'k_value',
+                        'l' => 'l_value',
+                    ],
+                ],
+            ],
+            '_a' => [
+                '_b' => [
+                    '_c' => '_c_value',
+                ],
+            ],
+        ],
+    ],
+    [
+        'a._b',
+        '_b_value',
+        [
+            'a' => [
+                'b' => 'b_value',
+                '_b' => '_b_value',
+
+            ],
+            'c' => [
+                'd' => ['0_value', '1_value'],
+            ],
+            'e' => '',
+            'f' => [
+                'g' => '',
+            ],
+            'h' => [
+                'i' => [
+                    'j' => [
+                        'k' => 'k_value',
+                        'l' => 'l_value',
+                    ],
+                ],
+            ],
+        ],
+    ],
+]);
+
 it('filters values', function ($callback, $expected) use ($translations) {
 
     $filtered = $translations->filter($callback);

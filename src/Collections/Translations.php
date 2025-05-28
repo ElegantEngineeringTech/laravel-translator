@@ -51,6 +51,8 @@ abstract class Translations implements Arrayable, Countable, Jsonable
         return (string) $value;
     }
 
+    abstract public function set(string $key, null|int|float|string|bool $value): static;
+
     /**
      * @return Collection<array-key, null|scalar>
      */
@@ -72,9 +74,9 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     abstract public function except(array $keys): static;
 
     /**
-     * @param  array<array-key, null|scalar|array<array-key, mixed>>  $values
+     * @param  Translations|array<array-key, null|scalar>  $values
      */
-    abstract public function merge(array $values): static;
+    abstract public function merge(Translations|array $values): static;
 
     abstract public function diff(Translations $translations): static;
 

@@ -42,6 +42,15 @@ class PhpTranslations extends Translations
         return Arr::has($this->items, $key);
     }
 
+    public function set(string $key, null|int|float|string|bool $value): static
+    {
+        $items = $this->items;
+
+        Arr::set($items, $key, $value);
+
+        return new static($items);
+    }
+
     public function only(array $keys): static
     {
         $items = [];
@@ -176,14 +185,17 @@ class PhpTranslations extends Translations
         );
     }
 
-    public function merge(array $values): static
+    public function merge(Translations|array $values): static
     {
-        return new static(
-            array_merge_recursive(
-                $this->items,
-                $values
-            )
-        );
+        $values = $values instanceof Translations ? $values->dot()->all() : $values;
+
+        $items = new static($this->items);
+
+        foreach ($values as $key => $value) {
+            $items = $items->set($key, $value);
+        }
+
+        return $items;
     }
 
     public function diff(Translations $translations): static

@@ -22,6 +22,15 @@ class JsonTranslations extends Translations
         return $this->items[$key] ?? null;
     }
 
+    public function set(string $key, null|int|float|string|bool $value): static
+    {
+        $items = $this->items;
+
+        $items[$key] = $value;
+
+        return new static($items);
+    }
+
     public function dot(): Collection
     {
         // @phpstan-ignore-next-line
@@ -49,8 +58,10 @@ class JsonTranslations extends Translations
         );
     }
 
-    public function merge(array $values): static
+    public function merge(Translations|array $values): static
     {
+        $values = $values instanceof Translations ? $values->dot()->all() : $values;
+
         return new static(
             array_merge(
                 $this->items,
