@@ -43,9 +43,9 @@ class ProofreadCommand extends TranslatorCommand implements PromptsForMissingInp
             rows: $translations
                 ->dot()
                 ->map(fn ($value, $key) => [
-                    $key,
+                    (string) $key,
                     (string) str((string) $value)->limit(25),
-                    (string) str((string) $proofread->get($key))->limit(25),
+                    (string) str($proofread->getString($key))->limit(25),
                 ])
                 ->all()
         );

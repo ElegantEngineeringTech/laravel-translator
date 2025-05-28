@@ -68,7 +68,7 @@ class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInp
                     ->map(function ($value, $key) use ($translations) {
                         return [
                             (string) $key,
-                            (string) str((string) $translations->get($key))->limit(25),
+                            (string) str($translations->getString($key))->limit(25),
                             (string) str((string) $value)->limit(25),
                         ];
                     })->toArray()

@@ -8,9 +8,6 @@ use Elegantly\Translator\Drivers\PhpDriver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-/**
- * @extends Translations<null|scalar|array<array-key, mixed>>
- */
 class PhpTranslations extends Translations
 {
     public string $driver = PhpDriver::class;
@@ -133,10 +130,18 @@ class PhpTranslations extends Translations
 
     public function filter(?callable $callback = null): static
     {
+        if ($callback) {
+            return new static($this->recursiveFilter(
+                $this->items,
+                $callback
+            ));
+        }
+
         return new static($this->recursiveFilter(
             $this->items,
-            $callback
+            fn ($value) => (bool) $value
         ));
+
     }
 
     /**
@@ -185,6 +190,35 @@ class PhpTranslations extends Translations
     {
         return $this->except(
             $translations->dot()->keys()->all()
+        );
+    }
+
+    /**
+     * @param  array<array-key, null|scalar|array<array-key, mixed>>  $items
+     * @return array<array-key, null|scalar|array<array-key, mixed>>
+     */
+    protected function recursiveSortKeys(array $items, int $options = SORT_REGULAR, bool $descending = false): array
+    {
+        foreach ($items as $key => $value) {
+            if (is_array($value)) {
+                $items[$key] = $this->recursiveSortKeys($value, $options, $descending);
+            }
+
+            if ($descending) {
+                krsort($items, $options);
+            } else {
+                ksort($items, $options);
+            }
+
+        }
+
+        return $items;
+    }
+
+    public function sortKeys(int $options = SORT_REGULAR, bool $descending = false): static
+    {
+        return new static(
+            $this->recursiveSortKeys($this->items, $options, $descending)
         );
     }
 

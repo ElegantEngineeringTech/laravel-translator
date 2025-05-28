@@ -212,8 +212,9 @@ class Translator
 
                 $sourceTranslations = $this->getTranslations($source)
                     ->only($keys)
-                    ->filter(fn ($value) => ! blank($value))
-                    ->toArray();
+                    ->notBlank()
+                    ->dot()
+                    ->all();
 
                 $translatedValues = $service->translateAll(
                     $sourceTranslations,
@@ -265,8 +266,9 @@ class Translator
                 $proofreadValues = $service->proofreadAll(
                     texts: $translations
                         ->only($keys)
-                        ->filter(fn ($value) => ! blank($value))
-                        ->toArray()
+                        ->notBlank()
+                        ->dot()
+                        ->all()
                 );
 
                 return $translations->merge($proofreadValues);

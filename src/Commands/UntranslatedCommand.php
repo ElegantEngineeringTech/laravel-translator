@@ -62,7 +62,7 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
                     ->map(function ($value, $key) use ($missing) {
                         return [
                             (string) $key,
-                            str((string) $missing->get($key))->limit(25)->value(),
+                            str($missing->getString($key))->limit(25)->value(),
                             str((string) $value)->limit(25)->value(),
                         ];
                     })

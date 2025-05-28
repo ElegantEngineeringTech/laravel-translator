@@ -230,6 +230,82 @@ it('retreives only the specified translation keys', function ($only, $expected) 
     ],
 ]);
 
+it('sorts keys in ascending order', function () {
+
+    $translations = new PhpTranslations([
+        'z' => [
+            'y' => 'y_value',
+            'x' => 'y_value',
+        ],
+        'w' => 'w_value',
+        'a' => [
+            'f' => 'f_value',
+            'b' => [
+                'e' => 'e_value',
+                'c' => 'c_value',
+                'd' => 'd_value',
+            ],
+        ],
+        'v' => 'v_value',
+    ]);
+
+    expect($translations->sortKeys(descending: false)->all())->toBe([
+        'a' => [
+            'b' => [
+                'c' => 'c_value',
+                'd' => 'd_value',
+                'e' => 'e_value',
+            ],
+            'f' => 'f_value',
+        ],
+        'v' => 'v_value',
+        'w' => 'w_value',
+        'z' => [
+            'x' => 'y_value',
+            'y' => 'y_value',
+        ],
+    ]);
+
+});
+
+it('sorts keys in descending order', function () {
+
+    $translations = new PhpTranslations([
+        'z' => [
+            'y' => 'y_value',
+            'x' => 'y_value',
+        ],
+        'w' => 'w_value',
+        'a' => [
+            'f' => 'f_value',
+            'b' => [
+                'e' => 'e_value',
+                'c' => 'c_value',
+                'd' => 'd_value',
+            ],
+        ],
+        'v' => 'v_value',
+    ]);
+
+    expect($translations->sortKeys(descending: true)->all())->toBe([
+        'z' => [
+            'y' => 'y_value',
+            'x' => 'y_value',
+        ],
+        'w' => 'w_value',
+        'v' => 'v_value',
+        'a' => [
+            'f' => 'f_value',
+            'b' => [
+                'e' => 'e_value',
+                'd' => 'd_value',
+                'c' => 'c_value',
+            ],
+        ],
+    ]);
+
+});
+
 it('encodes dot to unicode', function () {
 
     $translations = PhpTranslations::prepareTranslations([

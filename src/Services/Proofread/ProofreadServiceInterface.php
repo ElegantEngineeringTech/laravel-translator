@@ -7,8 +7,8 @@ namespace Elegantly\Translator\Services\Proofread;
 interface ProofreadServiceInterface
 {
     /**
-     * @param  array<string, string>  $texts
-     * @return array<string, string>
+     * @param  array<array-key, null|scalar>  $texts
+     * @return array<array-key, null|scalar>
      */
     public function proofreadAll(array $texts): array;
 

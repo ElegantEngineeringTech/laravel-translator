@@ -8,9 +8,6 @@ use Elegantly\Translator\Drivers\JsonDriver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-/**
- * @extends Translations<null|scalar>
- */
 class JsonTranslations extends Translations
 {
     public string $driver = JsonDriver::class;
@@ -20,9 +17,6 @@ class JsonTranslations extends Translations
         return array_key_exists($key, $this->items);
     }
 
-    /**
-     * @return null|scalar
-     */
     public function get(string $key): mixed
     {
         return $this->items[$key] ?? null;
@@ -30,7 +24,8 @@ class JsonTranslations extends Translations
 
     public function dot(): Collection
     {
-        return $this->collect();
+        // @phpstan-ignore-next-line
+        return new Collection($this->items);
     }
 
     public static function undot(Collection|array $items): static
@@ -76,11 +71,16 @@ class JsonTranslations extends Translations
 
     public function filter(?callable $callback = null): static
     {
-        return new static(array_filter(
-            $this->items,
-            $callback,
-            ARRAY_FILTER_USE_BOTH
-        ));
+        if ($callback) {
+            return new static(array_filter(
+                $this->items,
+                $callback,
+                ARRAY_FILTER_USE_BOTH
+            ));
+        }
+
+        return new static(array_filter($this->items));
+
     }
 
     public function map(?callable $callback = null): static
@@ -91,5 +91,14 @@ class JsonTranslations extends Translations
                 $callback
             )
         );
+    }
+
+    public function sortKeys(int $options = SORT_REGULAR, bool $descending = false): static
+    {
+        $items = $this->items;
+
+        $descending ? krsort($items, $options) : ksort($items, $options);
+
+        return new static($items);
     }
 }

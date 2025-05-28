@@ -11,9 +11,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 
 /**
- * @template TValue
- *
- * @implements Arrayable<string, TValue>
+ * @implements Arrayable<string, null|scalar|array<array-key, mixed>>
  */
 abstract class Translations implements Arrayable, Countable, Jsonable
 {
@@ -23,12 +21,12 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     public string $driver;
 
     /**
-     * @var array<array-key, TValue>
+     * @var array<array-key, null|scalar|array<array-key, mixed>>
      */
     public array $items = [];
 
     /**
-     * @param  array<array-key, TValue>|Collection<array-key,TValue>  $items
+     * @param  array<array-key, null|scalar|array<array-key, mixed>>|Collection<array-key,null|scalar|array<array-key, mixed>>  $items
      */
     final public function __construct(array|Collection $items = [])
     {
@@ -38,9 +36,20 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     abstract public function has(string $key): bool;
 
     /**
-     * @return TValue
+     * @return null|scalar|array<array-key, mixed>
      */
     abstract public function get(string $key): mixed;
+
+    public function getString(string $key): string
+    {
+        $value = $this->get($key);
+
+        if (is_array($value)) {
+            return '';
+        }
+
+        return (string) $value;
+    }
 
     /**
      * @return Collection<array-key, null|scalar>
@@ -48,7 +57,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     abstract public function dot(): Collection;
 
     /**
-     * @param  Collection<array-key, TValue>|array<array-key, TValue>  $items
+     * @param  Collection<array-key, null|scalar|array<array-key, mixed>>|array<array-key, null|scalar|array<array-key, mixed>>  $items
      */
     abstract public static function undot(Collection|array $items): static;
 
@@ -63,24 +72,23 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     abstract public function except(array $keys): static;
 
     /**
-     * @param  array<array-key, TValue>  $values
+     * @param  array<array-key, null|scalar|array<array-key, mixed>>  $values
      */
     abstract public function merge(array $values): static;
 
-    /**
-     * @param  Translations<TValue>  $translations
-     */
     abstract public function diff(Translations $translations): static;
 
     /**
-     * @param  null|(callable(array-key, TValue):mixed)  $callback
+     * @param  null|(callable(null|scalar|array<array-key, mixed>, array-key):mixed)  $callback
      */
     abstract public function filter(?callable $callback = null): static;
 
     /**
-     * @param  null|(callable(array-key, TValue):mixed)  $callback
+     * @param  null|(callable(null|scalar|array<array-key, mixed>, array-key):mixed)  $callback
      */
     abstract public function map(?callable $callback = null): static;
+
+    abstract public function sortKeys(int $options = SORT_REGULAR, bool $descending = false): static;
 
     public function notBlank(): static
     {
@@ -90,7 +98,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     }
 
     /**
-     * @return array<array-key, TValue>
+     * @return array<array-key, null|scalar|array<array-key, mixed>>
      */
     public function all(): array
     {
@@ -106,10 +114,11 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     }
 
     /**
-     * @return Collection<array-key, TValue>
+     * @return Collection<array-key, null|scalar|array<array-key, mixed>>
      */
     public function collect(): Collection
     {
+        // @phpstan-ignore-next-line
         return new Collection($this->items);
     }
 
@@ -120,6 +129,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
      */
     public function toBase(): Collection
     {
+        // @phpstan-ignore-next-line
         return $this->dot();
     }
 
@@ -129,7 +139,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     }
 
     /**
-     * @return array<array-key, TValue>
+     * @return array<array-key, null|scalar|array<array-key, mixed>>
      */
     public function toArray(): array
     {
