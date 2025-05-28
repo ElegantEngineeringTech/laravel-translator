@@ -32,14 +32,21 @@ class CsvExporterService implements ExporterInterface
 
         /** @var string[] $keys */
         $keys = collect($translationsByLocale)
-            ->flatMap(fn ($translations) => $translations->keys())
+            ->flatMap(fn ($translations) => $translations->dot()->keys()->all())
             ->unique()
             ->all();
 
         foreach ($keys as $key) {
 
             $values = array_map(function ($locale) use ($translationsByLocale, $key) {
-                return $translationsByLocale[$locale][$key] ?? null;
+
+                $value = $translationsByLocale[$locale]->get($key);
+
+                if (is_array($value)) {
+                    return null;
+                }
+
+                return $value;
             }, $locales);
 
             $writer->addRow([

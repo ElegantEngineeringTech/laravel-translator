@@ -40,25 +40,33 @@ it('gets translations', function () {
     $translations = $translator->getTranslations('fr');
 
     expect($translations->toArray())->toBe([
-        'messages.hello' => 'Bonjour',
-        'messages.add' => 'Ajouter',
-        'messages.home.title' => 'Titre',
-        'messages.home.end' => 'Fin',
-        'messages.home.missing' => 'Absent',
-        'messages.empty' => 'Vide',
-        'messages.missing' => 'Absent',
-        'messages.dummy.class' => 'class factice',
-        'messages.dummy.component' => 'composant factice',
-        'messages.dummy.view' => 'vue factice',
-        'messages.dummy.nested.0' => 'used',
-        'messages.dummy.nested.1' => 'as',
-        'messages.dummy.nested.2' => 'array',
-        'messages.register' => 'S\'inscrire',
-        'messages.registered' => 'Inscrit?',
+        'messages' => [
+            'hello' => 'Bonjour',
+            'add' => 'Ajouter',
+            'home' => [
+                'title' => 'Titre',
+                'end' => 'Fin',
+                'missing' => 'Absent',
+            ],
+            'empty' => 'Vide',
+            'missing' => 'Absent',
+            'dummy' => [
+                'class' => 'class factice',
+                'component' => 'composant factice',
+                'view' => 'vue factice',
+                'nested' => [
+                    'used',
+                    'as',
+                    'array',
+                ],
+            ],
+            'register' => 'S\'inscrire',
+            'registered' => 'Inscrit?',
+        ],
     ]);
 });
 
-it('gets undefined translations', function () {
+it('gets missing translations', function () {
     $translator = new Translator(
         driver: $this->getPhpDriver(),
         searchcodeService: $this->getSearchCodeService()
@@ -85,7 +93,7 @@ it('gets dead translations', function () {
 
     $dead = $translator->getDeadTranslations('fr');
 
-    expect($dead->keys()->toArray())->toBe([
+    expect($dead->dot()->keys()->toArray())->toBe([
         'messages.hello',
         'messages.add',
         'messages.home.title',
@@ -99,7 +107,7 @@ it('gets dead translations', function () {
 
 });
 
-it('gets missing translations', function () {
+it('gets untranslated translations', function () {
     $translator = new Translator(
         driver: $this->getPhpDriver(),
         searchcodeService: $this->getSearchCodeService()
@@ -111,10 +119,14 @@ it('gets missing translations', function () {
     );
 
     expect($untranlated->toArray())->toBe([
-        'messages.home.missing' => 'Absent',
-        'messages.empty' => 'Vide',
-        'messages.missing' => 'Absent',
-        'messages.register' => 'S\'inscrire',
+        'messages' => [
+            'home' => [
+                'missing' => 'Absent',
+            ],
+            'empty' => 'Vide',
+            'missing' => 'Absent',
+            'register' => 'S\'inscrire',
+        ],
     ]);
 
 });
@@ -127,7 +139,11 @@ it('replaces dot with unicode', function () {
     $translations = $translator->getTranslations('fr_CA');
 
     expect($translations->toArray())->toBe([
-        'dotted.This key contains a dot&#46; In the middle.And it &#46; ha&#46;s children&#46;' => 'And it has children.',
+        'dotted' => [
+            'This key contains a dot&#46; In the middle' => [
+                'And it &#46; ha&#46;s children&#46;' => 'And it has children.',
+            ],
+        ],
     ]);
 
 });
@@ -142,7 +158,11 @@ it('doesn\'t break keys with dot', function () {
     $translator->saveTranslations('fr_CA', $translations);
 
     expect($translator->getTranslations('fr_CA')->toArray())->toBe([
-        'dotted.This key contains a dot&#46; In the middle.And it &#46; ha&#46;s children&#46;' => 'And it has children.',
+        'dotted' => [
+            'This key contains a dot&#46; In the middle' => [
+                'And it &#46; ha&#46;s children&#46;' => 'And it has children.',
+            ],
+        ],
     ]);
 
 });

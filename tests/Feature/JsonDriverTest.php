@@ -71,7 +71,7 @@ it('gets dead translations', function () {
 
     $dead = $translator->getDeadTranslations('fr');
 
-    expect($dead->keys()->all())->toBe([
+    expect($dead->keys())->toBe([
         'All rights reserved.',
     ]);
 

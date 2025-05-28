@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array<int, string> getLocales()
  * @method static Translations getTranslations(string $locale)
  * @method static array<string, array{ count: int, files: string[] }> getMissingTranslations(string $locale)
- * @method static array<int, scalar|null> getDeadTranslations(string $locale)
+ * @method static Translations getDeadTranslations(string $locale)
  * @method static Translations getUntranslatedTranslations(string $source, string $target)
  * @method static Translations setTranslations(string $locale, array<string, scalar|null> $values)
  * @method static Translations translateTranslations(string $source, string $target, array<int, string> $keys)

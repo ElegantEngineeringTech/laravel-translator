@@ -36,7 +36,7 @@ class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
         table(
             headers: ['Key', "Translation {$locale}"],
             rows: $dead
-                ->toBase()
+                ->dot()
                 ->map(function ($value, $key) {
                     return [
                         $key,
@@ -51,7 +51,7 @@ class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
 
             $translator->deleteTranslations(
                 locale: $locale,
-                keys: $dead->keys()->toArray()
+                keys: $dead->dot()->keys()->all()
             );
 
             note(count($dead).' dead translations deleted from the driver.');

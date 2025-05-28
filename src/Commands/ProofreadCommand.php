@@ -33,7 +33,7 @@ class ProofreadCommand extends TranslatorCommand implements PromptsForMissingInp
         $proofread = spin(
             fn () => $translator->proofreadTranslations(
                 locale: $locale,
-                keys: $translations->toBase()->keys()->all()
+                keys: $translations->dot()->keys()->all()
             ),
             'Proofreading the translation strings.'
         );
@@ -41,11 +41,13 @@ class ProofreadCommand extends TranslatorCommand implements PromptsForMissingInp
         table(
             headers: ['Key', 'Before', 'After'],
             rows: $translations
+                ->dot()
                 ->map(fn ($value, $key) => [
-                    $key,
+                    (string) $key,
                     (string) str((string) $value)->limit(25),
-                    (string) str((string) $proofread->get($key))->limit(25),
-                ])->toArray()
+                    (string) str($proofread->getString($key))->limit(25),
+                ])
+                ->all()
         );
 
         return self::SUCCESS;

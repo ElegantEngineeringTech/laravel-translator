@@ -89,6 +89,12 @@ class JsonDriver extends Driver
         return new JsonTranslations;
     }
 
+    /**
+     * @template T of JsonTranslations
+     *
+     * @param  T  $translations
+     * @return T
+     */
     public function saveTranslations(string $locale, Translations $translations): Translations
     {
         $this->storage->put(
@@ -99,7 +105,7 @@ class JsonDriver extends Driver
         return $translations;
     }
 
-    public static function collect(): Translations
+    public static function collect(): JsonTranslations
     {
         return new JsonTranslations;
     }

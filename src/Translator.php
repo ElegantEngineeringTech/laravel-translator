@@ -128,7 +128,7 @@ class Translator
             ->filter(function ($value, $key) use ($translations) {
                 return ! $translations->has($key);
             })
-            ->toArray();
+            ->all();
     }
 
     /**
@@ -155,10 +155,7 @@ class Translator
         $sourceTranslations = $this->getTranslations($source)->notBlank();
         $targetTranslations = $this->getTranslations($target)->notBlank();
 
-        return $sourceTranslations
-            ->filter(function ($value, $key) use ($targetTranslations) {
-                return ! $targetTranslations->has($key);
-            });
+        return $sourceTranslations->diff($targetTranslations);
     }
 
     /**
@@ -215,8 +212,9 @@ class Translator
 
                 $sourceTranslations = $this->getTranslations($source)
                     ->only($keys)
-                    ->filter(fn ($value) => ! blank($value))
-                    ->toArray();
+                    ->notBlank()
+                    ->dot()
+                    ->all();
 
                 $translatedValues = $service->translateAll(
                     $sourceTranslations,
@@ -268,8 +266,9 @@ class Translator
                 $proofreadValues = $service->proofreadAll(
                     texts: $translations
                         ->only($keys)
-                        ->filter(fn ($value) => ! blank($value))
-                        ->toArray()
+                        ->notBlank()
+                        ->dot()
+                        ->all()
                 );
 
                 return $translations->merge($proofreadValues);
