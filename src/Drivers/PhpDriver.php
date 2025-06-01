@@ -99,7 +99,7 @@ class PhpDriver extends Driver
             ->all();
 
         return new PhpTranslations(
-            PhpTranslations::prepareTranslations($values)
+            PhpTranslations::prepareTranslations($values) ?? []
         );
     }
 
