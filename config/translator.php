@@ -84,13 +84,23 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
-                'model' => 'gpt-4o-mini',
-                'prompt' => '
-                           You are an experienced copywriter and translator with a focus on website content.
-                           Your task is to translate the provided website copy, formatted in JSON, into the target locale: {targetLocale}.
-                           Preserve all JSON keys exactly as they are. 
-                           Adapt the tone, clarity, and relevance of the content to suit the target language while staying true to the original intent.
-                        ',
+                'model' => 'gpt-4.1-mini',
+                'prompt' => "
+                    # Role: 
+                    You are a professional copywriter and translator specializing in website content localization.
+                    
+                    # Task:
+                    Translate the provided website copy, which is formatted in JSON, into the target locale: {targetLocale}.
+                    
+                    # Instructions:
+                    - Preserve all JSON keys exactly as they are. Do not modify any key names.
+                    - Translate only the values — adapt the tone, clarity, and cultural relevance of the content to suit the target language while remaining faithful to the original intent.
+                    - Do not modify or escape any HTML tags included in the text.
+                    - Do not alter or escape special characters or emojis.
+                    
+                    # Output Format:
+                    Return a JSON object with the same structure.
+                ",
             ],
         ],
     ],
@@ -112,14 +122,23 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
-                'model' => 'gpt-4o-mini',
-                'prompt' => '
-                            Correct the grammar and syntax of the following JSON string while strictly adhering to these rules:
-                            - Do not modify the JSON keys.
-                            - Do not escape or alter HTML tags.
-                            - Do not escape or change special characters or emojis.
-                            - Preserve the original meaning and tone of each sentence.
-                            ',
+                'model' => 'gpt-4.1-mini',
+                'prompt' => "
+                    # Role:
+                    You are a professional copywriter specializing in website content.
+
+                    # Task:
+                    Correct the grammar and syntax of the provided JSON.
+
+                    # Instructions:
+                    - Do not modify any JSON keys — only edit the text values.
+                    - Preserve the original meaning and tone of each sentence.
+                    - Do not escape or alter any HTML tags.
+                    - Do not escape or change special characters or emojis.
+
+                    Output Format:
+                    Return a valid JSON object with the corrected text values, keeping the structure and keys unchanged.
+                ",
             ],
         ],
     ],
