@@ -85,7 +85,7 @@ return [
         'services' => [
             'openai' => [
                 'model' => 'gpt-4.1-mini',
-                'prompt' => "
+                'prompt' => '
                     # Role: 
                     You are a professional copywriter and translator specializing in website content localization.
                     
@@ -100,7 +100,7 @@ return [
                     
                     # Output Format:
                     Return a JSON object with the same structure.
-                ",
+                ',
             ],
         ],
     ],
@@ -123,7 +123,7 @@ return [
         'services' => [
             'openai' => [
                 'model' => 'gpt-4.1-mini',
-                'prompt' => "
+                'prompt' => '
                     # Role:
                     You are a professional copywriter specializing in website content.
 
@@ -138,7 +138,7 @@ return [
 
                     Output Format:
                     Return a valid JSON object with the corrected text values, keeping the structure and keys unchanged.
-                ",
+                ',
             ],
         ],
     ],
