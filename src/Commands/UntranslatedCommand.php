@@ -28,7 +28,8 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
         $translator = $this->getTranslator();
 
         $missing = $translator->getUntranslatedTranslations($source, $target);
-        $count = $missing->count();
+        $missingDot = $missing->dot();
+        $count = $missingDot->count();
 
         intro('Using driver: '.$translator->driver::class);
 
@@ -36,8 +37,7 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
 
         table(
             headers: ['Key', "Source {$source}"],
-            rows: $missing
-                ->dot()
+            rows: $missingDot
                 ->map(fn ($value, $key) => [
                     $key,
                     (string) str((string) $value)->limit(50),
@@ -45,12 +45,12 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
         );
 
         if ($translate) {
-            $translated = spin(function () use ($translator, $source, $target, $missing) {
+            $translated = spin(function () use ($translator, $source, $target, $missingDot) {
 
                 return $translator->translateTranslations(
                     source: $source,
                     target: $target,
-                    keys: $missing->dot()->keys()->all()
+                    keys: $missingDot->keys()->all()
                 );
 
             }, "Translating the {$count} translations from '{$source}' to '{$target}'");
@@ -59,10 +59,10 @@ class UntranslatedCommand extends TranslatorCommand implements PromptsForMissing
                 headers: ['Key', "Source {$source}", "Target {$target}"],
                 rows: $translated
                     ->dot()
-                    ->map(function ($value, $key) use ($missing) {
+                    ->map(function ($value, $key) use ($missingDot) {
                         return [
                             (string) $key,
-                            str($missing->getString($key))->limit(25)->value(),
+                            str((string) $missingDot->get($key))->limit(25)->value(),
                             str((string) $value)->limit(25)->value(),
                         ];
                     })
