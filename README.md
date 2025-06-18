@@ -515,7 +515,7 @@ Service: `exporter`
 
 Export all your translation strings to a CSV file in the following format:
 
-| Key                 | en    | fr        |
+| key                 | en    | fr        |
 | ------------------- | ----- | --------- |
 | messages.auth.login | Login | Connexion |
 
@@ -537,7 +537,7 @@ Service: `exporter`
 
 Import translation strings from a CSV file. Ensure your CSV follows the format below:
 
-| Key                 | en    | fr        |
+| key                 | en    | fr        |
 | ------------------- | ----- | --------- |
 | messages.auth.login | Login | Connexion |
 
