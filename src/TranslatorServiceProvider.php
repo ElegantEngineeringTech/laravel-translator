@@ -8,6 +8,7 @@ use Elegantly\Translator\Commands\AddLocaleCommand;
 use Elegantly\Translator\Commands\ClearCacheCommand;
 use Elegantly\Translator\Commands\DeadCommand;
 use Elegantly\Translator\Commands\ExportCommand;
+use Elegantly\Translator\Commands\ImportCommand;
 use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
 use Elegantly\Translator\Commands\ProofreadCommand;
@@ -51,6 +52,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 ProofreadCommand::class,
                 ClearCacheCommand::class,
                 ExportCommand::class,
+                ImportCommand::class,
             ]);
     }
 
