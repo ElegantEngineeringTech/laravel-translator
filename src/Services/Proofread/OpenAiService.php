@@ -72,6 +72,7 @@ class OpenAiService implements ProofreadServiceInterface
                 ]);
 
                 $content = $response->choices[0]->message->content;
+                $content = str_replace('\\\/', "\/", $content);
                 $translations = json_decode($content, true);
 
                 return $translations;
