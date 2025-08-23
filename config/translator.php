@@ -84,7 +84,7 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
-                'model' => 'gpt-4.1-mini',
+                'model' => 'gpt-5-mini',
                 'prompt' => '
                     # Role: 
                     You are a professional copywriter and translator specializing in website content localization.
@@ -122,7 +122,7 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
-                'model' => 'gpt-4.1-mini',
+                'model' => 'gpt-5-mini',
                 'prompt' => '
                     # Role:
                     You are a professional copywriter specializing in website content.
