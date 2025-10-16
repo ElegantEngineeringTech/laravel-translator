@@ -3,25 +3,12 @@
 declare(strict_types=1);
 
 return [
-    'hello' => 'Bonjour',
-    'add' => 'Ajouter',
-    'home' => [
-        'title' => 'Titre',
-        'end' => 'Fin',
-        'missing' => 'Absent',
+    'title' => 'Titre',
+    'ignored' => 'ignoré',
+    'nested' => [
+        'title' => 'Sous-titre',
+        'array' => ['Option 1', 'Option 2'],
+        'untranslated' => 'Non traduit',
     ],
-    'empty' => 'Vide',
-    'missing' => 'Absent',
-    'dummy' => [
-        'class' => 'class factice',
-        'component' => 'composant factice',
-        'view' => 'vue factice',
-        'nested' => [
-            'used',
-            'as',
-            'array',
-        ],
-    ],
-    'register' => 'S\'inscrire',
-    'registered' => 'Inscrit?',
+    'untranslated' => 'Non traduit',
 ];

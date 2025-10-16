@@ -7,6 +7,7 @@ namespace Elegantly\Translator\Drivers;
 use Elegantly\Translator\Collections\PhpTranslations;
 use Elegantly\Translator\Collections\Translations;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
@@ -82,9 +83,14 @@ class PhpDriver extends Driver
      */
     public function getNamespaces(string $locale): array
     {
-        return collect($this->storage->files($locale))
+        return collect($this->storage->allFiles($locale))
             ->filter(fn (string $file) => File::extension($file) === 'php')
-            ->map(fn (string $file) => File::name($file))
+            ->map(function (string $file) use ($locale) {
+                return str($file)
+                    ->after($locale.DIRECTORY_SEPARATOR)
+                    ->beforeLast('.')
+                    ->value();
+            })
             ->sort(SORT_NATURAL)
             ->values()
             ->all();
@@ -92,11 +98,12 @@ class PhpDriver extends Driver
 
     public function getTranslations(string $locale): PhpTranslations
     {
-        $values = collect($this->getNamespaces($locale))
-            ->mapWithKeys(function ($namespace) use ($locale) {
-                return [$namespace => $this->getTranslationsInNamespace($locale, $namespace)];
-            })
-            ->all();
+        $values = Arr::mapWithKeys(
+            $this->getNamespaces($locale),
+            fn ($namespace) => [
+                $namespace => $this->getTranslationsInNamespace($locale, $namespace),
+            ]
+        );
 
         return new PhpTranslations(
             PhpTranslations::prepareTranslations($values) ?? []

@@ -3,22 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'hello' => 'Hello',
-    'add' => 'Add',
-    'home' => [
-        'title' => 'Title',
-        'end' => 'End',
+    'title' => 'Title',
+    'ignored' => 'ignored',
+    'nested' => [
+        'title' => 'Subtitle',
+        'array' => ['Option 1', 'Option 2'],
     ],
-    'empty' => '',
-    'dummy' => [
-        'class' => 'dummy class',
-        'component' => 'dummy component',
-        'view' => 'dummy view',
-        'nested' => [
-            'used',
-            'as',
-            'array',
-        ],
-    ],
-    'registered' => 'Registered?',
 ];

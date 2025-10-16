@@ -66,18 +66,21 @@ it('gets all the translations keys grouped by files', function () {
     );
 
     expect($service->translationsByFiles())->toBe([
-        $this->formatPath($appPath.'/DummyClass.php') => [
-            'messages.dummy.class',
+        $this->formatPath($appPath.'/Foo.php') => [
+            'messages.title',
         ],
-        $this->formatPath($resourcesPath.'/components/dummy-component.blade.php') => [
-            'messages.dummy.component',
-            'messages.dummy.view',
+        $this->formatPath($resourcesPath.'/components/users/account.blade.php') => [
+            'users/account.title',
         ],
-        $this->formatPath($resourcesPath.'/views/dummy-view.blade.php') => [
-            'This one is used.',
-            'messages.dummy.nested',
-            'messages.dummy.view',
-            'messages.dummy.view',
+        $this->formatPath($resourcesPath.'/views/foo.blade.php') => [
+            'messages.missing',
+            'messages.missing',
+            'messages.nested.missing',
+        ],
+        $this->formatPath($resourcesPath.'/views/json/foo.blade.php') => [
+            'All rights reserved.',
+            'This one is missing',
+            'This one is untranslated',
         ],
     ]);
 });
@@ -96,38 +99,48 @@ it('gets all the files grouped by translations', function () {
     );
 
     expect($service->filesByTranslations())->toBe([
-        'This one is used.' => [
+        'All rights reserved.' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
+                $this->formatPath($resourcesPath.'/views/json/foo.blade.php'),
             ],
         ],
-        'messages.dummy.class' => [
+        'This one is missing' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($appPath.'/DummyClass.php'),
+                $this->formatPath($resourcesPath.'/views/json/foo.blade.php'),
             ],
         ],
-        'messages.dummy.component' => [
+        'This one is untranslated' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($resourcesPath.'/components/dummy-component.blade.php'),
+                $this->formatPath($resourcesPath.'/views/json/foo.blade.php'),
             ],
         ],
-        'messages.dummy.nested' => [
+        'messages.missing' => [
+            'count' => 2,
+            'files' => [
+                $this->formatPath($resourcesPath.'/views/foo.blade.php'),
+            ],
+        ],
+        'messages.nested.missing' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
+                $this->formatPath($resourcesPath.'/views/foo.blade.php'),
             ],
         ],
-        'messages.dummy.view' => [
-            'count' => 3,
+        'messages.title' => [
+            'count' => 1,
             'files' => [
-                $this->formatPath($resourcesPath.'/components/dummy-component.blade.php'),
-                $this->formatPath($resourcesPath.'/views/dummy-view.blade.php'),
+                $this->formatPath($appPath.'/Foo.php'),
             ],
         ],
-
+        'users/account.title' => [
+            'count' => 1,
+            'files' => [
+                $this->formatPath($resourcesPath.'/components/users/account.blade.php'),
+            ],
+        ],
     ]);
 });
 

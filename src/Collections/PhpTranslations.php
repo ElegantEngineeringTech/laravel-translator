@@ -98,16 +98,16 @@ class PhpTranslations extends Translations
         $items = $this->items;
 
         foreach ($keys as $key) {
+
             if (array_key_exists($key, $items)) {
                 unset($items[$key]);
             } elseif (str_contains($key, '.')) {
-
                 $this->recursiveForget(
                     $items,
                     explode('.', $key)
                 );
-
             }
+
         }
 
         return new static($items);

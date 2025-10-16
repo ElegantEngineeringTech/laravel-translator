@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Elegantly\Translator\Tests\Src\App;
 
-class DummyClass
+class Foo
 {
     public function getLabel()
     {
-        return __(key: 'messages.dummy.class');
+        return __(key: 'messages.title');
     }
 }

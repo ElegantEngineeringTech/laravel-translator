@@ -1,3 +1,3 @@
 <div>
-    {{ __('messages.hello') }}
+    {{ __('messages.ignored') }}
 </div>

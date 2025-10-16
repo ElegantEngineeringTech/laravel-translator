@@ -10,8 +10,6 @@ it('gets nested folder as subdrivers', function () {
     $subDriversKeys = collect($subDrivers)->map(fn ($driver) => $driver->getKey())->all();
 
     expect($subDriversKeys)->tobe([
-        $driver->storage->path($this->formatPath('sublang/')),
-        $driver->storage->path($this->formatPath('sublang/subsublang/')),
-        $driver->storage->path($this->formatPath('vendorlang/package/')),
+        $driver->storage->path($this->formatPath('package/')),
     ]);
 });

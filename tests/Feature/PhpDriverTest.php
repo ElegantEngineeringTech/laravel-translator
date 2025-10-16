@@ -5,11 +5,41 @@ declare(strict_types=1);
 use Elegantly\Translator\Translator;
 
 it('gets locales from the directory', function () {
-    $translator = new Translator(
-        driver: $this->getPhpDriver(),
-    );
+    $driver = $this->getPhpDriver();
 
-    expect($translator->getLocales())->toBe(['en', 'fr', 'fr_CA', 'pt_BR']);
+    expect($driver->getLocales())->toBe(['en', 'fr', 'fr_CA', 'package']);
+});
+
+it('gets namespaces from the directory', function () {
+    $driver = $this->getPhpDriver();
+
+    expect($driver->getNamespaces('fr'))->toBe([
+        'messages',
+        'users/account',
+    ]);
+});
+
+it('gets translations', function () {
+    $driver = $this->getPhpDriver();
+
+    $translations = $driver->getTranslations('fr');
+
+    expect($translations->toArray())->toBe([
+        'messages' => [
+            'title' => 'Titre',
+            'ignored' => 'ignoré',
+            'nested' => [
+                'title' => 'Sous-titre',
+                'array' => ['Option 1', 'Option 2'],
+                'untranslated' => 'Non traduit',
+            ],
+            'untranslated' => 'Non traduit',
+        ],
+        'users/account' => [
+            'title' => 'Compte',
+            'untranslated' => 'Non traduit',
+        ],
+    ]);
 });
 
 it('gets locales from the config', function () {
@@ -22,89 +52,14 @@ it('gets locales from the config', function () {
     expect($translator->getLocales())->toBe(['fr']);
 });
 
-it('gets locales from the config when null', function () {
+it('gets locales from the directory when the config is null', function () {
     config()->set('translator.locales', null);
 
     $translator = new Translator(
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['en', 'fr', 'fr_CA', 'not_a_locale', 'pt_BR', 'sublang', 'vendorlang']);
-});
-
-it('gets translations', function () {
-    $translator = new Translator(
-        driver: $this->getPhpDriver(),
-    );
-
-    $translations = $translator->getTranslations('fr');
-
-    expect($translations->toArray())->toBe([
-        'messages' => [
-            'hello' => 'Bonjour',
-            'add' => 'Ajouter',
-            'home' => [
-                'title' => 'Titre',
-                'end' => 'Fin',
-                'missing' => 'Absent',
-            ],
-            'empty' => 'Vide',
-            'missing' => 'Absent',
-            'dummy' => [
-                'class' => 'class factice',
-                'component' => 'composant factice',
-                'view' => 'vue factice',
-                'nested' => [
-                    'used',
-                    'as',
-                    'array',
-                ],
-            ],
-            'register' => 'S\'inscrire',
-            'registered' => 'Inscrit?',
-        ],
-    ]);
-});
-
-it('gets missing translations', function () {
-    $translator = new Translator(
-        driver: $this->getPhpDriver(),
-        searchcodeService: $this->getSearchCodeService()
-    );
-
-    $keys = $translator->getMissingTranslations('fr');
-
-    expect($keys)->toBe([
-        'This one is used.' => [
-            'count' => 1,
-            'files' => [
-                $this->formatPath($this->getResourcesPath().'/views/dummy-view.blade.php'),
-            ],
-        ],
-    ]);
-
-});
-
-it('gets dead translations', function () {
-    $translator = new Translator(
-        driver: $this->getPhpDriver(),
-        searchcodeService: $this->getSearchCodeService()
-    );
-
-    $dead = $translator->getDeadTranslations('fr');
-
-    expect($dead->dot()->keys()->toArray())->toBe([
-        'messages.hello',
-        'messages.add',
-        'messages.home.title',
-        'messages.home.end',
-        'messages.home.missing',
-        'messages.empty',
-        'messages.missing',
-        'messages.register',
-        'messages.registered',
-    ]);
-
+    expect($translator->getLocales())->toBe(['en', 'fr', 'fr_CA', 'package']);
 });
 
 it('gets untranslated translations', function () {
@@ -120,29 +75,91 @@ it('gets untranslated translations', function () {
 
     expect($untranlated->toArray())->toBe([
         'messages' => [
-            'home' => [
-                'missing' => 'Absent',
+            'nested' => [
+                'untranslated' => 'Non traduit',
             ],
-            'empty' => 'Vide',
-            'missing' => 'Absent',
-            'register' => 'S\'inscrire',
+            'untranslated' => 'Non traduit',
+        ],
+        'users/account' => [
+            'untranslated' => 'Non traduit',
         ],
     ]);
 
 });
 
-it('replaces dot with unicode', function () {
+it('gets missing translations', function () {
     $translator = new Translator(
         driver: $this->getPhpDriver(),
+        searchcodeService: $this->getSearchCodeService()
     );
 
-    $translations = $translator->getTranslations('fr_CA');
+    $keys = $translator->getMissingTranslations('fr');
 
-    expect($translations->toArray())->toBe([
-        'dotted' => [
-            'This key contains a dot&#46; In the middle' => [
-                'And it &#46; ha&#46;s children&#46;' => 'And it has children.',
+    expect($keys)->toBe([
+        'All rights reserved.' => [
+            'count' => 1,
+            'files' => [
+                $this->formatPath($this->getResourcesPath().'/views/json/foo.blade.php'),
             ],
+        ],
+        'This one is missing' => [
+            'count' => 1,
+            'files' => [
+                $this->formatPath($this->getResourcesPath().'/views/json/foo.blade.php'),
+            ],
+        ],
+        'This one is untranslated' => [
+            'count' => 1,
+            'files' => [
+                $this->formatPath($this->getResourcesPath().'/views/json/foo.blade.php'),
+            ],
+        ],
+        'messages.missing' => [
+            'count' => 2,
+            'files' => [
+                $this->formatPath($this->getResourcesPath().'/views/foo.blade.php'),
+            ],
+        ],
+        'messages.nested.missing' => [
+            'count' => 1,
+            'files' => [
+                $this->formatPath($this->getResourcesPath().'/views/foo.blade.php'),
+            ],
+        ],
+    ]);
+
+});
+
+it('gets dead translations', function () {
+
+    $translator = new Translator(
+        driver: $this->getPhpDriver(),
+        ignoredTranslations: $this->getIgnoredTranslations(),
+        searchcodeService: $this->getSearchCodeService()
+    );
+
+    $dead = $translator->getDeadTranslations('fr');
+
+    expect($dead->dot()->keys()->toArray())->toBe([
+        'messages.nested.title',
+        'messages.nested.array.0',
+        'messages.nested.array.1',
+        'messages.nested.untranslated',
+        'messages.untranslated',
+        'users/account.untranslated',
+    ]);
+
+});
+
+it('replaces dot with unicode', function () {
+    $driver = $this->getPhpDriver();
+
+    $translations = $driver->getTranslations('fr_CA');
+
+    expect($translations->get('dot'))->toBe([
+        'with&#46;dot' => 'Avec . point',
+        'nested' => [
+            'with&#46;dot' => 'Avec . point',
         ],
     ]);
 
@@ -157,12 +174,28 @@ it('doesn\'t break keys with dot', function () {
 
     $translator->saveTranslations('fr_CA', $translations);
 
-    expect($translator->getTranslations('fr_CA')->toArray())->toBe([
-        'dotted' => [
-            'This key contains a dot&#46; In the middle' => [
-                'And it &#46; ha&#46;s children&#46;' => 'And it has children.',
-            ],
+    expect($translator->getTranslations('fr_CA')->get('dot'))->toBe([
+        'with&#46;dot' => 'Avec . point',
+        'nested' => [
+            'with&#46;dot' => 'Avec . point',
         ],
     ]);
 
+});
+
+it('gets nested folder as subdrivers', function () {
+    $driver = $this->getPhpDriver();
+
+    $subDrivers = $driver->getSubDrivers();
+
+    $subDriversKeys = array_map(
+        fn ($driver) => $driver->getKey(),
+        $subDrivers
+    );
+
+    expect($subDriversKeys)->tobe([
+        $driver->storage->path($this->formatPath('en/')),
+        $driver->storage->path($this->formatPath('fr/')),
+        $driver->storage->path($this->formatPath('package/')),
+    ]);
 });

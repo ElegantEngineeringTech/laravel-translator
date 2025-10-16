@@ -21,17 +21,3 @@ it('transform an array into a file', function () {
         "<?php\n\ndeclare(strict_types=1);\n\nreturn [\n    'Login' => 'Login',\n    'Don\'t have an account?' => 'Don\'t have an account?',\n    'nested' => [\n        'Don\'t have an account?' => 'Don\'t have an account?',\n    ],\n];\n"
     );
 });
-
-it('gets nested folder as subdrivers', function () {
-    $driver = $this->getPhpDriver();
-
-    $subDrivers = $driver->getSubDrivers();
-
-    $subDriversKeys = collect($subDrivers)->map(fn ($driver) => $driver->getKey())->all();
-
-    expect($subDriversKeys)->tobe([
-        $driver->storage->path($this->formatPath('sublang/')),
-        $driver->storage->path($this->formatPath('sublang/subsublang/')),
-        $driver->storage->path($this->formatPath('vendorlang/package/')),
-    ]);
-});

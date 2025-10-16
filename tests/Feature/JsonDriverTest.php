@@ -9,7 +9,7 @@ it('gets locales', function () {
         driver: $this->getJsonDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['fr']);
+    expect($translator->getLocales())->toBe(['fr', 'it']);
 });
 
 it('gets translations', function () {
@@ -21,11 +21,12 @@ it('gets translations', function () {
 
     expect($translations->toArray())->toBe([
         'All rights reserved.' => 'Tous droits réservés.',
-        'This one is used.' => 'Celui-ci est utilisé.',
+        'This one is untranslated' => 'Celui-ci est manquant',
+        'This one is dead' => 'Celui-ci est mort',
     ]);
 });
 
-it('gets undefined translations', function () {
+it('gets missing translations', function () {
     $translator = new Translator(
         driver: $this->getJsonDriver(),
         searchcodeService: $this->getSearchCodeService()
@@ -34,29 +35,34 @@ it('gets undefined translations', function () {
     $keys = $translator->getMissingTranslations('fr');
 
     expect($keys)->toBe([
-        'messages.dummy.class' => [
+        'This one is missing' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($this->getAppPath().'/DummyClass.php'),
+                $this->formatPath($this->getResourcesPath().'/views/json/foo.blade.php'),
             ],
         ],
-        'messages.dummy.component' => [
+        'messages.missing' => [
+            'count' => 2,
+            'files' => [
+                $this->formatPath($this->getResourcesPath().'/views/foo.blade.php'),
+            ],
+        ],
+        'messages.nested.missing' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($this->getResourcesPath().'/components/dummy-component.blade.php'),
+                $this->formatPath($this->getResourcesPath().'/views/foo.blade.php'),
             ],
         ],
-        'messages.dummy.nested' => [
+        'messages.title' => [
             'count' => 1,
             'files' => [
-                $this->formatPath($this->getResourcesPath().'/views/dummy-view.blade.php'),
+                $this->formatPath($this->getAppPath().'/Foo.php'),
             ],
         ],
-        'messages.dummy.view' => [
-            'count' => 3,
+        'users/account.title' => [
+            'count' => 1,
             'files' => [
-                $this->formatPath($this->getResourcesPath().'/components/dummy-component.blade.php'),
-                $this->formatPath($this->getResourcesPath().'/views/dummy-view.blade.php'),
+                $this->formatPath($this->getResourcesPath().'/components/users/account.blade.php'),
             ],
         ],
     ]);
@@ -72,12 +78,12 @@ it('gets dead translations', function () {
     $dead = $translator->getDeadTranslations('fr');
 
     expect($dead->keys())->toBe([
-        'All rights reserved.',
+        'This one is dead',
     ]);
 
 });
 
-it('gets missing translations', function () {
+it('gets untranslated translations', function () {
     $translator = new Translator(
         driver: $this->getJsonDriver(),
         searchcodeService: $this->getSearchCodeService()
@@ -85,12 +91,11 @@ it('gets missing translations', function () {
 
     $keys = $translator->getUntranslatedTranslations(
         source: 'fr',
-        target: 'en'
+        target: 'it'
     );
 
     expect($keys->toArray())->toBe([
-        'All rights reserved.' => 'Tous droits réservés.',
-        'This one is used.' => 'Celui-ci est utilisé.',
+        'This one is untranslated' => 'Celui-ci est manquant',
     ]);
 
 });

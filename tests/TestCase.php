@@ -19,9 +19,14 @@ class TestCase extends Orchestra
     public function getExcludedPaths(): array
     {
         return [
-            'ignored',
+            'IgnoredClass',
             'ignored.blade.php',
         ];
+    }
+
+    public function getIgnoredTranslations(): array
+    {
+        return ['messages.ignored'];
     }
 
     public function formatPath(string $value): string

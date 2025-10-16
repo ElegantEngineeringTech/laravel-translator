@@ -15,8 +15,12 @@ use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 
 class Translator
 {
+    /**
+     * @param  string[]  $ignoredTranslations
+     */
     final public function __construct(
         public Driver $driver,
+        public array $ignoredTranslations = [],
         public ?TranslateServiceInterface $translateService = null,
         public ?ProofreadServiceInterface $proofreadService = null,
         public ?SearchCodeServiceInterface $searchcodeService = null,
@@ -29,6 +33,7 @@ class Translator
     {
         return new static(
             driver: $name instanceof Driver ? $name : TranslatorServiceProvider::getDriverFromConfig($name),
+            ignoredTranslations: $this->ignoredTranslations,
             translateService: $this->translateService,
             proofreadService: $this->proofreadService,
             searchcodeService: $this->searchcodeService,
@@ -40,6 +45,7 @@ class Translator
     {
         return new static(
             driver: $this->driver,
+            ignoredTranslations: $this->ignoredTranslations,
             translateService: $this->translateService,
             proofreadService: $service,
             searchcodeService: $this->searchcodeService,
@@ -51,6 +57,7 @@ class Translator
     {
         return new static(
             driver: $this->driver,
+            ignoredTranslations: $this->ignoredTranslations,
             translateService: $service,
             proofreadService: $this->proofreadService,
             searchcodeService: $this->searchcodeService,
@@ -62,6 +69,7 @@ class Translator
     {
         return new static(
             driver: $this->driver,
+            ignoredTranslations: $this->ignoredTranslations,
             translateService: $this->translateService,
             proofreadService: $this->proofreadService,
             searchcodeService: $service,
@@ -79,9 +87,11 @@ class Translator
         }
 
         if ($validator = TranslatorServiceProvider::getLocaleValidator()) {
+            $validator = $validator::make();
+
             return array_values(array_filter(
                 $this->driver->getLocales(),
-                fn ($locale) => $validator::make()->isValid($locale),
+                fn ($locale) => $validator->isValid($locale),
             ));
         }
 
@@ -125,9 +135,7 @@ class Translator
         );
 
         return collect($keys)
-            ->filter(function ($value, $key) use ($translations) {
-                return ! $translations->has($key);
-            })
+            ->filter(fn ($value, $key) => ! $translations->has($key))
             ->all();
     }
 
@@ -140,11 +148,14 @@ class Translator
             throw TranslatorServiceException::missingSearchcodeService();
         }
 
-        $defined = $this->searchcodeService->filesByTranslations();
+        $keys = array_keys($this->searchcodeService->filesByTranslations());
 
         return $this
             ->getTranslations($locale)
-            ->except(array_keys($defined));
+            ->except([
+                ...$this->ignoredTranslations,
+                ...$keys,
+            ]);
     }
 
     public function getUntranslatedTranslations(

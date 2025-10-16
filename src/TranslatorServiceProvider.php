@@ -61,6 +61,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         $this->app->scoped(Translator::class, function () {
             return new Translator(
                 driver: static::getDriverFromConfig(),
+                ignoredTranslations: static::getIgnoredTranslationsFromConfig(),
                 translateService: static::getTranslateServiceFromConfig(),
                 proofreadService: static::getProofreadServiceFromConfig(),
                 searchcodeService: static::getSearchcodeServiceFromConfig(),
@@ -78,6 +79,14 @@ class TranslatorServiceProvider extends PackageServiceProvider
             'json' => JsonDriver::make(),
             default => $driver::make(),
         };
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getIgnoredTranslationsFromConfig(): array
+    {
+        return (array) config('translator.searchcode.ignored_translations');
     }
 
     public static function getTranslateServiceFromConfig(?string $serviceName = null): ?TranslateServiceInterface
