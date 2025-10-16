@@ -216,7 +216,7 @@ class PhpParserService implements SearchCodeServiceInterface
                         $translations = static::scanCode($content);
                     } catch (\Throwable $th) {
                         throw new Exception(
-                            "File can't be parsed: {$file->getPath()}. Your file might contain a syntax error. You can either fix the file or add it to the ignored path.",
+                            "File can't be parsed: {$file->getRealPath()}. Your file might contain a syntax error. You can either fix the file or add it to the ignored path.",
                             code: 422,
                             previous: $th
                         );
