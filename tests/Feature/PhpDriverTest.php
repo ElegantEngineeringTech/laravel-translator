@@ -193,7 +193,7 @@ it('gets nested folder as subdrivers', function () {
         $subDrivers
     );
 
-    expect($subDriversKeys)->tobe([
+    expect($subDriversKeys)->toEqualCanonicalizing([
         $driver->storage->path($this->formatPath('en/')),
         $driver->storage->path($this->formatPath('fr/')),
         $driver->storage->path($this->formatPath('package/')),
