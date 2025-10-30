@@ -84,6 +84,8 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
+                'concurrency' => true,
+                'chunk' => 10,
                 'model' => 'gpt-4.1-mini',
                 'prompt' => '
                     # Role: 
@@ -122,6 +124,8 @@ return [
         'service' => null,
         'services' => [
             'openai' => [
+                'concurrency' => true,
+                'chunk' => 10,
                 'model' => 'gpt-4.1-mini',
                 'prompt' => '
                     # Role:

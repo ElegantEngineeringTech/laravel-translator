@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Elegantly\Translator\Services\Translate;
 
-use Closure;
+use Elegantly\Translator\Services\AbstractOpenAiService;
+use Illuminate\Support\Facades\Concurrency;
 use InvalidArgumentException;
 use OpenAI;
 
-class OpenAiService implements TranslateServiceInterface
+class OpenAiService extends AbstractOpenAiService implements TranslateServiceInterface
 {
     public function __construct(
         public \OpenAI\Client $client,
         public string $model,
         public string $prompt,
+        public bool $concurrency,
+        public int $chunk,
     ) {
         //
     }
@@ -24,6 +27,8 @@ class OpenAiService implements TranslateServiceInterface
             client: static::makeClient(),
             model: config('translator.translate.services.openai.model'),
             prompt: config('translator.translate.services.openai.prompt'),
+            concurrency: config('translator.translate.services.openai.concurrency') ?? true,
+            chunk: config('translator.translate.services.openai.chunk') ?? 10,
         );
     }
 
@@ -53,62 +58,88 @@ class OpenAiService implements TranslateServiceInterface
 
     public static function getTimeout(): int
     {
-        return (int) (config('translator.translate.services.openai.request_timeout') ?? config('translator.services.openai.request_timeout') ?? 120);
+        return (int) (config('translator.translate.services.openai.request_timeout') ?? parent::getTimeout());
     }
 
     /**
-     * @template TValue
-     *
-     * @param  (Closure():TValue)  $callback
-     * @return TValue
+     * @param  array<array-key, null|scalar>  $texts
+     * @return array<array-key, null|scalar>
      */
-    protected function withTemporaryTimeout(int $limit, Closure $callback): mixed
+    public function translateAllWithConcurrency(array $texts, string $targetLocale): array
     {
-        $initial = (int) ini_get('max_execution_time');
+        $model = $this->model;
+        $prompt = $this->prompt;
 
-        set_time_limit($limit);
+        $tasks = collect($texts)
+            ->chunk($this->chunk)
+            ->map(function ($chunk) use ($model, $prompt, $targetLocale) {
 
-        try {
-            return $callback();
-        } catch (\Throwable $th) {
-            throw $th;
-        } finally {
-            set_time_limit($initial);
-        }
+                return function () use ($model, $prompt, $targetLocale, $chunk) {
+                    $response = static::makeClient()->chat()->create([
+                        'model' => $model,
+                        'response_format' => ['type' => 'json_object'],
+                        'messages' => [
+                            [
+                                'role' => 'system',
+                                'content' => str_replace('{targetLocale}', $targetLocale, $prompt),
+                            ],
+                            [
+                                'role' => 'user',
+                                'content' => $chunk->toJson(),
+                            ],
+                        ],
+                    ]);
+
+                    $content = $response->choices[0]->message->content;
+                    $content = str_replace('\\\/', "\/", $content);
+                    $translations = json_decode($content, true);
+
+                    return $translations;
+                };
+            })
+            ->all();
+
+        $results = $this->withTemporaryTimeout(
+            static::getTimeout() * count($tasks),
+            fn () => Concurrency::run($tasks),
+        );
+
+        return collect($results)->collapse()->toArray();
     }
 
     public function translateAll(array $texts, string $targetLocale): array
     {
+        if ($this->concurrency) {
+            return $this->translateAllWithConcurrency($texts, $targetLocale);
+        }
+
+        $chunks = collect($texts)->chunk($this->chunk);
+
         return $this->withTemporaryTimeout(
-            static::getTimeout(),
-            function () use ($texts, $targetLocale) {
-                return collect($texts)
-                    ->chunk(50)
-                    ->map(function ($chunk) use ($targetLocale) {
-                        $response = $this->client->chat()->create([
-                            'model' => $this->model,
-                            'response_format' => ['type' => 'json_object'],
-                            'messages' => [
-                                [
-                                    'role' => 'system',
-                                    'content' => str_replace('{targetLocale}', $targetLocale, $this->prompt),
-                                ],
-                                [
-                                    'role' => 'user',
-                                    'content' => $chunk->toJson(),
-                                ],
-                            ],
-                        ]);
+            static::getTimeout() * count($chunks),
+            fn () => $chunks->map(function ($chunk) use ($targetLocale) {
 
-                        $content = $response->choices[0]->message->content;
-                        $content = str_replace('\\\/', "\/", $content);
-                        $translations = json_decode($content, true);
+                $response = $this->client->chat()->create([
+                    'model' => $this->model,
+                    'response_format' => ['type' => 'json_object'],
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => str_replace('{targetLocale}', $targetLocale, $this->prompt),
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => $chunk->toJson(),
+                        ],
+                    ],
+                ]);
 
-                        return $translations;
-                    })
-                    ->collapse()
-                    ->toArray();
-            }
+                $content = $response->choices[0]->message->content;
+                $content = str_replace('\\\/', "\/", $content);
+                $translations = json_decode($content, true);
+
+                return $translations;
+            })->collapse()->toArray()
         );
 
     }
