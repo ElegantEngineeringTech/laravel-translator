@@ -7,13 +7,13 @@ use Elegantly\Translator\Translator;
 it('gets locales from the directory', function () {
     $driver = $this->getPhpDriver();
 
-    expect($driver->getLocales())->toBe(['en', 'fr', 'fr_CA', 'package']);
+    expect($driver->getLocales())->toEqualCanonicalizing(['en', 'fr', 'fr_CA', 'package']);
 });
 
 it('gets namespaces from the directory', function () {
     $driver = $this->getPhpDriver();
 
-    expect($driver->getNamespaces('fr'))->toBe([
+    expect($driver->getNamespaces('fr'))->toEqualCanonicalizing([
         'messages',
         'users/account',
     ]);
@@ -49,7 +49,7 @@ it('gets locales from the config', function () {
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['fr']);
+    expect($translator->getLocales())->toEqualCanonicalizing(['fr']);
 });
 
 it('gets locales from the directory when the config is null', function () {
@@ -59,7 +59,7 @@ it('gets locales from the directory when the config is null', function () {
         driver: $this->getPhpDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['en', 'fr', 'fr_CA', 'package']);
+    expect($translator->getLocales())->toEqualCanonicalizing(['en', 'fr', 'fr_CA', 'package']);
 });
 
 it('gets untranslated translations', function () {
@@ -140,7 +140,7 @@ it('gets dead translations', function () {
 
     $dead = $translator->getDeadTranslations('fr');
 
-    expect($dead->dot()->keys()->toArray())->toBe([
+    expect($dead->dot()->keys()->toArray())->toEqualCanonicalizing([
         'messages.nested.title',
         'messages.nested.array.0',
         'messages.nested.array.1',

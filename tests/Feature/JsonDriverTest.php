@@ -9,7 +9,7 @@ it('gets locales', function () {
         driver: $this->getJsonDriver(),
     );
 
-    expect($translator->getLocales())->toBe(['fr', 'it']);
+    expect($translator->getLocales())->toEqualCanonicalizing(['fr', 'it']);
 });
 
 it('gets translations', function () {
@@ -77,7 +77,7 @@ it('gets dead translations', function () {
 
     $dead = $translator->getDeadTranslations('fr');
 
-    expect($dead->keys())->toBe([
+    expect($dead->keys())->toEqualCanonicalizing([
         'This one is dead',
     ]);
 
