@@ -69,13 +69,15 @@ class OpenAiService extends AbstractOpenAiService implements ProofreadServiceInt
     {
         $prompt = $this->prompt;
 
+        $model = $this->model;
+
         $tasks = collect($texts)
             ->chunk($this->chunk)
-            ->map(function ($chunk) use ($prompt) {
+            ->map(function ($chunk) use ($model, $prompt) {
 
-                return function () use ($prompt, $chunk) {
+                return function () use ($model, $prompt, $chunk) {
                     $response = static::makeClient()->chat()->create([
-                        'model' => $this->model,
+                        'model' => $model,
                         'response_format' => ['type' => 'json_object'],
                         'messages' => [
                             [
