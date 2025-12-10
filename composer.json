@@ -26,7 +26,7 @@
         "spatie/laravel-package-tools": "^1.16",
         "spatie/simple-excel": "^3.7",
         "symfony/finder": "^6.0||^7.0",
-        "symfony/intl": "^7.2"
+        "symfony/intl": "^7.2||^8.0"
     },
     "require-dev": {
         "larastan/larastan": "^2.9||^3.0",
