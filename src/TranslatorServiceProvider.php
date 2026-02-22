@@ -20,11 +20,11 @@ use Elegantly\Translator\Drivers\JsonDriver;
 use Elegantly\Translator\Drivers\PhpDriver;
 use Elegantly\Translator\Services\Exporter\CsvExporterService;
 use Elegantly\Translator\Services\Exporter\ExporterInterface;
-use Elegantly\Translator\Services\Proofread\OpenAiService as ProofreadOpenAiService;
+use Elegantly\Translator\Services\Proofread\PrismService as ProofreadPrismService;
 use Elegantly\Translator\Services\Proofread\ProofreadServiceInterface;
 use Elegantly\Translator\Services\SearchCode\PhpParserService;
 use Elegantly\Translator\Services\SearchCode\SearchCodeServiceInterface;
-use Elegantly\Translator\Services\Translate\OpenAiService;
+use Elegantly\Translator\Services\Translate\PrismService;
 use Elegantly\Translator\Services\Translate\TranslateServiceInterface;
 use Elegantly\Translator\Support\LocaleValidator;
 use Spatie\LaravelPackageTools\Package;
@@ -99,7 +99,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         }
 
         return match ($service) {
-            'openai' => OpenAiService::make(),
+            'prism','openai' => PrismService::make(),
             default => $service::make(),
         };
     }
@@ -114,7 +114,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
         }
 
         return match ($service) {
-            'openai' => ProofreadOpenAiService::make(),
+            'prism','openai' => ProofreadPrismService::make(),
             default => $service::make(),
         };
     }

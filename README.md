@@ -9,12 +9,12 @@
 
 Easily manage all your Laravel translation strings with powerful features:
 
--   **Translate** strings into other languages using OpenAI, Claude, Gemini or custom services.
--   **Proofread** translations to fix grammar and syntax automatically (using OpenAI, Claude, Gemini or custom service).
--   **Find missing** translation strings across locales.
--   **Detect unused** translation keys in your codebase.
--   **Sort** translations in natural order.
--   **Import & Export** translations in a CSV file.
+- **Translate** strings into other languages using OpenAI, Claude, Gemini or custom services.
+- **Proofread** translations to fix grammar and syntax automatically (using OpenAI, Claude, Gemini or custom service).
+- **Find missing** translation strings across locales.
+- **Detect unused** translation keys in your codebase.
+- **Sort** translations in natural order.
+- **Import & Export** translations in a CSV file.
 
 ---
 
@@ -41,8 +41,9 @@ Easily manage all your Laravel translation strings with powerful features:
     - [CLI Commands](#cli-commands)
     - [Using Code](#using-code)
 1. [Automatic Translation](#automatic-translation)
-    - [Configuring OpenAI](#configuring-openai)
+    - [Configuring Prism](#configuring-prism)
     - [Using Claude](#using-claude)
+    - [Using Gemini](#using-gemini)
     - [CLI Translation](#cli-translation)
     - [Programmatic Translation](#programmatic-translation)
 1. [Proofreading Translations](#proofreading-translations)
@@ -98,8 +99,8 @@ php artisan vendor:publish --tag="translator-config"
 
 This package uses a driver-based architecture. By default, it supports two standard drivers: PHP and JSON.
 
--   Use the `PHP` driver if you store your translation strings in `.php` files, such as `/lang/en/message.php`.
--   Use the `JSON` driver if you store your translation strings in `.json` files, such as `/lang/fr.json`.
+- Use the `PHP` driver if you store your translation strings in `.php` files, such as `/lang/en/message.php`.
+- Use the `JSON` driver if you store your translation strings in `.json` files, such as `/lang/fr.json`.
 
 You can also create custom drivers for alternative storage methods, such as a database.
 
@@ -159,20 +160,20 @@ Service: `searchcode`.
 
 Features:
 
--   [Detecting Missing Translations](#detecting-missing-translations)
--   [Detecting Dead Translations](#detecting-dead-translations)
+- [Detecting Missing Translations](#detecting-missing-translations)
+- [Detecting Dead Translations](#detecting-dead-translations)
 
 Both the detection of dead and missing translations rely on scanning your code.
 
--   **Missing translations** are keys found in your codebase but missing in translation files.
--   **Dead translations** are keys defined in your translation files but unused in your codebase.
+- **Missing translations** are keys found in your codebase but missing in translation files.
+- **Dead translations** are keys defined in your translation files but unused in your codebase.
 
 ### Requirements
 
 At the moment, this package can only scan the following files:
 
--   `.php`
--   `.blade.php`
+- `.php`
+- `.blade.php`
 
 > [!NOTE]
 > If you use a React or Vue frontend, it would not be able to scan those files, making this feature irrelevant.
@@ -181,21 +182,21 @@ The default detector uses `nikic/php-parser` to scan all your `.php` files, incl
 
 In order to be able to detect your keys, you will have to use one of the following Laravel function:
 
--   `__(...)`,
--   `trans(...)`
--   `trans_choice(...)`
--   `\Illuminate\Support\Facades\Lang::get(...)`
--   `\Illuminate\Support\Facades\Lang::has(...)`
--   `\Illuminate\Support\Facades\Lang::hasForLocale(...)`
--   `\Illuminate\Support\Facades\Lang::choice(...)`
--   `app('translator')->get(...)`
--   `app('translator')->has(...)`
--   `app('translator')->hasForLocale(...)`
--   `app('translator')->choice(...)`
+- `__(...)`,
+- `trans(...)`
+- `trans_choice(...)`
+- `\Illuminate\Support\Facades\Lang::get(...)`
+- `\Illuminate\Support\Facades\Lang::has(...)`
+- `\Illuminate\Support\Facades\Lang::hasForLocale(...)`
+- `\Illuminate\Support\Facades\Lang::choice(...)`
+- `app('translator')->get(...)`
+- `app('translator')->has(...)`
+- `app('translator')->hasForLocale(...)`
+- `app('translator')->choice(...)`
 
 Or one of the following Laravel Blade directive:
 
--   `@lang(...)`
+- `@lang(...)`
 
 Here is some example of do's and don'ts:
 
@@ -295,47 +296,63 @@ Service: `translate`.
 
 Before translating, configure a translation service. The package supports:
 
--   **OpenAI**
--   Any model compatible with the OpenAI SDK
+- **Prism (prism-php/prism)**
+- Any Prism provider (OpenAI, Anthropic/Claude, Gemini, Ollama, ...)
 
 Custom translation services can also be implemented.
 
-### Configuring OpenAI
+### Configuring Prism
 
-Define your OpenAI credentials in the configuration file or via environment variables:
+Enable Prism as your translation service in `config/translator.php`:
+
+```php
+return [
+    // ...
+
+    'translate' => [
+        'service' => 'prism',
+        // ...
+    ],
+];
+```
+
+Choose the provider/model used by the translator:
 
 ```php
 return [
     // ...
 
     'services' => [
-        'openai' => [
-            'key' => env('OPENAI_API_KEY'),
-            'organization' => env('OPENAI_ORGANIZATION'),
-            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
-            'base_uri' => env('OPENAI_BASE_URI'),
-            'project' => env('OPENAI_PROJECT'),
+        'prism' => [
+            'provider' => env('TRANSLATOR_PRISM_PROVIDER', 'openai'),
+            'model' => env('TRANSLATOR_PRISM_MODEL', 'gpt-4.1-mini'),
         ],
     ],
 
     // ...
 ];
+```
+
+Prism itself reads provider credentials from `config/prism.php`.
+
+If you haven't published the Prism config yet:
+
+```bash
+php artisan vendor:publish --tag=prism-config
 ```
 
 ### Using Claude
 
-Anthropic offers an [API compatible with the OpenAI SDK](https://docs.anthropic.com/en/api/openai-sdk). To integrate Claude using this SDK, you simply need to update the `base_uri` to point to Anthropic's endpoint and use your Anthropic API key.
-
-Here’s a sample configuration in PHP:
+To translate with Claude via Prism, set the provider to `anthropic` and pick a Claude model:
 
 ```php
 return [
     // ...
 
     'services' => [
-        'openai' => [
-            'key' => env('ANTHROPIC_API_KEY'),
-            'base_uri' => 'https://api.anthropic.com/v1',
+        'prism' => [
+            'provider' => 'anthropic',
+            'model' => 'claude-3-7-sonnet-latest',
         ],
     ],
 
@@ -343,7 +360,26 @@ return [
 ];
 ```
 
-> 💡 **Note:** Ensure your `ANTHROPIC_API_KEY` is set in your environment variables.
+> 💡 **Note:** Ensure your `ANTHROPIC_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
+
+### Using Gemini
+
+To translate with Gemini via Prism, set the provider to `gemini` and pick a Gemini model:
+
+```php
+return [
+    // ...
+
+    'services' => [
+        'prism' => [
+            'provider' => 'gemini',
+            'model' => 'gemini-2.0-flash',
+        ],
+    ],
+];
+```
+
+> 💡 **Note:** Ensure your `GEMINI_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
 
 ### CLI Translation
 
@@ -401,9 +437,9 @@ Service: `proofread`.
 
 Proofreading corrects the grammar and syntax of your translation strings.
 
-Currently, OpenAI is the only built-in service, but custom services can be implemented.
+This package ships with a Prism-based proofreading service (`prism-php/prism`), and custom services can also be implemented.
 
-To configure OpenAI, see [Configuring OpenAI](#configuring-openai).
+Enable it by setting `translator.proofread.service` to `prism`, and configure Prism as described in [Configuring Prism](#configuring-prism).
 
 ### CLI Proofreading
 
@@ -583,8 +619,8 @@ Report security vulnerabilities via GitHub or email.
 
 ## Credits
 
--   [Quentin Gabriele](https://github.com/QuentinGab)
--   [All Contributors](../../contributors)
+- [Quentin Gabriele](https://github.com/QuentinGab)
+- [All Contributors](../../contributors)
 
 ---
 

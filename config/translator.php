@@ -54,16 +54,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Define the API keys for your third-party services. These keys are reused for both 'translate' and 'proofread'.
-    | You can override this configuration and define specific service options, for example, in 'translate.services.openai.key'.
+    | You can override this configuration and define specific service options, for example, in 'translate.services.prism.key'.
     |
     */
     'services' => [
-        'openai' => [
-            'key' => env('OPENAI_API_KEY'),
-            'organization' => env('OPENAI_ORGANIZATION'),
-            'request_timeout' => env('OPENAI_REQUEST_TIMEOUT'),
-            'base_uri' => env('OPENAI_BASE_URL'),
-            'project' => env('OPENAI_PROJECT'),
+        'prism' => [
+            'provider' => env('TRANSLATOR_PRISM_PROVIDER', 'openai'),
+            'model' => env('TRANSLATOR_PRISM_MODEL', 'gpt-4.1-mini'),
+            'provider_config' => null,
+            'timeout' => null,
         ],
     ],
 
@@ -78,15 +77,14 @@ return [
     */
     'translate' => [
         /**
-         * Supported: 'openai', 'MyOwnServiceClass::name'
+         * Supported: 'prism', 'MyOwnServiceClass::name'
          * Define your own service using the class's name: 'MyOwnServiceClass::class'
          */
         'service' => null,
         'services' => [
-            'openai' => [
-                'concurrency' => true,
+            'prism' => [
+                'concurrency' => false,
                 'chunk' => 10,
-                'model' => 'gpt-4.1-mini',
                 'prompt' => '
                     # Role: 
                     You are a professional copywriter and translator specializing in website content localization.
@@ -118,15 +116,14 @@ return [
     */
     'proofread' => [
         /**
-         * Supported: 'openai', 'MyOwnServiceClass::name'
+         * Supported: 'prism', 'MyOwnServiceClass::name'
          * Define your own service using the class's name: 'MyOwnServiceClass::class'
          */
         'service' => null,
         'services' => [
-            'openai' => [
-                'concurrency' => true,
+            'prism' => [
+                'concurrency' => false,
                 'chunk' => 10,
-                'model' => 'gpt-4.1-mini',
                 'prompt' => '
                     # Role:
                     You are a professional copywriter specializing in website content.

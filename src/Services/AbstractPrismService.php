@@ -6,11 +6,11 @@ namespace Elegantly\Translator\Services;
 
 use Closure;
 
-abstract class AbstractOpenAiService
+abstract class AbstractPrismService
 {
     public static function getTimeout(): int
     {
-        return (int) (config('translator.services.openai.request_timeout') ?? 120);
+        return (int) (config('translator.services.prism.timeout') ?? config('translator.services.openai.request_timeout') ?? 120);
     }
 
     /**
