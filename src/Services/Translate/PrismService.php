@@ -24,8 +24,8 @@ class PrismService extends AbstractPrismService implements TranslateServiceInter
     public static function make(): self
     {
         return new self(
-            provider: config('translator.translate.services.prism.provider') ?? config('translator.services.prism.provider'),
-            model: config('translator.translate.services.prism.model') ?? config('translator.services.prism.model'),
+            provider: config('translator.translate.services.prism.provider') ?? config('translator.services.prism.provider') ?? 'openai',
+            model: config('translator.translate.services.prism.model') ?? config('translator.services.prism.model') ?? 'gpt-4.1-mini',
             prompt: config('translator.translate.services.prism.prompt') ?? config('translator.translate.services.openai.prompt'),
             concurrency: config('translator.translate.services.prism.concurrency') ?? config('translator.translate.services.openai.concurrency') ?? false,
             chunk: config('translator.translate.services.prism.chunk') ?? config('translator.translate.services.openai.chunk') ?? 10,
