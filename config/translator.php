@@ -97,6 +97,7 @@ return [
                     - Translate only the values — adapt the tone, clarity, and cultural relevance of the content to suit the target language while remaining faithful to the original intent.
                     - Do not modify or escape any HTML tags included in the text.
                     - Do not alter or escape special characters or emojis.
+                    - Return ONLY raw JSON (no Markdown, no code fences, no extra text).
                     
                     # Output Format:
                     Return a JSON object with the same structure.
@@ -136,6 +137,7 @@ return [
                     - Preserve the original meaning and tone of each sentence.
                     - Do not escape or alter any HTML tags.
                     - Do not escape or change special characters or emojis.
+                    - Return ONLY raw JSON (no Markdown, no code fences, no extra text).
 
                     Output Format:
                     Return a valid JSON object with the corrected text values, keeping the structure and keys unchanged.
