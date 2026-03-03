@@ -29,7 +29,7 @@ class TranslateCommand extends TranslatorCommand implements PromptsForMissingInp
 
         intro('Using driver: '.$translator->driver::class);
 
-        $translations = $$force ? $translator->getTranslations($source)->dot() : $translator->getUntranslatedTranslations($source, $target)->dot();
+        $translations = $force ? $translator->getTranslations($source)->dot() : $translator->getUntranslatedTranslations($source, $target)->dot();
 
         $count = $translations->count();
 
