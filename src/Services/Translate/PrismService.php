@@ -45,29 +45,12 @@ class PrismService extends AbstractPrismService implements TranslateServiceInter
         $tasks = collect($texts)
             ->chunk($this->chunk)
             ->map(function ($chunk) use ($provider, $model, $prompt) {
-
-                return function () use ($provider, $model, $prompt, $chunk) {
-
-                    $response = Prism::text()
-                        ->using($provider, $model)
-                        ->withSystemPrompt($prompt)
-                        ->withPrompt($chunk->toJson())
-                        ->asText();
-
-                    $json = str_replace('\\\/', "\/", $response->text);
-                    $translations = json_decode(
-                        json: $json,
-                        associative: true,
-                        flags: JSON_THROW_ON_ERROR
-                    );
-
-                    return $translations;
-                };
+                return fn () => static::execute($chunk->all(), $provider, $model, $prompt);
             })
             ->all();
 
         $results = $this->withTemporaryTimeout(
-            static::getTimeout() * count($tasks),
+            static::getTimeout(),
             fn () => Concurrency::run($tasks),
         );
 
@@ -88,24 +71,43 @@ class PrismService extends AbstractPrismService implements TranslateServiceInter
             static::getTimeout() * count($chunks),
             fn () => $chunks->map(function ($chunk) use ($prompt) {
 
-                $response = Prism::text()
-                    ->using($this->provider, $this->model)
-                    ->withSystemPrompt($prompt)
-                    ->withPrompt($chunk->toJson())
-                    ->asText();
+                return static::execute($chunk->all(), $this->provider, $this->model, $prompt);
 
-                // 'response_format' => ['type' => 'json_object'],
-
-                $json = str_replace('\\\/', "\/", $response->text);
-                $translations = json_decode(
-                    json: $json,
-                    associative: true,
-                    flags: JSON_THROW_ON_ERROR
-                );
-
-                return $translations;
             })->collapse()->toArray()
         );
 
+    }
+
+    /**
+     * @param  array<array-key, null|scalar>  $texts
+     * @return array<array-key, null|scalar>
+     */
+    public static function execute(
+        array $texts,
+        Provider|string $provider,
+        string $model,
+        string $prompt,
+    ): array {
+        $response = Prism::text()
+            ->using($provider, $model)
+            ->withSystemPrompt($prompt)
+            ->withPrompt(json_encode($texts, JSON_THROW_ON_ERROR))
+            ->asText();
+
+        $json = str($response->text)
+            ->replaceStart('```json\n', '')
+            ->replaceStart('```json', '')
+            ->replaceEnd('```', '')
+            ->replaceEnd('\n```', '')
+            ->replace('\\\/', '\/')
+            ->value();
+
+        $translations = json_decode(
+            json: $json,
+            associative: true,
+            flags: JSON_THROW_ON_ERROR
+        );
+
+        return $translations;
     }
 }

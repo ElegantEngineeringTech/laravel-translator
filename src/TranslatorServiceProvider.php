@@ -13,6 +13,7 @@ use Elegantly\Translator\Commands\LocalesCommand;
 use Elegantly\Translator\Commands\MissingCommand;
 use Elegantly\Translator\Commands\ProofreadCommand;
 use Elegantly\Translator\Commands\SortCommand;
+use Elegantly\Translator\Commands\TranslateCommand;
 use Elegantly\Translator\Commands\UntranslatedCommand;
 use Elegantly\Translator\Contracts\ValidateLocales;
 use Elegantly\Translator\Drivers\Driver;
@@ -53,6 +54,7 @@ class TranslatorServiceProvider extends PackageServiceProvider
                 ClearCacheCommand::class,
                 ExportCommand::class,
                 ImportCommand::class,
+                TranslateCommand::class,
             ]);
     }
 
