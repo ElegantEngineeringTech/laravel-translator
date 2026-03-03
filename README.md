@@ -389,22 +389,41 @@ Display all keys defined in the source locale (English) but not translated in th
 php artisan translator:untranslated en fr
 ```
 
-Translate untranslated English strings into French:
+Specify a driver:
 
 ```bash
-php artisan translator:untranslated en fr --translate
-```
-
-Translate using a specific driver:
-
-```bash
-php artisan translator:untranslated en fr --translate --driver=json
+php artisan translator:untranslated en fr --driver=json
 ```
 
 Add a new locale (French) with their translations from a source (English):
 
 ```bash
 php artisan translator:add-locale fr en --translate
+```
+
+Translate all keys from a source locale (English) into a target locale (French).
+By default, it only translates missing keys:
+
+```bash
+php artisan translator:translate en fr
+```
+
+Force re-translation of all keys (overwrites existing target values):
+
+```bash
+php artisan translator:translate en fr --force
+```
+
+Translate using smaller/larger chunks (defaults to `10`):
+
+```bash
+php artisan translator:translate en fr --chunk=25
+```
+
+Translate using a specific driver:
+
+```bash
+php artisan translator:translate en fr --driver=json
 ```
 
 ### Programmatic Translation

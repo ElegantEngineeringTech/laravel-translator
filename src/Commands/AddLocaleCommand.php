@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Elegantly\Translator\Commands;
 
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Support\Facades\Artisan;
 
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\intro;
 use function Laravel\Prompts\select;
-use function Laravel\Prompts\spin;
-use function Laravel\Prompts\table;
 use function Laravel\Prompts\text;
 
 class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInput
@@ -51,28 +50,12 @@ class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInp
         info("{$locale} added with {$count} keys.");
 
         if ($translate) {
-            $translated = spin(function () use ($translator, $source, $locale, $translations) {
 
-                return $translator->translateTranslations(
-                    source: $source,
-                    target: $locale,
-                    keys: $translations->dot()->keys()->toArray()
-                );
-
-            }, "Translating the {$count} missing translations from '{$source}' to '{$locale}'");
-
-            table(
-                headers: ['Key', "Source {$source}", "Target {$locale}"],
-                rows: $translated
-                    ->dot()
-                    ->map(function ($value, $key) use ($translations) {
-                        return [
-                            (string) $key,
-                            (string) str($translations->getString($key))->limit(25),
-                            (string) str((string) $value)->limit(25),
-                        ];
-                    })->toArray()
-            );
+            return Artisan::call(TranslateCommand::class, [
+                'source' => $source,
+                'target' => $locale,
+                '--driver' => $this->getDriverName(),
+            ]);
         }
 
         return self::SUCCESS;
