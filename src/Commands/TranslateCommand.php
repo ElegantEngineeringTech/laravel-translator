@@ -23,16 +23,13 @@ class TranslateCommand extends TranslatorCommand implements PromptsForMissingInp
         /** @var string $target */
         $target = $this->argument('target');
         $force = (bool) $this->option('force');
-        $chunk = (int) $this->option('chunks');
+        $chunkSize = (int) $this->option('chunk');
 
         $translator = $this->getTranslator();
 
         intro('Using driver: '.$translator->driver::class);
 
-        $translations = match ($force) {
-            true => $translator->getTranslations($source)->dot(),
-            false => $translator->getUntranslatedTranslations($source, $target)->dot(),
-        };
+        $translations = $$force ? $translator->getTranslations($source)->dot() : $translator->getUntranslatedTranslations($source, $target)->dot();
 
         $count = $translations->count();
 
@@ -42,12 +39,14 @@ class TranslateCommand extends TranslatorCommand implements PromptsForMissingInp
             return self::SUCCESS;
         }
 
-        $progress = new Progress("Translating {$source} to {$target}, {$chunk} chunks size.", $count);
+        $progress = new Progress(
+            "Translating {$source} to {$target} (chunk size: {$chunkSize}).",
+            $count
+        );
 
-        $chunks = $translations->chunk($chunk);
+        $chunks = $translations->chunk($chunkSize);
 
         foreach ($chunks as $chunk) {
-
             $translator->translateTranslations(
                 source: $source,
                 target: $target,
@@ -55,7 +54,6 @@ class TranslateCommand extends TranslatorCommand implements PromptsForMissingInp
             );
 
             $progress->advance($chunk->count());
-
         }
 
         $progress->finish();
