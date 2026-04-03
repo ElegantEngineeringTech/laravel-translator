@@ -12,22 +12,42 @@ use function Laravel\Prompts\intro;
 
 class TranslateCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:translate {source} {target} {--force} {--chunk=10} {--driver=}';
+    public $signature = 'translator:translate {source} {--target=*} {--force} {--chunk=10} {--driver=}';
 
     public $description = 'Translate all the translation keys to the target locale.';
 
     public function handle(): int
     {
+        $translator = $this->getTranslator();
+
         /** @var string $source */
         $source = $this->argument('source');
-        /** @var string $target */
-        $target = $this->argument('target');
+        /** @var ?array<int, string> $targets */
+        $targets = $this->option('target') ?: $translator->getLocales();
         $force = (bool) $this->option('force');
         $chunkSize = (int) $this->option('chunk');
 
-        $translator = $this->getTranslator();
-
         intro('Using driver: '.$translator->driver::class);
+
+        foreach ($targets as $target) {
+            if ($target === $source) {
+                continue;
+            }
+
+            $this->handleTarget($source, $target, $force, $chunkSize);
+        }
+
+        return self::SUCCESS;
+    }
+
+    public function handleTarget(
+        string $source,
+        string $target,
+        bool $force,
+        int $chunkSize,
+    ): int {
+
+        $translator = $this->getTranslator();
 
         $translations = $force ? $translator->getTranslations($source)->dot() : $translator->getUntranslatedTranslations($source, $target)->dot();
 
@@ -45,6 +65,8 @@ class TranslateCommand extends TranslatorCommand implements PromptsForMissingInp
         );
 
         $chunks = $translations->chunk($chunkSize);
+
+        $progress->start();
 
         foreach ($chunks as $chunk) {
             $translator->translateTranslations(
