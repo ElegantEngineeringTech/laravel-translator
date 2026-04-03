@@ -10,6 +10,7 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
+use PhpParser\PrettyPrinter\Standard;
 
 class SearchCodeCache
 {
@@ -118,7 +119,7 @@ class SearchCodeCache
 
         $node = new Return_(new Array_($items));
 
-        $prettyPrinter = new \PhpParser\PrettyPrinter\Standard;
+        $prettyPrinter = new Standard;
 
         return $this->storage->put(
             static::FILENAME,
