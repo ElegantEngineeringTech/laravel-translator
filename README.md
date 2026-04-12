@@ -360,7 +360,8 @@ return [
 ];
 ```
 
-> 💡 **Note:** Ensure your `ANTHROPIC_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
+> [!NOTE]
+> Ensure your `ANTHROPIC_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
 
 ### Using Gemini
 
@@ -379,51 +380,57 @@ return [
 ];
 ```
 
-> 💡 **Note:** Ensure your `GEMINI_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
+> [!NOTE]
+> Ensure your `GEMINI_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
 
 ### CLI Translation
 
-Display all keys defined in the source locale (English) but not translated in the target (French):
+Translate all missing keys from English to every configured locale:
 
 ```bash
-php artisan translator:untranslated en fr
+php artisan translator:translate en
 ```
 
-Specify a driver:
+Force re-translation of all keys (overwrites existing values):
 
 ```bash
-php artisan translator:untranslated en fr --driver=json
+php artisan translator:translate en --force
 ```
 
-Add a new locale (French) with their translations from a source (English):
+Translate from English to French:
 
 ```bash
-php artisan translator:add-locale fr en --translate
-```
-
-Translate all keys from a source locale (English) into a target locale (French).
-By default, it only translates missing keys:
-
-```bash
-php artisan translator:translate en fr
-```
-
-Force re-translation of all keys (overwrites existing target values):
-
-```bash
-php artisan translator:translate en fr --force
+php artisan translator:translate en --target=fr
 ```
 
 Translate using smaller/larger chunks (defaults to `10`):
 
 ```bash
-php artisan translator:translate en fr --chunk=25
+php artisan translator:translate en --chunk=25
 ```
 
 Translate using a specific driver:
 
 ```bash
-php artisan translator:translate en fr --driver=json
+php artisan translator:translate en --driver=json
+```
+
+Inspect untranslated keys before translating:
+
+```bash
+php artisan translator:untranslated en fr
+```
+
+Inspect untranslated keys with a specific driver:
+
+```bash
+php artisan translator:untranslated en fr --driver=json
+```
+
+Add a new locale and immediately translate it from an existing source locale:
+
+```bash
+php artisan translator:add-locale fr en --translate
 ```
 
 ### Programmatic Translation
