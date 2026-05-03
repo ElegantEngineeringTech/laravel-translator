@@ -95,7 +95,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     public function notBlank(): static
     {
         return $this->filter(
-            fn($value) => !blank($value)
+            fn ($value) => ! blank($value)
         );
     }
 
