@@ -37,7 +37,7 @@ class PhpTranslations extends Translations
         return Arr::get($this->items, $key);
     }
 
-    public function has(string $key): bool
+    public function has(string|int $key): bool
     {
         return Arr::has($this->items, $key);
     }
@@ -77,7 +77,7 @@ class PhpTranslations extends Translations
     {
         $segment = array_shift($segments);
 
-        if (! array_key_exists($segment, $items)) {
+        if (!array_key_exists($segment, $items)) {
             return;
         }
 
@@ -148,7 +148,7 @@ class PhpTranslations extends Translations
 
         return new static($this->recursiveFilter(
             $this->items,
-            fn ($value) => (bool) $value
+            fn($value) => (bool) $value
         ));
 
     }
@@ -245,7 +245,7 @@ class PhpTranslations extends Translations
             return str_replace('.', '&#46;', $values);
         }
 
-        if (! is_array($values)) {
+        if (!is_array($values)) {
             return $values;
         }
 
@@ -255,7 +255,7 @@ class PhpTranslations extends Translations
 
         return Arr::mapWithKeys(
             $values,
-            fn ($value, $key) => [
+            fn($value, $key) => [
                 static::prepareTranslations($key, true) => static::prepareTranslations($value),
             ]
         );
@@ -271,7 +271,7 @@ class PhpTranslations extends Translations
             return str_replace('&#46;', '.', $values);
         }
 
-        if (! is_array($values)) {
+        if (!is_array($values)) {
             return $values;
         }
 
@@ -281,7 +281,7 @@ class PhpTranslations extends Translations
 
         return Arr::mapWithKeys(
             $values,
-            fn ($value, $key) => [
+            fn($value, $key) => [
                 static::unprepareTranslations($key, true) => static::unprepareTranslations($value),
             ]
         );

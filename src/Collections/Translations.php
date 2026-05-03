@@ -33,7 +33,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
         $this->items = $items instanceof Collection ? $items->all() : $items;
     }
 
-    abstract public function has(string $key): bool;
+    abstract public function has(string|int $key): bool;
 
     /**
      * @return null|scalar|array<array-key, mixed>
@@ -95,7 +95,7 @@ abstract class Translations implements Arrayable, Countable, Jsonable
     public function notBlank(): static
     {
         return $this->filter(
-            fn ($value) => ! blank($value)
+            fn($value) => !blank($value)
         );
     }
 

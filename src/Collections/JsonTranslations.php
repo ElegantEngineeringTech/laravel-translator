@@ -12,7 +12,7 @@ class JsonTranslations extends Translations
 {
     public string $driver = JsonDriver::class;
 
-    public function has(string $key): bool
+    public function has(string|int $key): bool
     {
         return array_key_exists($key, $this->items);
     }
