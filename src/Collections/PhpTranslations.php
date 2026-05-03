@@ -37,7 +37,7 @@ class PhpTranslations extends Translations
         return Arr::get($this->items, $key);
     }
 
-    public function has(string $key): bool
+    public function has(string|int $key): bool
     {
         return Arr::has($this->items, $key);
     }
