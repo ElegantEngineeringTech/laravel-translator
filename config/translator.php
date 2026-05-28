@@ -54,15 +54,16 @@ return [
     |--------------------------------------------------------------------------
     |
     | Define the API keys for your third-party services. These keys are reused for both 'translate' and 'proofread'.
-    | You can override this configuration and define specific service options, for example, in 'translate.services.prism.key'.
+    | You can override this configuration and define specific service options, for example, in 'translate.services.ai.key'.
     |
     */
     'services' => [
-        'prism' => [
-            'provider' => env('TRANSLATOR_PRISM_PROVIDER', 'openai'),
-            'model' => env('TRANSLATOR_PRISM_MODEL', 'gpt-4.1-mini'),
-            'provider_config' => null,
+        'ai' => [
+            'provider' => null,
+            'model' => null,
             'timeout' => null,
+            'chunk' => 10,
+            'concurrency' => false,
         ],
     ],
 
@@ -77,33 +78,28 @@ return [
     */
     'translate' => [
         /**
-         * Supported: 'prism', 'MyOwnServiceClass::name'
+         * Supported: 'ai', 'MyOwnServiceClass::name'
          * Define your own service using the class's name: 'MyOwnServiceClass::class'
          */
-        'service' => null,
-        'services' => [
-            'prism' => [
-                'concurrency' => false,
-                'chunk' => 10,
-                'prompt' => '
-                    # Role: 
-                    You are a professional copywriter and translator specializing in website content localization.
-                    
-                    # Task:
-                    Translate the provided website copy, which is formatted in JSON, into the target locale: {targetLocale}.
-                    
-                    # Instructions:
-                    - Preserve all JSON keys exactly as they are. Do not modify any key names.
-                    - Translate only the values — adapt the tone, clarity, and cultural relevance of the content to suit the target language while remaining faithful to the original intent.
-                    - Do not modify or escape any HTML tags included in the text.
-                    - Do not alter or escape special characters or emojis.
-                    - Return ONLY raw JSON (no Markdown, no code fences, no extra text).
-                    
-                    # Output Format:
-                    Return a JSON object with the same structure.
-                ',
-            ],
-        ],
+        'service' => 'ai',
+
+        'prompt' => '
+            # Role: 
+            You are a professional copywriter and translator specializing in website content localization.
+            
+            # Task:
+            Translate the provided website copy, which is formatted in JSON, into the target locale: {targetLocale}.
+            
+            # Instructions:
+            - Preserve all JSON keys exactly as they are. Do not modify any key names.
+            - Translate only the values — adapt the tone, clarity, and cultural relevance of the content to suit the target language while remaining faithful to the original intent.
+            - Do not modify or escape any HTML tags included in the text.
+            - Do not alter or escape special characters or emojis.
+            - Return ONLY raw JSON (no Markdown, no code fences, no extra text).
+            
+            # Output Format:
+            Return a JSON object with the same structure.
+        ',
     ],
 
     /*
@@ -117,33 +113,28 @@ return [
     */
     'proofread' => [
         /**
-         * Supported: 'prism', 'MyOwnServiceClass::name'
+         * Supported: 'ai', 'MyOwnServiceClass::name'
          * Define your own service using the class's name: 'MyOwnServiceClass::class'
          */
-        'service' => null,
-        'services' => [
-            'prism' => [
-                'concurrency' => false,
-                'chunk' => 10,
-                'prompt' => '
-                    # Role:
-                    You are a professional copywriter specializing in website content.
+        'service' => 'ai',
 
-                    # Task:
-                    Correct the grammar and syntax of the provided JSON.
+        'prompt' => '
+            # Role:
+            You are a professional copywriter specializing in website content.
 
-                    # Instructions:
-                    - Do not modify any JSON keys — only edit the text values.
-                    - Preserve the original meaning and tone of each sentence.
-                    - Do not escape or alter any HTML tags.
-                    - Do not escape or change special characters or emojis.
-                    - Return ONLY raw JSON (no Markdown, no code fences, no extra text).
+            # Task:
+            Correct the grammar and syntax of the provided JSON.
 
-                    Output Format:
-                    Return a valid JSON object with the corrected text values, keeping the structure and keys unchanged.
-                ',
-            ],
-        ],
+            # Instructions:
+            - Do not modify any JSON keys — only edit the text values.
+            - Preserve the original meaning and tone of each sentence.
+            - Do not escape or alter any HTML tags.
+            - Do not escape or change special characters or emojis.
+            - Return ONLY raw JSON (no Markdown, no code fences, no extra text).
+
+            Output Format:
+            Return a valid JSON object with the corrected text values, keeping the structure and keys unchanged.
+        ',
     ],
 
     /*

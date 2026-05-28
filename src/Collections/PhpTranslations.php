@@ -39,6 +39,10 @@ class PhpTranslations extends Translations
 
     public function has(string|int $key): bool
     {
+        if (is_int($key)) {
+            return array_key_exists($key, $this->items);
+        }
+
         return Arr::has($this->items, $key);
     }
 

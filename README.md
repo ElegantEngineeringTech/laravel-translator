@@ -41,9 +41,7 @@ Easily manage all your Laravel translation strings with powerful features:
     - [CLI Commands](#cli-commands)
     - [Using Code](#using-code)
 1. [Automatic Translation](#automatic-translation)
-    - [Configuring Prism](#configuring-prism)
-    - [Using Claude](#using-claude)
-    - [Using Gemini](#using-gemini)
+    - [Configuring the Laravel AI SDK](#configuring-the-laravel-ai-sdk)
     - [CLI Translation](#cli-translation)
     - [Programmatic Translation](#programmatic-translation)
 1. [Proofreading Translations](#proofreading-translations)
@@ -294,94 +292,36 @@ Translator::driver('json')->sortTranslations(locale: 'fr');
 
 Service: `translate`.
 
-Before translating, configure a translation service. The package supports:
+By default, this package uses the Laravel AI SDK (`laravel/ai`) to perform translation requests through an AI provider.
+See the official documentation for more details: [Laravel AI SDK documentation](https://laravel.com/docs/13.x/ai-sdk)
 
-- **Prism (prism-php/prism)**
-- Any Prism provider (OpenAI, Anthropic/Claude, Gemini, Ollama, ...)
+You can also implement your own translation service if you need custom behavior or provider integration.
 
-Custom translation services can also be implemented.
+### Configuring the Laravel AI SDK
 
-### Configuring Prism
-
-Enable Prism as your translation service in `config/translator.php`:
-
-```php
-return [
-    // ...
-
-    'translate' => [
-        'service' => 'prism',
-        // ...
-    ],
-];
-```
-
-Choose the provider/model used by the translator:
+You may override the Laravel AI SDK configuration through the `translator.services.ai` configuration options:
 
 ```php
 return [
     // ...
 
     'services' => [
-        'prism' => [
-            'provider' => env('TRANSLATOR_PRISM_PROVIDER', 'openai'),
-            'model' => env('TRANSLATOR_PRISM_MODEL', 'gpt-4.1-mini'),
-        ],
-    ],
+        'ai' => [
+            'provider' => null,
+            'model' => null,
+            'timeout' => null,
 
-    // ...
-];
-```
+            // Number of items processed per request.
+            'chunk' => 10,
 
-Prism itself reads provider credentials from `config/prism.php`.
-
-If you haven't published the Prism config yet:
-
-```bash
-php artisan vendor:publish --tag=prism-config
-```
-
-### Using Claude
-
-To translate with Claude via Prism, set the provider to `anthropic` and pick a Claude model:
-
-```php
-return [
-    // ...
-
-    'services' => [
-        'prism' => [
-            'provider' => 'anthropic',
-            'model' => 'claude-3-7-sonnet-latest',
-        ],
-    ],
-
-    // ...
-];
-```
-
-> [!NOTE]
-> Ensure your `ANTHROPIC_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
-
-### Using Gemini
-
-To translate with Gemini via Prism, set the provider to `gemini` and pick a Gemini model:
-
-```php
-return [
-    // ...
-
-    'services' => [
-        'prism' => [
-            'provider' => 'gemini',
-            'model' => 'gemini-2.0-flash',
+            // Enable concurrent translation requests.
+            'concurrency' => false,
         ],
     ],
 ];
 ```
 
-> [!NOTE]
-> Ensure your `GEMINI_API_KEY` is configured in `config/prism.php` (or set in your `.env`).
+The Laravel AI SDK reads provider credentials and default settings from the `config/ai.php` configuration file.
 
 ### CLI Translation
 
@@ -461,11 +401,14 @@ Translator::driver('json')->translateTranslations(
 
 Service: `proofread`.
 
-Proofreading corrects the grammar and syntax of your translation strings.
+The proofreading service improves existing translation strings by correcting grammar, spelling, syntax, and wording while preserving the original meaning and translation context.
 
-This package ships with a Prism-based proofreading service (`prism-php/prism`), and custom services can also be implemented.
+By default, this package uses the Laravel AI SDK (`laravel/ai`) to send proofreading requests to an AI provider.
+See the official documentation for more details: [Laravel AI SDK documentation](https://laravel.com/docs/13.x/ai-sdk)
 
-Enable it by setting `translator.proofread.service` to `prism`, and configure Prism as described in [Configuring Prism](#configuring-prism).
+See [Configuring the Laravel AI SDK](#configuring-the-laravel-ai-sdk) for configuration details.
+
+You may also implement a custom proofreading service to integrate a different provider or customize the proofreading workflow.
 
 ### CLI Proofreading
 

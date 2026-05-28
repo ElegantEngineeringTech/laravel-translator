@@ -6,13 +6,8 @@ namespace Elegantly\Translator\Services;
 
 use Closure;
 
-abstract class AbstractPrismService
+abstract class AbstractService
 {
-    public static function getTimeout(): int
-    {
-        return (int) (config('translator.services.prism.timeout') ?? config('translator.services.openai.request_timeout') ?? 120);
-    }
-
     /**
      * @template TValue
      *
@@ -27,8 +22,6 @@ abstract class AbstractPrismService
 
         try {
             return $callback();
-        } catch (\Throwable $th) {
-            throw $th;
         } finally {
             set_time_limit($initial);
         }
