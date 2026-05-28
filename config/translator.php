@@ -88,7 +88,7 @@ return [
             You are a professional copywriter and translator specializing in website content localization.
             
             # Task:
-            Translate the provided website copy, which is formatted in JSON, into the target locale: {targetLocale}.
+            Translate the provided website copy, which is formatted in JSON, into the target locale: {targetLanguage} ({targetLocale}).
             
             # Instructions:
             - Preserve all JSON keys exactly as they are. Do not modify any key names.
