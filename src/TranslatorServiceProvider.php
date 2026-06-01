@@ -72,14 +72,19 @@ class TranslatorServiceProvider extends PackageServiceProvider
         });
     }
 
-    public static function getDriverFromConfig(?string $driverName = null): Driver
-    {
+    /**
+     * @param  array<array-key, mixed>  $config
+     */
+    public static function getDriverFromConfig(
+        ?string $driverName = null,
+        array $config = [],
+    ): Driver {
         $driver = $driverName ?? config('translator.driver');
 
         return match ($driver) {
-            'php' => PhpDriver::make(),
-            'json' => JsonDriver::make(),
-            default => $driver::make(),
+            'php' => PhpDriver::make($config),
+            'json' => JsonDriver::make($config),
+            default => $driver::make($config),
         };
     }
 

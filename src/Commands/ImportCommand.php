@@ -14,7 +14,7 @@ use function Laravel\Prompts\intro;
  */
 class ImportCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:import {path} {--driver=}';
+    public $signature = 'translator:import {path} {--driver=} {--root=}';
 
     public $description = 'Import all the translations from a file.';
 

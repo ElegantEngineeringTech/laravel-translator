@@ -20,17 +20,33 @@ class TranslatorCommand extends Command
         return $this->option('driver');
     }
 
-    public function getTranslator(): Translator
+    public function getRoot(): ?string
     {
-        return \Elegantly\Translator\Facades\Translator::driver(
-            $this->getDriverName()
+        /** @var ?string */
+        return $this->option('root');
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $config
+     */
+    public function getDriver(array $config = []): Driver
+    {
+        return TranslatorServiceProvider::getDriverFromConfig(
+            $this->getDriverName(),
+            array_filter([
+                'root' => $this->getRoot(),
+                ...$config,
+            ])
         );
     }
 
-    public function getDriver(): Driver
+    /**
+     * @param  array<array-key, mixed>  $config
+     */
+    public function getTranslator(array $config = []): Translator
     {
-        return TranslatorServiceProvider::getDriverFromConfig(
-            $this->getDriverName()
+        return \Elegantly\Translator\Facades\Translator::driver(
+            $this->getDriver($config)
         );
     }
 

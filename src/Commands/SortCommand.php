@@ -14,7 +14,7 @@ use function Laravel\Prompts\table;
  */
 class SortCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:sort {locale} {--driver=}';
+    public $signature = 'translator:sort {locale} {--driver=} {--root=}';
 
     public $description = 'Sort all the translation keys in the specified locale using natural order.';
 

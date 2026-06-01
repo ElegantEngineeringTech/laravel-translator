@@ -15,7 +15,7 @@ use function Laravel\Prompts\table;
  */
 class DeadCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:dead {locale} {--sync : Delete the dead keys from your driver} {--driver=}';
+    public $signature = 'translator:dead {locale} {--sync : Delete the dead keys from your driver} {--driver=} {--root=}';
 
     public $description = 'Display all the translation keys not found in the codebase.';
 

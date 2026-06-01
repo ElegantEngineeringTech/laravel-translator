@@ -12,7 +12,7 @@ use function Laravel\Prompts\note;
 
 class LocalesCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:locales {--driver=}';
+    public $signature = 'translator:locales {--driver=} {--root=}';
 
     public $description = 'Retrieve the defined locales.';
 

@@ -15,13 +15,13 @@ use function Laravel\Prompts\table;
  */
 class ProofreadCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:proofread {locale} {--driver=}';
+    public $signature = 'translator:proofread {locale} {--driver=} {--root=}';
 
     public $description = 'Fix grammar and synax of the translations strings in the specified locale.';
 
     public function handle(): int
     {
-        /** @var string $locale */
+        /** @var string */
         $locale = $this->argument('locale');
 
         $translator = $this->getTranslator();

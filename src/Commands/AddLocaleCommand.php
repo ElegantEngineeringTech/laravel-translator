@@ -14,7 +14,7 @@ use function Laravel\Prompts\text;
 
 class AddLocaleCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:add-locale {locale} {source} {--translate} {--driver=}';
+    public $signature = 'translator:add-locale {locale} {source} {--translate} {--driver=} {--root=}';
 
     public $description = 'Add a new locale with all keys';
 

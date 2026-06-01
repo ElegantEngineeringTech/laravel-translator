@@ -14,7 +14,7 @@ use function Laravel\Prompts\table;
 
 class MissingCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:missing {locale} {--sync : Add the missing keys to your driver} {--driver=}';
+    public $signature = 'translator:missing {locale} {--sync : Add the missing keys to your driver} {--driver=} {--root=}';
 
     public $description = 'Display all the translation keys found in the codebase but not in the driver.';
 

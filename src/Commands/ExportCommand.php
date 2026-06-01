@@ -14,7 +14,7 @@ use function Laravel\Prompts\intro;
  */
 class ExportCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:export {path} {--driver=}';
+    public $signature = 'translator:export {path} {--driver=} {--root=}';
 
     public $description = 'Export all the translations in a file.';
 

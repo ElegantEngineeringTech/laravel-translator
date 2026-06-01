@@ -12,7 +12,7 @@ use function Laravel\Prompts\intro;
 
 class TranslateCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:translate {source} {--target=*} {--force} {--chunk=10} {--driver=}';
+    public $signature = 'translator:translate {source} {--target=*} {--force} {--chunk=10} {--driver=} {--root=}';
 
     public $description = 'Translate all the translation keys to the target locale.';
 

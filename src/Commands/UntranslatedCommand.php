@@ -12,7 +12,7 @@ use function Laravel\Prompts\table;
 
 class UntranslatedCommand extends TranslatorCommand implements PromptsForMissingInput
 {
-    public $signature = 'translator:untranslated {source} {target} {--driver=}';
+    public $signature = 'translator:untranslated {source} {target} {--driver=} {--root=}';
 
     public $description = 'Display all the translation keys defined in the source locale but not in the target locale.';
 
