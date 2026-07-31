@@ -59,10 +59,10 @@ return [
     */
     'services' => [
         'ai' => [
-            'provider' => null,
-            'model' => null,
-            'timeout' => null,
-            'chunk' => 10,
+            'provider' => 'openai',
+            'model' => 'gpt-5.6-luna',
+            'timeout' => 60 * 5,
+            'chunk' => 50,
             'concurrency' => false,
         ],
     ],
